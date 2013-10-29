@@ -1,37 +1,60 @@
-/**
- * Example Gruntfile for Mocha setup
- */
-
 'use strict';
 
 module.exports = function(grunt) {
-
 	grunt.initConfig({
+		pkg: grunt.file.readJSON('package.json'),
+
 		mocha: {
-			all: [],
+			all: {
+				options: {
+					urls: ['test/*.unittests.html']
+				}
+			},
 			options: {
 				reporter: 'Spec',
+				timeout: 20000
 			}
 		}
 	});
 
-	grunt.loadTasks('tasks');
+	grunt.loadNpmTasks('grunt-mocha');
 
-	var rootJsLib = 'C:/vp/playpens/development/subversion/Web/www/vp/JS-Lib/';
+	grunt.registerTask('testConnect', 'Test a connection to the js-test-env server.', function () {
+		var done = this.async();
 
-	grunt.registerTask('findTests', function (target) {
-		var config = grunt.config.get('mocha');
-		var files = grunt.file.expand([
-			rootJsLib + '/**/*.tests.html'
-		]);
-		console.log(files);
-		var urls = grunt.util._.map(files, function (file)
-		{
-			return 'http://localhost.us/vp/JS-Lib/' + file.replace(rootJsLib, '');
+		function fail(msg) {
+			console.error(msg);
+			process.exit(1);
+		}
+
+		// first make sure the web server is running
+		require('http').get({
+			host: 'localhost',
+			port: 8981,
+			path: '/alive',
+			timeout: 30
+		}, function (res) {
+			if (res.statusCode == 200) {
+				done();
+			} else {
+				fail('JavaScript Test Environment: unknown error with web server');
+			}
+		}).on('error', function(e) {
+			fail('JavaScript Test Environment: web server is not running, use `npm run`.');
 		});
-		config.options.urls = urls;
+	});
+
+	grunt.registerTask('findTests', 'Locate all tests and generate an array of test URLs.', function () {
+		var findTests = require('./lib/utils').findTests;
+		var config = grunt.config.get('mocha');
+
+		config.all.options.urls = findTests().map(function (test) {
+			return 'http://localhost:8981' + test.url;
+		});
+
 		grunt.config.set('mocha', config);
 	});
 
-	grunt.task.registerTask('test', ['findTests', 'mocha']);
+	grunt.registerTask('test', ['testConnect', 'findTests', 'mocha']);
+	grunt.registerTask('test-bypass', ['findTests', 'mocha']);
 };

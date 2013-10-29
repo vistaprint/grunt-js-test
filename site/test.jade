@@ -1,0 +1,25 @@
+!!! 5
+html(lang='en')
+	head
+		title JS Test Env
+		meta(charset='utf-8')
+		meta(name='viewport', content='width=device-width, initial-scale=1.0')
+		meta(name='description', content='')
+		meta(name='author', content='')
+		link(rel='stylesheet', href='/vp/JS-Lib/js-test-env/site.css', media='screen')
+		link(rel='stylesheet', href='/vp/JS-Lib/js-test-env/mocha.css', media='screen')
+	body
+		div(id='mocha')
+
+		//- global deps
+		script(src='/vp/JS-Lib/js-test-env/mocha.js')
+		script(src='/vp/JS-Lib/js-test-env/chai.js')
+		script(src='/vp/JS-Lib/js-test-env/shared.js')
+
+		//- test-specific deps, test file should be last in list
+		- for (var i=0; i<deps.length; i++) {
+			script(src=deps[i])
+		- }
+
+		//- bootstrap file, not important when automating
+		script(src='http://getbootstrap.com/dist/js/bootstrap.min.js')
