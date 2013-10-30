@@ -40,7 +40,7 @@ module.exports = function(grunt) {
 				fail('JavaScript Test Environment: unknown error with web server');
 			}
 		}).on('error', function(e) {
-			fail('JavaScript Test Environment: web server is not running, use `npm run`.');
+			fail('JavaScript Test Environment: web server is not running, use `npm start`.');
 		});
 	});
 
