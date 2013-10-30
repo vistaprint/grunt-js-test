@@ -6,9 +6,8 @@ html(lang='en')
 		meta(name='viewport', content='width=device-width, initial-scale=1.0')
 		meta(name='description', content='')
 		meta(name='author', content='')
-		link(rel='stylesheet', href='http://getbootstrap.com/dist/css/bootstrap.css', media='screen')
-		//- link(rel='stylesheet', href='http://getbootstrap.com/examples/navbar/navbar.css', media='screen')
-		link(rel='stylesheet', href='http://getbootstrap.com/examples/navbar-fixed-top/navbar-fixed-top.css', media='screen')
+		link(rel='stylesheet', href='/vp/JS-Lib/js-test-env/bootstrap.css', media='screen')
+		link(rel='stylesheet', href='/vp/JS-Lib/js-test-env/site.css', media='screen')
 	body
 		.container
 			.navbar.navbar-default.navbar-fixed-top
@@ -17,51 +16,34 @@ html(lang='en')
 						span.icon-bar
 						span.icon-bar
 						span.icon-bar
-					a.navbar-brand(href='/about', title='JavaScript Test Environment') JS Test Env
+					a.navbar-brand(href='/', title='JavaScript Test Environment') JS Test Env
 				.navbar-collapse.collapse
 					ul.nav.navbar-nav
 						li.active
-							a(href='/') All
-						li.dropdown
-							a.dropdown-toggle(href='#', data-toggle='dropdown')
-								| Dropdown
-								b.caret
-							ul.dropdown-menu
-								li
-									a(href='#') Action
-								li
-									a(href='#') Another action
-								li
-									a(href='#') Something else here
-								li.divider
-								li.dropdown-header Nav header
-								li
-									a(href='#') Separated link
-								li
-									a(href='#') One more separated link
+							a(href='/') List
 
-			.jumbotron
-				h1 JS Test Environment
-				p
-					| This is a utility web service for automated testing to our JavaScript files.
-					| It's currently in early alpha and may be extremely unstable.
-				p
-					a.btn.btn-lg.btn-primary(href='/about') View docs »
+			//- .jumbotron
+			//- 	h1 JS Test Environment
+			//- 	p
+			//- 		| This is a utility web service for automated testing to our JavaScript files.
+			//- 		| It's currently in early alpha and may be extremely unstable.
+			//- 	p
+			//- 		a.btn.btn-lg.btn-primary(href='/about') View docs »
 
 			.panel.panel-default
 				.panel-heading Tests
 				.panel-body
 					p
-						| Below is a list of all found test files. If you have an associated <code>*.tests.html</code> file
-						| then your related <code>*.tests.js</code> will not appear in the list. To run an individual test,
-						| simply select the test you are testing.
+						| Below is a list of all test files found. If there is an associated
+						| <code>*.tests.html</code> file the <code>*.tests.js</code> will not
+						| appear in the list. To run an individual test, simply select the test below.
 
 				table.table
 					thead
 						tr
 							th(style='width: 5%; max-width: 20px') #
-							th(style='width: 80%') Test
-							th(style='width: 15%')
+							th Test file
+							th Directory
 					tbody
 						//- for (var x = 0; x < 3; x++)
 						- for (var testNumber in tests) {
@@ -69,9 +51,9 @@ html(lang='en')
 							tr
 								td= testNumber
 								td
-									a(href=test.url)= test.name
-								td
+									a(href=test.url)= test.basename
+								td= test.directory
 						- }
 
-		script(src='//code.jquery.com/jquery.js')
-		script(src='http://getbootstrap.com/dist/js/bootstrap.min.js')
+		//- script(src='//code.jquery.com/jquery.js')
+		//- script(src='http://getbootstrap.com/dist/js/bootstrap.min.js')
