@@ -1,3 +1,15 @@
 {
-	"node": true
+	"node": true,
+	"strict": true,
+	"curly": true,
+	"trailing": true,
+	"unused": true,
+	"undef": true,
+	"quotmark": "single",
+	"noempty": true,
+	"noarg": true,
+	"latedef": true,
+	"forin": true,
+	"immed": true,
+	"eqeqeq": true
 }

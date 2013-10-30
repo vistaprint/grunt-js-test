@@ -23,17 +23,17 @@ app.configure(function(){
 	app.use('/vp/JS-Lib', express.static(rootFolder + '/vp/JS-Lib'));
 });
 
-app.get('/', function (req, res){
+app.get('/', function (req, res) {
 	res.render('index', {
 		tests: testUtils.findTests(),
 	});
 });
 
-app.get('/alive', function (req, res){
+app.get('/alive', function (req, res) {
 	res.send('hello world');
 });
 
-app.get('/test', function (req, res){
+app.get('/test', function (req, res) {
 	res.render('test', {
 		testFile: req.query.js,
 		deps: findDeps(rootFolder, req.query.js),
