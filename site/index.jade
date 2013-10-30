@@ -22,6 +22,8 @@ html(lang='en')
 						li.active
 							a(href='/') List
 						li
+							a(href='/all') Run All Tests
+						li
 							a(href='http://vistawiki.vistaprint.net/wiki/JavaScript_test_environment', target='_blank') Help
 
 			//- .jumbotron
@@ -47,15 +49,14 @@ html(lang='en')
 							th Test file
 							th Directory
 					tbody
-						//- for (var x = 0; x < 3; x++)
 						- for (var testNumber in tests) {
 						- var test = tests[testNumber];
 							tr
 								td= testNumber
 								td
-									a(href=test.url)= test.basename
-								td= test.directory
+									a(href=test.url)= test.filename
+								td= test.dir
 						- }
 
-		//- script(src='//code.jquery.com/jquery.js')
-		//- script(src='http://getbootstrap.com/dist/js/bootstrap.min.js')
+		script(src='/vp/JS-Lib/js-test-env/jquery.js')
+		script(src='/vp/JS-Lib/js-test-env/bootstrap.min.js')
