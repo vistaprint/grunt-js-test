@@ -34,27 +34,38 @@ module.exports = function(grunt) {
 			path: '/alive',
 			timeout: 30
 		}, function (res) {
-			if (res.statusCode == 200) {
+			if (res.statusCode === 200) {
 				done();
 			} else {
 				fail('JavaScript Test Environment: unknown error with web server');
 			}
-		}).on('error', function(e) {
+		}).on('error', function() {
 			fail('JavaScript Test Environment: web server is not running, use `npm start`.');
 		});
 	});
 
 	grunt.registerTask('findTests', 'Locate all tests and generate an array of test URLs.', function () {
-		var findTests = require('./lib/utils').findTests;
+		var file = grunt.option('file');
 		var config = grunt.config.get('mocha');
 
-		config.all.options.urls = findTests().map(function (test) {
-			return 'http://localhost:8981' + test.url;
-		});
+		if (file) {
+			// TODO: check if this file is an *.tests.html
+			config.all.options.urls = [
+				'http://localhost:8981/test?js=' + file.replace(/^\//, '')
+			];
+		} else {
+			var findTests = require('./lib/utils').findTests;
+
+			config.all.options.urls = findTests().map(function (test) {
+				return 'http://localhost:8981' + test.url;
+			});
+		}
 
 		grunt.config.set('mocha', config);
 	});
 
 	grunt.registerTask('test', ['testConnect', 'findTests', 'mocha']);
+
+	// an option to bypass the textConnect step
 	grunt.registerTask('test-bypass', ['findTests', 'mocha']);
 };

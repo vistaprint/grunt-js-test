@@ -9,10 +9,6 @@
 		"jade": "~0.35",
 		"glob": "3.2.x"
 	},
-	"scripts": {
-		"start": "node ./server.js",
-		"test": "grunt test"
-	},
 	"engines": {
 		"node": "*"
 	},
