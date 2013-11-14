@@ -1,8 +1,19 @@
 'use strict';
 
-module.exports = function(grunt) {
+var path = require('path');
+
+module.exports = function (grunt) {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
+
+		express: {
+			server: {
+				options: {
+					port: 8981,
+					server: path.resolve(__dirname, 'server.js')
+				}
+			}
+		},
 
 		mocha: {
 			all: {
@@ -14,35 +25,23 @@ module.exports = function(grunt) {
 				reporter: 'Spec',
 				timeout: 20000
 			}
-		}
-	});
+		},
 
-	grunt.loadNpmTasks('grunt-mocha');
-
-	grunt.registerTask('testConnect', 'Test a connection to the js-test-env server.', function () {
-		var done = this.async();
-
-		function fail(msg) {
-			console.error(msg);
-			process.exit(1);
-		}
-
-		// first make sure the web server is running
-		require('http').get({
-			host: 'localhost',
-			port: 8981,
-			path: '/alive',
-			timeout: 30
-		}, function (res) {
-			if (res.statusCode === 200) {
-				done();
-			} else {
-				fail('JavaScript Test Environment: unknown error with web server');
+		jshint: {
+			uses_defaults: [
+				'gruntfile.js',
+				'server.js',
+				'lib/**/*.js'
+			],
+			options: {
+				jshintrc: '.jshintrc'
 			}
-		}).on('error', function() {
-			fail('JavaScript Test Environment: web server is not running, use `npm start`.');
-		});
+		}
 	});
+
+	grunt.loadNpmTasks('grunt-contrib-jshint');
+	grunt.loadNpmTasks('grunt-express');
+	grunt.loadNpmTasks('grunt-mocha');
 
 	grunt.registerTask('findTests', 'Locate all tests and generate an array of test URLs.', function () {
 		var file = grunt.option('file');
@@ -64,8 +63,12 @@ module.exports = function(grunt) {
 		grunt.config.set('mocha', config);
 	});
 
-	grunt.registerTask('test', ['testConnect', 'findTests', 'mocha']);
+	// run all the tests (or a single test, if the --file argument is used)
+	grunt.registerTask('test', ['express', 'findTests', 'mocha']);
 
 	// an option to bypass the textConnect step
 	grunt.registerTask('test-bypass', ['findTests', 'mocha']);
+
+	// start the express server with keepalive
+	grunt.registerTask('server', ['express', 'express-keepalive']);
 };

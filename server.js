@@ -51,4 +51,4 @@ app.get('/test', function (req, res) {
 	});
 });
 
-app.listen(8981);
+module.exports = app;

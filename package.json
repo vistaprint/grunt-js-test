@@ -1,13 +1,17 @@
 {
 	"name": "js-test-env",
-	"version": "0.0.1",
-	"description": "mocha test framework for vistaprint js-lib.",
-	"homepage": "http://vistawiki.vistaprint.net/wiki/JavaScript_unit_testing",
+	"version": "0.0.2",
+	"description": "JavaScript Testing Environment",
+	"homepage": "http://vistawiki.vistaprint.net/wiki/JavaScript_test_environment",
 	"dependencies": {
 		"express": "3.x",
+		"glob": "3.2.x",
+		"grunt-express": "~1.2.x",
 		"grunt-mocha": "0.4.1",
-		"jade": "~0.35",
-		"glob": "3.2.x"
+		"jade": "~0.35"
+	},
+	"devDependencies": {
+		"grunt-contrib-jshint": "~0.3.0"
 	},
 	"engines": {
 		"node": "*"
