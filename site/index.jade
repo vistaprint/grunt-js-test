@@ -6,8 +6,8 @@ html(lang='en')
 		meta(name='viewport', content='width=device-width, initial-scale=1.0')
 		meta(name='description', content='')
 		meta(name='author', content='')
-		link(rel='stylesheet', href='/vp/JS-Lib/js-test-env/bootstrap.css', media='screen')
-		link(rel='stylesheet', href='/vp/JS-Lib/js-test-env/site.css', media='screen')
+		link(rel='stylesheet', href='/js-test-env/bootstrap.css', media='screen')
+		link(rel='stylesheet', href='/js-test-env/site.css', media='screen')
 	body
 		.container
 			.navbar.navbar-default.navbar-fixed-top
@@ -20,43 +20,45 @@ html(lang='en')
 				.navbar-collapse.collapse
 					ul.nav.navbar-nav
 						li.active
-							a(href='/') List
-						li
-							a(href='/all') Run All Tests
+							a(href='/', data-toggle='dropdown').dropdown-toggle
+								| List
+								b.caret
+							ul.dropdown-menu
+								- allProjects.forEach(function (project) {
+									li
+										a(href='/'+project.slug)= project.name
+								- });
+						li.dropdown
+							a(href='#', data-toggle='dropdown').dropdown-toggle
+								| Run All Tests
+								b.caret
+							ul.dropdown-menu
+								- allProjects.forEach(function (project) {
+									li
+										a(href='/'+project.slug+'/all')= project.name
+								- });
 						li
 							a(href='http://vistawiki.vistaprint.net/wiki/JavaScript_test_environment', target='_blank') Help
 
-			//- .jumbotron
-			//- 	h1 JS Test Environment
-			//- 	p
-			//- 		| This is a utility web service for automated testing to our JavaScript files.
-			//- 		| It's currently in early alpha and may be extremely unstable.
-			//- 	p
-			//- 		a.btn.btn-lg.btn-primary(href='/about') View docs »
-
-			.panel.panel-default
-				.panel-heading Tests
-				.panel-body
-					p
-						| Below is a list of all test files found. If there is an associated
-						| <code>*.tests.html</code> file the <code>*.tests.js</code> will not
-						| appear in the list. To run an individual test, simply select the test below.
-
-				table.table
-					thead
-						tr
-							th(style='width: 5%; max-width: 20px') #
-							th Test file
-							th Directory
-					tbody
-						- for (var testNumber in tests) {
-						- var test = tests[testNumber];
+			- projects.forEach(function (project) {
+				.panel.panel-default
+					.panel-heading
+						a(href='/'+project.slug)= project.name
+					table.table
+						thead
 							tr
-								td= testNumber
-								td
-									a(href=test.url)= test.filename
-								td= test.dir
-						- }
+								th(style='width: 5%; max-width: 20px') #
+								th Test file
+								th Directory
+						tbody
+							- project.tests().forEach(function (test, testNumber) {
+								tr
+									td= testNumber
+									td
+										a(href=test.url)= test.filename
+									td= test.dir
+							- });
+			- });
 
-		script(src='/vp/JS-Lib/js-test-env/jquery.js')
-		script(src='/vp/JS-Lib/js-test-env/bootstrap.min.js')
+		script(src='/js-test-env/jquery.js')
+		script(src='/js-test-env/bootstrap.min.js')

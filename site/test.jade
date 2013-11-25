@@ -1,22 +1,30 @@
 !!! 5
 html(lang='en')
 	head
-		title= testFile
+		title= test.file
 		meta(charset='utf-8')
 		meta(name='viewport', content='width=device-width, initial-scale=1.0')
 		meta(name='description', content='')
 		meta(name='author', content='')
-		link(rel='stylesheet', href='/vp/JS-Lib/js-test-env/site.css', media='screen')
-		link(rel='stylesheet', href='/vp/JS-Lib/js-test-env/mocha.css', media='screen')
-	body
+		link(rel='stylesheet', href='/js-test-env/site.css', media='screen')
+		link(rel='stylesheet', href='/js-test-env/mocha.css', media='screen')
+	body(data-module=module)
 		div(id='mocha')
 
 		//- global deps
-		script(src='/vp/JS-Lib/js-test-env/mocha.js')
-		script(src='/vp/JS-Lib/js-test-env/chai.js')
-		script(src='/vp/JS-Lib/js-test-env/shared.js')
+		script(src='/js-test-env/mocha.js')
+		script(src='/js-test-env/chai.js')
+		script(src='/js-test-env/sinon.js')
+		script(src='/js-test-env/shared.js')
+
+		//- project deps
+		- if (project.deps) {
+			- project.deps.forEach(function (dep) {
+				script(src=dep)
+			- })
+		- }
 
 		//- test-specific deps, test file should be last in list
 		- for (var i=0; i<deps.length; i++) {
-			script(src='/vp/JS-Lib/'+deps[i])
+			script(src=deps[i])
 		- }

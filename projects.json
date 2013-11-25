@@ -1,0 +1,65 @@
+[
+	{
+		"name": "JS-Lib",
+		"slug": "js-lib",
+		"locations": [
+			{
+				"uri": "/vp/JS-Lib",
+				"root": "C:/vp/playpens/development/subversion/Web/www/vp/JS-Lib/",
+				"pattern": "**/*.tests.*"
+			}
+		],
+		"dedup": true
+	},
+	{
+		"disabled": true,
+		"name": "SkinnyJS",
+		"slug": "skinny",
+		"locations": [
+			{
+				"uri": "/",
+				"root": "C:/Users/bhutchins/Documents/SkinnyJS",
+				"pattern": "test/*.unittests.html"
+			}
+		]
+	},
+	{
+		"disabled": true,
+		"name": "Studio",
+		"slug": "studio",
+		"deps": [
+			"/vp/JS-Lib/jQuery/jquery-current.js",
+			"/vp/JS-Lib/ThirdParty/lodash/lodash.compat.js",
+			"/vp/JS-Lib/ThirdParty/handlebars/handlebars.js",
+			"/vp/JS-Lib/ThirdParty/RTEjs/rangy.debug.js",
+			"/vp/JS-Lib/ThirdParty/RTEjs/rte.debug.js",
+			"/vp/JS-Lib/Areas/Studio/views/richtext/stylemanager.js",
+			"/vp/JS-Lib/ThirdParty/skinnyjs/jquery.delimitedstring.js",
+			"/vp/JS-Lib/ThirdParty/skinnyjs/jquery.querystring.js",
+			"/vp/JS-Lib/ThirdParty/skinnyjs/jquery.url.js",
+			"/vp/JS-Lib/ThirdParty/skinnyjs/jquery.css.js",
+			"/vp/JS-Lib/common/vp.color.js",
+			"/vp/JS-Lib/ThirdParty/backbone/backbone.js",
+			"/vp/JS-Lib/ThirdParty/backbone/vpextensions/backbone.extensions.js",
+			"/vp/JS-Lib/ThirdParty/backbone/vpextensions/backbone.nested.js",
+			"/vp/JS-Lib/ThirdParty/backbone/vpextensions/backbone.computedAttributes.js",
+			"/vp/JS-Lib/ThirdParty/backbone/backbone_handlebars.js",
+			"/vp/JS-Lib/ThirdParty/require.js",
+			"/vp/JS-Lib/Areas/Studio/requireconfig.js",
+			"/vp/JS-Lib/Areas/Studio/ExternalDependencyModules.js",
+			"/vp/JS-Lib/Areas/Studio/Tests/require.config.js",
+			"/vp/JS-Lib/Areas/Studio/Tests/helpers/testsetup.removeMePlease.js",
+			"/vp/JS-Lib/Areas/Studio/Tests/test-bootstrapper.js"
+		],
+		"locations": [
+			{
+				"uri": "/vp/JS-Lib",
+				"root": "C:/vp/playpens/development/subversion/Web/www/vp/JS-Lib/",
+				"pattern": "Areas/Studio/Tests/*.unittests.js",
+				"exclude": "All.unittests.js",
+				"modulesRelativeTo": "C:/vp/playpens/development/subversion/Web/www/vp/JS-Lib/Areas/Studio",
+				"requirejs": true
+			}
+		]
+	}
+]

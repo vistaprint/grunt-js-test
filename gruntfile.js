@@ -43,32 +43,100 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-express');
 	grunt.loadNpmTasks('grunt-mocha');
 
-	grunt.registerTask('findTests', 'Locate all tests and generate an array of test URLs.', function () {
+	grunt.registerTask('findTests', 'Locate all tests and generate an array of test URLs.', function (project) {
 		var file = grunt.option('file');
 		var config = grunt.config.get('mocha');
+		project = project || grunt.option('project'); // project should be the project slug (set in projects.json)
 
-		if (file) {
-			// TODO: check if this file is an *.tests.html
-			config.all.options.urls = [
-				'http://localhost:8981/test?js=' + file.replace(/^\//, '')
-			];
-		} else {
-			var findTests = require('./lib/utils').findTests;
+		if (!project && file) {
+			grunt.fail.warn('You must provide the project via --project=slug when providing a file to test');
+			return;
+		}
 
-			config.all.options.urls = findTests().map(function (test) {
-				return 'http://localhost:8981' + test.url;
+		var projects = require('./lib/projects');
+		var tests = [];
+
+		// if a project is provided, only find the tests for that project
+		if (project) {
+			grunt.verbose.write('Finding tests only for project:', project, '\n');
+			project = projects[project];
+			tests = project.tests();
+		}
+		// if no project is provided, we test all projects
+		else {
+			projects.forEach(function (project) {
+				tests = tests.concat(project.tests());
 			});
 		}
+
+		// filter: find a specific test file
+		if (file) {
+			grunt.verbose.write('Specific file provided:', file, '\n');
+			tests = tests.filter(function (test) {
+				return file === test.file;
+			});
+
+			if (tests.length === 0) {
+				grunt.fail.warn('Failed to find file by --file provided.');
+				return;
+			}
+		}
+
+		// filter: RegExp
+		if (grunt.option('re')) {
+			grunt.verbose.write('Applying RegEx filter:', grunt.option('re'), '\n');
+
+			var re = new RegExp(grunt.option('re'), 'i');
+			tests = tests.filter(function (test) {
+				var pass = re.test(test.file);
+				grunt.verbose.write('  ', test.file, '=', pass ? 'pass' : 'fail', '\n');
+				return pass;
+			});
+		}
+
+		// filter: simple contains
+		if (grunt.option('search')) {
+			var search = grunt.option('search');
+			grunt.verbose.write('Applying simple filter:', search, '\n');
+
+			tests = tests.filter(function (test) {
+				var pass = test.file.toLowerCase().indexOf(search) !== -1;
+				grunt.verbose.write('  ', test.file, '=', pass ? 'pass' : 'fail', '\n');
+				return pass;
+			});
+		}
+
+		// set the config for mocha passing the correct URLs to be used
+		config.all.options.urls = tests.map(function (test) {
+			return 'http://localhost:8981' + test.url;
+		});
 
 		grunt.config.set('mocha', config);
 	});
 
 	// run all the tests (or a single test, if the --file argument is used)
-	grunt.registerTask('test', ['express', 'findTests', 'mocha']);
+	grunt.registerTask('test', 'Run tests for a project.', function (project) {
+		if (project) {
+			grunt.task.run(['express', 'findTests:' + project, 'mocha']);
+		} else {
+			grunt.task.run(['express', 'findTests', 'mocha']);
+		}
+	});
+
+	// run all tests for all projects
+	grunt.registerTask('test-all', ['express', 'findTests', 'mocha']);
 
 	// an option to bypass the textConnect step
 	grunt.registerTask('test-bypass', ['findTests', 'mocha']);
 
 	// start the express server with keepalive
 	grunt.registerTask('server', ['express', 'express-keepalive']);
+
+	// live reload web server optio
+	grunt.registerTask('server-watch', function () {
+		var config = grunt.config.get('express');
+		config.server.options.serverreload = true;
+		grunt.config.set('express', config);
+		grunt.task.run('server');
+	});
 };
