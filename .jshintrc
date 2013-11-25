@@ -11,5 +11,6 @@
 	"latedef": true,
 	"forin": true,
 	"immed": true,
-	"eqeqeq": true
+	"eqeqeq": true,
+	"white": true
 }
