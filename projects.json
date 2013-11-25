@@ -18,7 +18,7 @@
 		"locations": [
 			{
 				"uri": "/",
-				"root": "C:/Users/bhutchins/Documents/SkinnyJS",
+				"root": "C:/vp/SkinnyJS",
 				"pattern": "test/*.unittests.html"
 			}
 		]
