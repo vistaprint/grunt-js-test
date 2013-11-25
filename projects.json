@@ -8,8 +8,7 @@
 				"root": "C:/vp/playpens/development/subversion/Web/www/vp/JS-Lib/",
 				"pattern": "**/*.tests.*"
 			}
-		],
-		"dedup": true
+		]
 	},
 	{
 		"disabled": true,
