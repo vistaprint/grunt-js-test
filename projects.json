@@ -2,30 +2,29 @@
 	{
 		"name": "JS-Lib",
 		"slug": "js-lib",
-		"locations": [
-			{
-				"uri": "/vp/JS-Lib",
-				"root": "C:/vp/playpens/development/subversion/Web/www/vp/JS-Lib/",
-				"pattern": "**/*.tests.*"
-			}
-		]
+		"baseUri": "/vp/JS-Lib",
+		"root": "C:/vp/playpens/development/subversion/Web/www/vp/JS-Lib/",
+		"pattern": "**/*.tests.*"
 	},
 	{
 		"disabled": true,
 		"name": "SkinnyJS",
 		"slug": "skinny",
-		"locations": [
-			{
-				"uri": "/",
-				"root": "C:/vp/SkinnyJS",
-				"pattern": "test/*.unittests.html"
-			}
-		]
+		"baseUri": "/",
+		"root": "C:/vp/SkinnyJS",
+		"pattern": "test/*.unittests.html"
 	},
 	{
-		"disabled": true,
+		"disabled": false,
 		"name": "Studio",
 		"slug": "studio",
+		"baseUri": "/vp/JS-Lib",
+		"root": "C:/vp/playpens/development/subversion/Web/www/vp/JS-Lib/",
+		"pattern": "Areas/Studio/Tests/*.unittests.js",
+		"exclude": "All.unittests.js",
+		"requirejs": {
+			"modulesRelativeTo": "C:/vp/playpens/development/subversion/Web/www/vp/JS-Lib/Areas/Studio"
+		},
 		"deps": [
 			"/vp/JS-Lib/jQuery/jquery-current.js",
 			"/vp/JS-Lib/ThirdParty/lodash/lodash.compat.js",
@@ -49,16 +48,6 @@
 			"/vp/JS-Lib/Areas/Studio/Tests/require.config.js",
 			"/vp/JS-Lib/Areas/Studio/Tests/helpers/testsetup.removeMePlease.js",
 			"/vp/JS-Lib/Areas/Studio/Tests/test-bootstrapper.js"
-		],
-		"locations": [
-			{
-				"uri": "/vp/JS-Lib",
-				"root": "C:/vp/playpens/development/subversion/Web/www/vp/JS-Lib/",
-				"pattern": "Areas/Studio/Tests/*.unittests.js",
-				"exclude": "All.unittests.js",
-				"modulesRelativeTo": "C:/vp/playpens/development/subversion/Web/www/vp/JS-Lib/Areas/Studio",
-				"requirejs": true
-			}
 		]
 	}
 ]

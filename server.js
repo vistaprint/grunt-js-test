@@ -24,9 +24,9 @@ app.configure(function () {
 // allow projects to proxy through their own asset files
 // var _port = 8990;
 projects.forEach(function (project) {
-	project.locations.forEach(function (location) {
+	project.statics.forEach(function (use) {
 		// var app = express();
-		app.use(location.uri, express.static(location.root));
+		app.use(use.baseUri, express.static(use.root));
 		// location.port = _port++;
 		// app.listen(project.port);
 	});
@@ -40,7 +40,7 @@ app.get('/', function (req, res) {
 	});
 });
 
-// list tests for a single project
+// list all tests for a given project
 app.get('/:project', function (req, res) {
 	var project = projects[req.params.project];
 
@@ -51,26 +51,19 @@ app.get('/:project', function (req, res) {
 	});
 });
 
+// run all tests for a given project
 app.get('/:project/all', function (req, res) {
-	// get an array of all test files to find their dependencies for
-	var project = projects[req.params.project];
-	project.tests();
-
 	var testFiles = [];
+	var project = projects[req.params.project];
 
-	project.locations.forEach(function (loc) {
-		if (loc.tests) {
-			loc.tests.map(function (test) {
-				testFiles.push(test.abs);
-			});
-		}
+	project.tests().map(function (test) {
+		testFiles.push(test.abs);
 	});
 
-	var location = project.locations[0];
-	var deps = findDeps(testFiles, location.requirejs);
+	var deps = findDeps(testFiles, project.requirejs);
 
 	deps = deps.map(function (dep) {
-		return path.join(location.uri, path.relative(location.root, dep)).replace(/\\/g, '/');
+		return path.join(project.baseUri, path.relative(project.root, dep)).replace(/\\/g, '/');
 	});
 
 	res.render('all-tests', {
@@ -80,17 +73,16 @@ app.get('/:project/all', function (req, res) {
 	});
 });
 
-app.get('/test/:project/:path/:test', function (req, res) {
+app.get('/test/:project/:test', function (req, res) {
 	var project = projects[req.params.project];
-	var location = project.locations[req.params.path];
-	var test = project.getTest(req.params.path, req.params.test);
+	var test = project.getTest(req.params.test);
 	var file = test.abs;
-	var deps = findDeps(file, location.requirejs);
+	var deps = findDeps(file, project.requirejs);
 	var module;
 
 	// attempt to find the module name for this file
-	if (location.requirejs) {
-		module = path.relative(location.modulesRelativeTo, file).replace(/\\/g, '/').replace(/\.js$/, '');
+	if (project.requirejs) {
+		module = path.relative(project.requirejs.modulesRelativeTo, file).replace(/\\/g, '/').replace(/\.js$/, '');
 
 		// remove the module from deps
 		deps.splice(deps.length - 1, 1);
@@ -99,7 +91,7 @@ app.get('/test/:project/:path/:test', function (req, res) {
 	// convert the list of deps (which is a list of absolute file paths)
 	// to web-accessible URIs for the given location
 	deps = deps.map(function (dep) {
-		return /*'http://localhost:' + location.port +*/ path.join(location.uri, path.relative(location.root, dep)).replace(/\\/g, '/');
+		return /*'http://localhost:' + project.port +*/ path.join(project.baseUri, path.relative(project.root, dep)).replace(/\\/g, '/');
 	});
 
 	res.render('test', {
