@@ -61,15 +61,20 @@ app.get('/:project/all', function (req, res) {
 	});
 
 	var deps = findDeps(testFiles, project.requirejs);
+	var modules = [];
 
-	deps = deps.map(function (dep) {
-		return path.join(project.baseUri, path.relative(project.root, dep)).replace(/\\/g, '/');
-	});
+	// attempt to find the module name for this file
+	if (project.requirejs) {
+		modules = project.tests().map(function (test) {
+			return path.relative(project.requirejs.modulesRelativeTo, test.abs).replace(/\\/g, '/').replace(/\.js$/, '');
+		});
+	}
 
-	res.render('all-tests', {
+	res.render('test', {
+		all: true,
 		project: project,
-		// tests: tests,
-		deps: deps,
+		modules: modules.length > 0 ? modules.join(',') : '',
+		deps: deps.map(project.resolveDeps),
 	});
 });
 
@@ -83,22 +88,13 @@ app.get('/test/:project/:test', function (req, res) {
 	// attempt to find the module name for this file
 	if (project.requirejs) {
 		module = path.relative(project.requirejs.modulesRelativeTo, file).replace(/\\/g, '/').replace(/\.js$/, '');
-
-		// remove the module from deps
-		deps.splice(deps.length - 1, 1);
 	}
-
-	// convert the list of deps (which is a list of absolute file paths)
-	// to web-accessible URIs for the given location
-	deps = deps.map(function (dep) {
-		return /*'http://localhost:' + project.port +*/ path.join(project.baseUri, path.relative(project.root, dep)).replace(/\\/g, '/');
-	});
 
 	res.render('test', {
 		project: project,
-		module: module || '',
+		modules: module || '',
 		test: test,
-		deps: deps,
+		deps: deps.map(project.resolveDeps),
 	});
 });
 

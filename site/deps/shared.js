@@ -5,7 +5,7 @@ window.addEventListener('load', function () {
     window.expect = chai.expect;
 
     // if this is not a require.js test, then run mocha on page load
-	if (!document.body.dataset.module) {
+	if (!document.body.dataset.modules) {
 		mocha.run();
 	}
 }, false);
