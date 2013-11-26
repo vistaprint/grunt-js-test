@@ -31,10 +31,10 @@ module.exports = function (grunt) {
 			uses_defaults: [
 				'gruntfile.js',
 				'server.js',
-				'lib/**/*.js'
+				'lib/**/*.js',
 			],
 			options: {
-				jshintrc: '.jshintrc'
+				jshintrc: '.jshintrc',
 			}
 		}
 	});
@@ -131,12 +131,4 @@ module.exports = function (grunt) {
 
 	// start the express server with keepalive
 	grunt.registerTask('server', ['express', 'express-keepalive']);
-
-	// live reload web server optio
-	grunt.registerTask('server-watch', function () {
-		var config = grunt.config.get('express');
-		config.server.options.serverreload = true;
-		grunt.config.set('express', config);
-		grunt.task.run('server');
-	});
 };
