@@ -20,8 +20,8 @@
 		"slug": "studio",
 		"baseUri": "/vp/JS-Lib",
 		"root": "C:/vp/playpens/development/subversion/Web/www/vp/JS-Lib/",
-		"pattern": "Areas/Studio/Tests/*.unittests.js",
-		"exclude": "All.unittests.js",
+		"pattern": "Areas/Studio/Tests/**/*.unittests.js",
+		"exclude": ["All.unittests.js", "ExternalTextEditor.unittests.js"],
 		"requirejs": {
 			"modulesRelativeTo": "C:/vp/playpens/development/subversion/Web/www/vp/JS-Lib/Areas/Studio"
 		},
@@ -46,7 +46,6 @@
 			"/vp/JS-Lib/Areas/Studio/requireconfig.js",
 			"/vp/JS-Lib/Areas/Studio/ExternalDependencyModules.js",
 			"/vp/JS-Lib/Areas/Studio/Tests/require.config.js",
-			"/vp/JS-Lib/Areas/Studio/Tests/helpers/testsetup.removeMePlease.js",
 			"/vp/JS-Lib/Areas/Studio/Tests/test-bootstrapper.js"
 		]
 	}
