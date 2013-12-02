@@ -58,6 +58,12 @@ module.exports = function (grunt) {
 
 		// if a project is provided, only find the tests for that project
 		if (project) {
+			// ensure this project exists
+			if (!projects[project]) {
+				grunt.fail.warn('No project found by slug:', project);
+				return;
+			}
+
 			grunt.verbose.write('Finding tests only for project:', project, '\n');
 			project = projects[project];
 			tests = project.tests();
@@ -110,6 +116,11 @@ module.exports = function (grunt) {
 		config.all.options.urls = tests.map(function (test) {
 			return 'http://localhost:8981' + test.url;
 		});
+
+		// option: bail - exit on first error found
+		if (grunt.option('bail')) {
+			config.all.options.bail = true;
+		}
 
 		grunt.config.set('mocha', config);
 	});
