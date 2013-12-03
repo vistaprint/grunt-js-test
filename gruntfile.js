@@ -53,6 +53,7 @@ module.exports = function (grunt) {
 			return;
 		}
 
+		var jenkins = !!grunt.option('jenkins');
 		var projects = require('./lib/projects');
 		var tests = [];
 
@@ -66,12 +67,12 @@ module.exports = function (grunt) {
 
 			grunt.verbose.write('Finding tests only for project:', project, '\n');
 			project = projects[project];
-			tests = project.tests();
+			tests = project.tests(jenkins);
 		}
 		// if no project is provided, we test all projects
 		else {
 			projects.forEach(function (project) {
-				tests = tests.concat(project.tests());
+				tests = tests.concat(project.tests(jenkins));
 			});
 		}
 
@@ -118,7 +119,7 @@ module.exports = function (grunt) {
 		});
 
 		// option: bail - exit on first error found
-		if (grunt.option('bail')) {
+		if (grunt.option('bail') || jenkins) {
 			config.all.options.bail = true;
 		}
 

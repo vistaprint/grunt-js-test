@@ -4,6 +4,7 @@
 		"slug": "js-lib",
 		"baseUri": "/vp/JS-Lib",
 		"root": "C:/vp/playpens/development/subversion/Web/www/vp/JS-Lib/",
+		"jenkins": "C:/Jenkins/workspace/JavaScript Unit Tests/",
 		"pattern": "**/*.tests.*"
 	},
 	{
