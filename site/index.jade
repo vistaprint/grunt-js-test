@@ -24,10 +24,10 @@ html(lang='en')
 								| List
 								b.caret
 							ul.dropdown-menu
-								- allProjects.forEach(function (project) {
+								- allProjects.forEach(function (project) {if (project) {
 									li
 										a(href='/'+project.slug)= project.name
-								- });
+								- }});
 						li.dropdown
 							a(href='#', data-toggle='dropdown').dropdown-toggle
 								| Run All Tests
@@ -40,7 +40,7 @@ html(lang='en')
 						li
 							a(href='http://vistawiki.vistaprint.net/wiki/JavaScript_test_environment', target='_blank') Help
 
-			- projects.forEach(function (project) {
+			- projects.forEach(function (project) {if (project) {
 				.panel.panel-default
 					.panel-heading
 						a(href='/'+project.slug)= project.name
@@ -58,7 +58,7 @@ html(lang='en')
 										a(href=test.url)= test.filename
 									td= test.dir
 							- });
-			- });
+			- }});
 
 		script(src='/js-test-env/jquery.js')
 		script(src='/js-test-env/bootstrap.min.js')
