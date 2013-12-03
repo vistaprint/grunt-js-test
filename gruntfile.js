@@ -79,7 +79,7 @@ module.exports = function (grunt) {
 		if (file) {
 			grunt.verbose.write('Specific file provided:', file, '\n');
 			tests = tests.filter(function (test) {
-				return file === test.file;
+				return file.toLowerCase() === test.file.toLowerCase();
 			});
 
 			if (tests.length === 0) {

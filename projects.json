@@ -21,7 +21,7 @@
 		"baseUri": "/vp/JS-Lib",
 		"root": "C:/vp/playpens/development/subversion/Web/www/vp/JS-Lib/",
 		"pattern": "Areas/Studio/Tests/**/*.unittests.js",
-		"exclude": ["All.unittests.js", "ExternalTextEditor.unittests.js"],
+		"exclude": ["All.unittests.js"],
 		"requirejs": {
 			"modulesRelativeTo": "C:/vp/playpens/development/subversion/Web/www/vp/JS-Lib/Areas/Studio"
 		},
@@ -38,7 +38,7 @@
 			"/vp/JS-Lib/ThirdParty/skinnyjs/jquery.css.js",
 			"/vp/JS-Lib/common/vp.color.js",
 			"/vp/JS-Lib/ThirdParty/backbone/backbone.js",
-			"/vp/JS-Lib/ThirdParty/backbone/vpextensions/backbone.extensions.js",
+			"/vp/JS-Lib/ThirdParty/backbone/vpextensions/backbone.studio.js",
 			"/vp/JS-Lib/ThirdParty/backbone/vpextensions/backbone.nested.js",
 			"/vp/JS-Lib/ThirdParty/backbone/vpextensions/backbone.computedAttributes.js",
 			"/vp/JS-Lib/ThirdParty/backbone/backbone_handlebars.js",
