@@ -123,6 +123,13 @@ module.exports = function (grunt) {
 			config.all.options.bail = true;
 		}
 
+		// option: mocha-grep - grep within the test file, mocha does this
+		if (grunt.option('mocha-grep')) {
+			config.all.options.mocha = {
+				grep: grunt.options('mocha-grep')
+			};
+		}
+
 		grunt.config.set('mocha', config);
 	});
 
