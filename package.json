@@ -7,7 +7,7 @@
 		"express": "3.x",
 		"glob": "3.2.x",
 		"grunt-express": "~1.2.x",
-		"grunt-mocha": "0.4.7",
+		"grunt-mocha": "0.4.x",
 		"jade": "~0.35"
 	},
 	"devDependencies": {
