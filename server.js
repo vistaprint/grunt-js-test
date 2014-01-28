@@ -17,18 +17,20 @@ app.configure(function () {
 	// app.use(express.methodOverride());
 	app.use(express.errorHandler());
 
-	// proxy static javascript files from vp's js-lib
+	// proxy static js-test-env javascript files
 	app.use('/js-test-env', express.static(__dirname + '/site/deps'));
 });
 
 // allow projects to proxy through their own asset files
-// var _port = 8990;
+var _port = 8990;
 projects.forEach(function (project) {
 	project.statics.forEach(function (use) {
-		// var app = express();
+		var app = express();
 		app.use(use.baseUri, express.static(use.root));
-		// location.port = _port++;
-		// app.listen(project.port);
+		if (!project.port) {
+			project.port = _port++;
+		}
+		app.listen(project.port);
 	});
 });
 
@@ -56,26 +58,32 @@ app.get('/:project/all', function (req, res) {
 	var testFiles = [];
 	var project = projects[req.params.project];
 
-	project.tests().map(function (test) {
-		testFiles.push(test.abs);
-	});
+	if (project.isolate) {
+		res.render('test-all-isolate', {
+			project: project
+		});
+	} else {
+		project.tests().map(function (test) {
+			testFiles.push(test.abs);
+		});
 
-	var deps = findDeps(testFiles, project.requirejs);
-	var modules = [];
+		var deps = findDeps(testFiles, project.requirejs);
+		var modules = [];
 
-	// attempt to find the module name for this file
-	if (project.requirejs) {
-		modules = project.tests().map(function (test) {
-			return path.relative(project.requirejs.modulesRelativeTo, test.abs).replace(/\\/g, '/').replace(/\.js$/, '');
+		// attempt to find the module name for this file
+		if (project.requirejs) {
+			modules = project.tests().map(function (test) {
+				return path.relative(project.requirejs.modulesRelativeTo, test.abs).replace(/\\/g, '/').replace(/\.js$/, '');
+			});
+		}
+
+		res.render('test', {
+			all: true,
+			project: project,
+			modules: modules.length > 0 ? modules.join(',') : '',
+			deps: deps.map(project.resolveDeps),
 		});
 	}
-
-	res.render('test', {
-		all: true,
-		project: project,
-		modules: modules.length > 0 ? modules.join(',') : '',
-		deps: deps.map(project.resolveDeps),
-	});
 });
 
 app.get('/test/:project/:test', function (req, res) {

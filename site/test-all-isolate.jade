@@ -1,0 +1,16 @@
+!!! 5
+html(lang='en')
+	head
+		title= "JS Test Env: " + project.name + ": All tests"
+		meta(charset='utf-8')
+		meta(name='viewport', content='width=device-width, initial-scale=1.0')
+		meta(name='description', content='')
+		meta(name='author', content='')
+		link(rel='stylesheet', href='/js-test-env/site.css', media='screen')
+		link(rel='stylesheet', href='/js-test-env/mocha.css', media='screen')
+		script(src='/js-test-env/iframes.js')
+	body
+		//- test-specific deps, test file should be last in list
+		- project.tests().forEach(function (test) {
+			iframe(seamless="seamless", src=test.url + "&iframe=1")
+		- });

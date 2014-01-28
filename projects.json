@@ -16,9 +16,10 @@
 		"pattern": "test/*.unittests.html"
 	},
 	{
-		"disabled": false,
 		"name": "Studio",
 		"slug": "studio",
+		"port": 8982,
+		"isolate": true,
 		"baseUri": "/vp/JS-Lib",
 		"root": "C:/vp/playpens/development/subversion/Web/www/vp/JS-Lib/",
 		"jenkins": "C:/Jenkins/workspace/JavaScript Test Env - Studio/",

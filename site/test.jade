@@ -20,11 +20,11 @@ html(lang='en')
 		//- project deps
 		- if (project.deps) {
 			- project.deps.forEach(function (dep) {
-				script(src=dep)
+				script(src=project.getBaseUri()+dep)
 			- })
 		- }
 
 		//- test-specific deps, test file should be last in list
 		- for (var i=0; i<deps.length; i++) {
-			script(src=deps[i])
+			script(src=project.getBaseUri()+deps[i])
 		- }
