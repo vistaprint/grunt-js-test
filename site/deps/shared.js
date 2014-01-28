@@ -33,6 +33,8 @@
 		// Create a Grunt listener for each Mocha events
 		// start, test, test end, suite, suite end, fail, pass, pending, end
 		runner.on('test end', debounce(fixHeight, 200));
+		runner.on('fail', window.parent.reportFailure);
+		runner.on('pass', window.parent.reportSuccess);
 		runner.on('end', fixHeight);
 	}
 

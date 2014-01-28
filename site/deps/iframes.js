@@ -28,3 +28,15 @@ function fixIframe(iframeWindow) {
 		}
 	}
 }
+
+function reportSuccess() {
+	var el = document.getElementById('passes');
+	var passes = parseInt(el.innerHTML, 10);
+	el.innerHTML = ++passes;
+}
+
+function reportFailure() {
+	var el = document.getElementById('failures');
+	var failures = parseInt(el.innerHTML, 10);
+	el.innerHTML = ++failures;
+}
