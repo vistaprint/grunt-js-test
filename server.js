@@ -106,6 +106,10 @@ app.get('/test/:project/:test', function (req, res) {
 	});
 });
 
+app.get('/alive', function (req, res) {
+	res.send('hello world');
+});
+
 if (require.main === module) {
 	try {
 		app.listen(8981);

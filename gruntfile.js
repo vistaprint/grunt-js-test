@@ -43,6 +43,34 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-express');
 	grunt.loadNpmTasks('grunt-mocha');
 
+	grunt.registerTask('testConnect', 'Test a connection to the js-test-env server.', function () {
+		var done = this.async();
+
+		function startServer() {
+			grunt.task.run(['express']);
+			done();
+		}
+
+		var express = grunt.config.get('express');
+
+		// first make sure the web server is running
+		require('http').get({
+			host: express.server.options.hostname || 'localhost',
+			port: express.server.options.port,
+			path: '/alive',
+			timeout: 30
+		}, function (res) {
+			if (res.statusCode !== 200) {
+				startServer();
+			} else {
+				// passed
+				done();
+			}
+		}).on('error', function () {
+			startServer();
+		});
+	});
+
 	grunt.registerTask('findTests', 'Locate all tests and generate an array of test URLs.', function (project) {
 		var file = grunt.option('file');
 		var config = grunt.config.get('mocha');
@@ -136,18 +164,14 @@ module.exports = function (grunt) {
 	// run all the tests (or a single test, if the --file argument is used)
 	grunt.registerTask('test', 'Run tests for a project.', function (project) {
 		if (project) {
-			grunt.task.run(['express', 'findTests:' + project, 'mocha']);
+			grunt.task.run(['testConnect', 'findTests:' + project, 'mocha']);
 		} else {
-			grunt.task.run(['express', 'findTests', 'mocha']);
+			grunt.task.run(['testConnect', 'findTests', 'mocha']);
 		}
 	});
 
-	// run all tests for all projects
-	grunt.registerTask('test-all', ['express', 'findTests', 'mocha']);
-
-	// an option to bypass the textConnect step
-	grunt.registerTask('test-bypass', ['findTests', 'mocha']);
+	grunt.registerTask('test-all', 'Run all tests for all projects.', ['testConnect', 'findTests', 'mocha']);
 
 	// start the express server with keepalive
-	grunt.registerTask('server', ['express', 'express-keepalive']);
+	grunt.registerTask('server', 'Start server with keepalive.', ['express', 'express-keepalive']);
 };
