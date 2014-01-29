@@ -60,11 +60,10 @@ module.exports = function (grunt) {
 			path: '/alive',
 			timeout: 30
 		}, function (res) {
-			if (res.statusCode !== 200) {
-				startServer();
-			} else {
-				// passed
+			if (res.statusCode === 200) {
 				done();
+			} else {
+				startServer();
 			}
 		}).on('error', function () {
 			startServer();
