@@ -159,7 +159,16 @@ module.exports = function (grunt) {
 
 		// option: send over console messages
 		if (grunt.option('log')) {
+			// log console.log messages
 			config.all.options.log = true;
+
+			// log javascript errors
+			config.all.options.logErrors = true;
+		}
+
+		// option: allow the mocha reporter to change
+		if (grunt.option('reporter')) {
+			config.options.reporter = grunt.option('reporter');
 		}
 
 		grunt.config.set('mocha', config);
