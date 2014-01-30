@@ -157,6 +157,11 @@ module.exports = function (grunt) {
 			};
 		}
 
+		// option: send over console messages
+		if (grunt.option('log')) {
+			config.all.options.log = true;
+		}
+
 		grunt.config.set('mocha', config);
 	});
 
