@@ -24,7 +24,7 @@
 		"root": "C:/vp/playpens/development/subversion/Web/www/vp/JS-Lib/",
 		"jenkins": "C:/Jenkins/workspace/JavaScript Test Env - Studio/",
 		"pattern": "Areas/Studio/Tests/**/*.unittests.js",
-		"exclude": ["All.unittests.js"],
+		"exclude": [],
 		"requirejs": {
 			"modulesRelativeTo": "C:/vp/playpens/development/subversion/Web/www/vp/JS-Lib/Areas/Studio"
 		},
@@ -32,8 +32,8 @@
 			"/vp/JS-Lib/jQuery/jquery-current.js",
 			"/vp/JS-Lib/ThirdParty/lodash/lodash.compat.js",
 			"/vp/JS-Lib/ThirdParty/handlebars/handlebars.js",
-			"/vp/JS-Lib/ThirdParty/RTEjs/rangy.debug.js",
-			"/vp/JS-Lib/ThirdParty/RTEjs/rte.debug.js",
+			"/vp/JS-Lib/ThirdParty/artejs/rangy.debug.js",
+			"/vp/JS-Lib/ThirdParty/artejs/arte.debug.js",
 			"/vp/JS-Lib/Areas/Studio/views/richtext/stylemanager.js",
 			"/vp/JS-Lib/ThirdParty/skinnyjs/jquery.delimitedstring.js",
 			"/vp/JS-Lib/ThirdParty/skinnyjs/jquery.querystring.js",
@@ -46,9 +46,8 @@
 			"/vp/JS-Lib/ThirdParty/backbone/vpextensions/backbone.computedAttributes.js",
 			"/vp/JS-Lib/ThirdParty/backbone/backbone_handlebars.js",
 			"/vp/JS-Lib/ThirdParty/require.js",
-			"/vp/JS-Lib/Areas/Studio/requireconfig.js",
+			"/vp/JS-Lib/Areas/Studio/RequireConfig.js",
 			"/vp/JS-Lib/Areas/Studio/ExternalDependencyModules.js",
-			"/vp/JS-Lib/Areas/Studio/Tests/require.config.js",
 			"/vp/JS-Lib/Areas/Studio/Tests/test-bootstrapper.js"
 		]
 	}
