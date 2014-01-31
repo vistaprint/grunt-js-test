@@ -8,6 +8,9 @@ var express = require('express'),
 
 var app = express();
 
+// default port for js-test-env
+var PORT = 8981;
+
 app.configure(function () {
 	app.set('views', __dirname + '/site');
 	app.locals.pretty = true;
@@ -79,6 +82,7 @@ app.get('/:project/all', function (req, res) {
 
 		res.render('test', {
 			all: true,
+			defaultBaseUri: 'http://localhost:' + PORT,
 			project: project,
 			modules: modules.length > 0 ? modules.join(',') : '',
 			deps: deps.map(project.resolveDeps),
@@ -99,6 +103,7 @@ app.get('/test/:project/:test', function (req, res) {
 	}
 
 	res.render('test', {
+		defaultBaseUri: 'http://localhost:' + PORT,
 		project: project,
 		modules: module || '',
 		test: test,
@@ -112,7 +117,7 @@ app.get('/alive', function (req, res) {
 
 if (require.main === module) {
 	try {
-		app.listen(8981);
+		app.listen(PORT);
 	} catch (ex) {
 		console.error('Confirm the server is not already running');
 	}
