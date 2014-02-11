@@ -102,13 +102,48 @@ app.get('/test/:project/:test', function (req, res) {
 		moduleName = path.relative(project.requirejs.modulesRelativeTo, file).replace(/\\/g, '/').replace(/\.js$/, '');
 	}
 
-	res.render('test', {
-		defaultBaseUri: 'http://localhost:' + PORT,
-		project: project,
-		modules: moduleName || '',
-		test: test,
-		deps: deps.map(project.resolveDeps),
-	});
+	function render(injectHTML) {
+		res.render('test', {
+			defaultBaseUri: 'http://localhost:' + PORT,
+			project: project,
+			modules: moduleName || '',
+			injectHTML: injectHTML || '',
+			test: test,
+			deps: deps.map(project.resolveDeps),
+		});
+	}
+
+	// if test has an inject HTML file, inject it
+	if (test.injectFile) {
+		require('fs').readFile(test.injectFile, function (err, html) {
+			if (err) {
+				console.log('Error reading inject file!');
+			}
+
+			render(html);
+		});
+	}
+	// if the test has an inject URL, request it and inject it
+	else if (test.injectUrl) {
+		require('http').get(test.injectUrl, function (res) {
+			var data = '';
+
+            res.on('data', function (chunk) {
+                data += chunk;
+            });
+
+            res.on('end', function () {
+				render(data);
+			});
+		}).on('error', function () {
+			console.log('Error requesting inject url!');
+			render(null);
+		});
+	}
+	// no inject HTML, most tests go here, just render the response
+	else {
+		render(null);
+	}
 });
 
 app.get('/alive', function (req, res) {

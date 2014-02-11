@@ -18,6 +18,9 @@ html(lang='en')
 		script(src=defaultBaseUri + '/js-test-env/sinon.js')
 		script(src=defaultBaseUri + '/js-test-env/shared.js')
 
+		//- Inject HTML
+		div!= injectHTML
+
 		//- project deps
 		- if (project.deps) {
 			- project.deps.forEach(function (dep) {
