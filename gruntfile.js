@@ -70,7 +70,18 @@ module.exports = function (grunt) {
 		});
 	});
 
-	grunt.registerTask('findTests', 'Locate all tests and generate an array of test URLs.', function (project) {
+	var HELP = [
+		'Locate tests that match given filters.',
+		'--project     Specify project',
+		'--file        Specify test file, rel to project base',
+		'--re          Inc. Reg Ex run on test file names',
+		'--search      Inc. str match run on test file names',
+		'--mocha-grep  Inc. Reg Ex run on test descriptions',
+		'--reporter    Mocha reporter to use, default Spec',
+		'--bail        Exit on first failed test',
+	];
+
+	grunt.registerTask('findTests', HELP.join('\n'), function (project) {
 		var file = grunt.option('file');
 		var config = grunt.config.get('mocha');
 		project = project || grunt.option('project'); // project should be the project slug (set in projects.json)
@@ -182,8 +193,6 @@ module.exports = function (grunt) {
 			grunt.task.run(['testConnect', 'findTests', 'mocha']);
 		}
 	});
-
-	grunt.registerTask('test-all', 'Run all tests for all projects.', ['testConnect', 'findTests', 'mocha']);
 
 	// start the express server with keepalive
 	grunt.registerTask('server', 'Start server with keepalive.', ['express', 'express-keepalive']);
