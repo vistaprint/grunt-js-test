@@ -95,17 +95,17 @@ app.get('/test/:project/:test', function (req, res) {
 	var test = project.getTest(req.params.test);
 	var file = test.abs;
 	var deps = findDeps(file, project.requirejs);
-	var module;
+	var moduleName;
 
 	// attempt to find the module name for this file
 	if (project.requirejs) {
-		module = path.relative(project.requirejs.modulesRelativeTo, file).replace(/\\/g, '/').replace(/\.js$/, '');
+		moduleName = path.relative(project.requirejs.modulesRelativeTo, file).replace(/\\/g, '/').replace(/\.js$/, '');
 	}
 
 	res.render('test', {
 		defaultBaseUri: 'http://localhost:' + PORT,
 		project: project,
-		modules: module || '',
+		modules: moduleName || '',
 		test: test,
 		deps: deps.map(project.resolveDeps),
 	});
