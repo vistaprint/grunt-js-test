@@ -82,7 +82,8 @@ app.get('/:project/all', function (req, res) {
 
 		res.render('test', {
 			all: true,
-			defaultBaseUri: 'http://localhost:' + PORT,
+			defaultBaseUri: 'http://' + req.host + ':' + PORT,
+			projectBaseUri: project.getBaseUri(req.host),
 			project: project,
 			modules: modules.length > 0 ? modules.join(',') : '',
 			deps: deps.map(project.resolveDeps),
@@ -104,7 +105,8 @@ app.get('/test/:project/:test', function (req, res) {
 
 	function render(injectHTML) {
 		res.render('test', {
-			defaultBaseUri: 'http://localhost:' + PORT,
+			defaultBaseUri: 'http://' + req.host + ':' + PORT,
+			projectBaseUri: project.getBaseUri(req.host),
 			project: project,
 			modules: moduleName || '',
 			injectHTML: injectHTML || '',
