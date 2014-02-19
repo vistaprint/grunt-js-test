@@ -23,7 +23,8 @@ module.exports = function (grunt) {
 			},
 			options: {
 				reporter: 'Spec',
-				timeout: 20000
+				timeout: 20000,
+				run: false // default will be changing in grunt-mocha >= 0.5
 			}
 		},
 
