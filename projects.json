@@ -5,7 +5,7 @@
 		"baseUri": "/vp/JS-Lib",
 		"root": "C:/vp/playpens/development/subversion/Web/www/vp/JS-Lib/",
 		"jenkins": "C:/Jenkins/workspace/JavaScript Unit Tests/",
-		"pattern": "**/*.tests.*"
+		"pattern": "**/*.tests.js"
 	},
 	{
 		"disabled": true,
@@ -13,12 +13,11 @@
 		"slug": "skinny",
 		"baseUri": "/",
 		"root": "C:/vp/SkinnyJS",
-		"pattern": "test/*.unittests.html"
+		"pattern": "test/*.unittests.js"
 	},
 	{
 		"name": "Studio",
 		"slug": "studio",
-		"port": 8982,
 		"isolate": true,
 		"baseUri": "/vp/JS-Lib",
 		"root": "C:/vp/playpens/development/subversion/Web/www/vp/JS-Lib/",
