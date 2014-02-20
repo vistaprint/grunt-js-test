@@ -197,4 +197,40 @@ module.exports = function (grunt) {
 
 	// start the express server with keepalive
 	grunt.registerTask('server', 'Start server with keepalive.', ['express', 'express-keepalive']);
+
+	// start the jscover proxy server
+	grunt.registerTask('jscover', 'Start JSCover proxy server.', function () {
+		var project = grunt.option('project'),
+			done = this.async(),
+			dir = path.join(__dirname, 'jscover', 'reports', project),
+			cmd = 'java -jar jscover/JSCover-all.jar -ws --proxy --port=3128 --no-instrument-reg=js-test-env --report-dir=' + dir + ' --local-storage',
+			exec = require('child_process').exec;
+
+		grunt.log.ok('JSCover proxy server started.');
+
+		exec(cmd, function (err, stdout, stderr) {
+			if (err) {
+				console.log(err, stdout, stderr);
+			}
+
+			grunt.log.ok('JSCover proxy server terminated.');
+			done();
+		});
+
+		done();
+	});
+
+	// Run coverage reports
+	grunt.registerTask('coverage', 'Start the JSCover proxy server and the web server', function () {
+		// project should be the project slug (set in projects.json)
+		var project = grunt.option('project');
+
+		if (!project) {
+			grunt.fail.warn('You must provide a project via the --project argument');
+		} else {
+			grunt.log.ok('Starting coverage proxy for project:', project);
+		}
+
+		grunt.task.run(['jscover', 'server']);
+	});
 };

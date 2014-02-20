@@ -9,3 +9,7 @@ iframe {
 	min-height: 100px;
 	border: none;
 }
+
+.right {
+	float: right;
+}

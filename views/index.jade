@@ -44,6 +44,9 @@ html(lang='en')
 				.panel.panel-default
 					.panel-heading
 						a(href='/'+project.slug)= project.name
+						- if (project.getCoverageReportFile()) {
+							a.right(href='/'+project.slug+'/jscover') Coverage Report
+						- }
 					table.table
 						thead
 							tr

@@ -12,7 +12,6 @@ var app = express();
 var PORT = 8981;
 
 app.configure(function () {
-	app.set('views', __dirname + '/site');
 	app.locals.pretty = true;
 	app.set('view engine', 'jade');
 	// app.use(express.logger('dev'));
@@ -21,7 +20,7 @@ app.configure(function () {
 	app.use(express.errorHandler());
 
 	// proxy static js-test-env javascript files
-	app.use('/js-test-env', express.static(__dirname + '/site/deps'));
+	app.use('/js-test-env', express.static(__dirname + '/views/deps'));
 });
 
 // allow projects to proxy through their own asset files
@@ -29,10 +28,24 @@ var _port = 8990;
 projects.forEach(function (project) {
 	project.statics.forEach(function (use) {
 		var app = express();
+
+		// ensure all responses are utf8 and are accessible cross-domain
+		app.use(function (req, res, next) {
+			res.header('Access-Control-Allow-Origin', '*');
+			res.header('Access-Control-Allow-Headers', 'X-Requested-With');
+			if (/.*\.js/.test(req.path)) {
+				res.charset = 'utf-8';
+			}
+			next();
+		});
+
+		// static file root
 		app.use(use.baseUri, express.static(use.root));
+
 		if (!project.port) {
 			project.port = _port++;
 		}
+
 		app.listen(project.port);
 	});
 });
@@ -45,6 +58,18 @@ app.get('/', function (req, res) {
 	});
 });
 
+// jscover page, in case someone makes this request by mistake
+app.get('/jscoverage.html', function (req, res) {
+	// if they're on the right hostname, this should be picked up by the proxy server
+	if (req.host === 'localhost-proxy') {
+		res.send('<h1>Error</h1><p>Ensure you have configured the HTTP Proxy for your web browser as described <a href="http://vistawiki.vistaprint.net/wiki/JavaScript_test_environment#Coverage_Reports">on the wiki</a> to <code>localhost:3128</code>.</p>');
+	}
+	// if they're not on the right hostname, they are never going to get a useful page here
+	else {
+		res.send('<h1>Error</h1><p>Please make this request using the jscover proxy at <a href="http://localhost-proxy:8981/jscoverage.html">http://localhost-proxy:8981/jscoverage.html</a></p>');
+	}
+});
+
 // list all tests for a given project
 app.get('/:project', function (req, res) {
 	var project = projects[req.params.project];
@@ -54,6 +79,16 @@ app.get('/:project', function (req, res) {
 		projects: [project],
 		allProjects: projects
 	});
+});
+
+// jscover report for a given project
+app.get('/:project/jscover', function (req, res) {
+	res.render('jscoverage');
+});
+
+// jscoverage json report for a given project
+app.get('/:project/jscoverage.json', function (req, res) {
+	res.status(200).sendfile(projects[req.params.project].getCoverageReportFile());
 });
 
 // run all tests for a given project
@@ -82,7 +117,7 @@ app.get('/:project/all', function (req, res) {
 
 		res.render('test', {
 			all: true,
-			defaultBaseUri: 'http://' + req.host + ':' + PORT,
+			defaultBaseUri: '//' + req.host + ':' + PORT,
 			projectBaseUri: project.getBaseUri(req.host),
 			project: project,
 			modules: modules.length > 0 ? modules.join(',') : '',
@@ -105,7 +140,7 @@ app.get('/test/:project/:test', function (req, res) {
 
 	function render(injectHTML) {
 		res.render('test', {
-			defaultBaseUri: 'http://' + req.host + ':' + PORT,
+			defaultBaseUri: '//' + req.host + ':' + PORT,
 			projectBaseUri: project.getBaseUri(req.host),
 			project: project,
 			modules: moduleName || '',
