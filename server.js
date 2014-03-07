@@ -4,7 +4,8 @@
 var express = require('express'),
 	findDeps = require('./lib/deps'),
 	projects = require('./lib/projects'),
-	path = require('path');
+	path = require('path'),
+	fs = require('fs');
 
 var app = express();
 
@@ -151,14 +152,12 @@ app.get('/test/:project/:test', function (req, res) {
 	}
 
 	// if test has an inject HTML file, inject it
-	if (test.injectFile) {
-		require('fs').readFile(test.injectFile, function (err, html) {
-			if (err) {
-				console.log('Error reading inject file!');
-			}
-
-			render(html);
+	if (test.injectFiles && test.injectFiles.length > 0) {
+		var injectHTML = '';
+		test.injectFiles.forEach(function (injectFile) {
+			injectHTML += fs.readFileSync(injectFile);
 		});
+		render(injectHTML);
 	}
 	// if the test has an inject URL, request it and inject it
 	else if (test.injectUrl) {
