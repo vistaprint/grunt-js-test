@@ -1,67 +1,28 @@
-!!! 5
-html(lang='en')
-	head
-		title JS Test Env
-		meta(charset='utf-8')
-		meta(name='viewport', content='width=device-width, initial-scale=1.0')
-		meta(name='description', content='')
-		meta(name='author', content='')
-		link(rel='stylesheet', href='/js-test-env/bootstrap.css', media='screen')
-		link(rel='stylesheet', href='/js-test-env/site.css', media='screen')
-	body.bootstrap
-		.container
-			.navbar.navbar-default.navbar-fixed-top
-				.navbar-header
-					button.navbar-toggle(type='button', data-toggle='collapse', data-target='.navbar-collapse')
-						span.icon-bar
-						span.icon-bar
-						span.icon-bar
-					a.navbar-brand(href='/', title='JavaScript Test Environment') JS Test Env
-				.navbar-collapse.collapse
-					ul.nav.navbar-nav
-						li.active
-							a(href='/', data-toggle='dropdown').dropdown-toggle
-								| List
-								b.caret
-							ul.dropdown-menu
-								- allProjects.forEach(function (project) {if (project) {
-									li
-										a(href='/'+project.slug)= project.name
-								- }});
-						li.dropdown
-							a(href='#', data-toggle='dropdown').dropdown-toggle
-								| Run All Tests
-								b.caret
-							ul.dropdown-menu
-								- allProjects.forEach(function (project) {
-									li
-										a(href='/'+project.slug+'/all')= project.name
-								- });
-						li
-							a(href='http://vistawiki.vistaprint.net/wiki/JavaScript_test_environment', target='_blank') Help
+extends base
 
-			- projects.forEach(function (project) {if (project) {
-				.panel.panel-default
-					.panel-heading
-						a(href='/'+project.slug)= project.name
-						- if (project.getCoverageReportFile()) {
-							a.right(href='/'+project.slug+'/jscover') Coverage Report
-						- }
-					table.table
-						thead
-							tr
-								th(style='width: 5%; max-width: 20px') #
-								th Test file
-								th Directory
-						tbody
-							- project.tests().forEach(function (test, testNumber) {
-								tr
-									td= testNumber
-									td
-										a(href=test.url)= test.filename
-									td= test.dir
-							- });
-			- }});
-
-		script(src='/js-test-env/jquery.js')
-		script(src='/js-test-env/bootstrap.min.js')
+block content
+	- projects.forEach(function (project) {if (project) {
+		.panel.panel-default
+			.panel-heading.clearfix
+				a.left(href='/'+project.slug)= project.name
+				div.right
+					a(href='/'+project.slug+'/all') Run all tests
+					|  &middot; 
+					a(href='/'+project.slug+'/all?coverage=1') Generate coverage report
+					| &middot; 
+					a(href='/'+project.slug+'/jscoverage') View coverage report
+			table.table
+				thead
+					tr
+						th(style='width: 5%; max-width: 20px') #
+						th Test file
+						th Filename
+				tbody
+					- project.tests().forEach(function (test, testNumber) {
+						tr
+							td= testNumber
+							td
+								a(href=test.url)= test.file
+							td= test.filename
+					- });
+	- }});

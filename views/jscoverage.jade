@@ -1,130 +1,89 @@
-!!! 5
-html
-head
-    meta(http-equiv='X-UA-Compatible', content='IE=EmulateIE7')
-    title JSCover
-    link(rel='stylesheet', type='text/css', href='/js-test-env/jscoverage-highlight.css')
-    link(rel='stylesheet', type='text/css', href='/js-test-env/jscoverage.css')
-    //if IE
-      link(rel='stylesheet', type='text/css', href='/js-test-env/jscoverage-ie.css')
-    script(type='text/javascript', src='/js-test-env/jscoverage.head.js')
-    script(type='text/javascript', src='/js-test-env/jscoverage.js')
-  body(onload='jscoverage_body_load();', onresize='jscoverage_body_resize();')
-    #mainDiv
-      #headingDiv
-        h1 JSCover
-        #progressBar.ProgressBar
-          span.ProgressPercentage
-          .ProgressGraph
-            .ProgressCovered
-        span#progressLabel
-      #tabs.Tabs
-        #browserTab
-          img(src='/js-test-env/jscoverage-throbber.gif', alt='')
-          | Browser
-          img(src='/js-test-env/jscoverage-throbber.gif', alt='')
-        #summaryTab
-          img#summaryThrobber(src='/js-test-env/jscoverage-throbber.gif', alt='')
-          | Summary
-          img(src='/js-test-env/jscoverage-throbber.gif', alt='')
-        #sourceTab.disabled
-          img(src='/js-test-env/jscoverage-throbber.gif', alt='')
-          | Source
-          img(src='/js-test-env/jscoverage-throbber.gif', alt='')
-        #storeTab
-          img#storeThrobber(src='/js-test-env/jscoverage-throbber.gif', alt='')
-          | Store
-          img(src='/js-test-env/jscoverage-throbber.gif', alt='')
-        #aboutTab
-          img(src='/js-test-env/jscoverage-throbber.gif', alt='')
-          | About
-          img(src='/js-test-env/jscoverage-throbber.gif', alt='')
-      #tabPages.TabPages
-        #browserTabPage.TabPage
-          #locationDiv
-            | URL:
-            input#location(type='text', size='70', onkeypress='jscoverage_input_keypress(event)')
-            button#openInFrameButton(onclick='jscoverage_openInFrameButton_click();', title='open URL in the iframe below [Enter]') Open in frame
-            button#openInWindowButton(onclick='jscoverage_openInWindowButton_click();', title='open URL in a new window (or tab) [Shift+Enter]') Open in window
-          #iframeDiv
-            iframe#browserIframe(name='browserIframe', onload='jscoverage_browser_load();')
-        .TabPage
-          input#checkbox(type='checkbox', onclick='return jscoverage_checkbox_click();')
-          label(for='checkbox') Show missing statements column
-          #summaryDiv
-            #summaryErrorDiv
-            table#summaryTable
-              thead
-                tr#headerRow
-                  th.leftColumn File
-                  th
-                    abbr(title='The total number of executable statements') Statements
-                  th
-                    abbr(title='The number of statements actually executed') Executed
-                  th
-                    abbr(title='The total number of branches') Branches
-                  th
-                    abbr(title='The number of branches covered') Branches Hit
-                  th
-                    abbr(title='The total number of functions') Functions
-                  th
-                    abbr(title='The number of functions covered') Functions Hit
-                  th
-                    a(href='javascript:jscoverage_recalculateSummaryTabBy(\'Coverage\')')
-                      abbr(title='Number of executed statements as a percentage of total number of statements') Coverage
-                  th
-                    a(href='javascript:jscoverage_recalculateSummaryTabBy(\'Branch\')')
-                      abbr(title='Number of executed branch paths as a percentage of total number of branch paths') Branch
-                  th
-                    a(href='javascript:jscoverage_recalculateSummaryTabBy(\'Function\')')
-                      abbr(title='Number of executed functions as a percentage of total number of functions') Function
-                tr#summaryTotals
-                  td.leftColumn
-                    span.title Total:
-                    span 0
-                  td.numeric 0
-                  td.numeric 0
-                  td.numeric 0
-                  td.numeric 0
-                  td.numeric 0
-                  td.numeric 0
-                  td.coverage
-                    .pctGraph
-                      .covered
-                    span#summaryTotal.pct 0%
-                  td.coverage
-                    .pctGraph
-                      .covered
-                    span#branchSummaryTotal.pct 0%
-                  td.coverage
-                    .pctGraph
-                      .covered
-                    span#functionSummaryTotal.pct 0%
-                //
-                      <tr>
-                      <td>0</td>
-                      <td>0</td>
-                      <td>0</td>
-                      <td>0%</td>
-                      <td>0</td>
-                      </tr>
-              tbody#summaryTbody
+extends base
 
-        .TabPage
-          #fileDiv
-          #sourceDiv
-        #storeTabPage.TabPage
-          button#storeButton(onclick='jscoverage_storeButton_click();') Store Report
-          button#stopButton(onclick='jscoverage_stopButton_click();') Stop Server
-          img#storeImg(src='/js-test-env/jscoverage-throbber.gif', alt='loading...')
-          #storeDiv
-        .TabPage
-          p
-            | This is version 1.0.6 of JSCover, a program that calculates code
-            | coverage statistics for JavaScript.
-          p
-            | See
-            a(href='http://tntim96.github.com/JSCover') http://tntim96.github.com/JSCover
-            | for more information.
-          p
-            | Copyright © 2007, 2008, 2009, 2010 siliconforks.com - 2012, 2013 tntim96
+block append title
+	|&middot; Coverage Reports
+
+block append styles
+	link(rel='stylesheet', type='text/css', href='/js-test-env/jscoverage-highlight.css')
+	link(rel='stylesheet', type='text/css', href='/js-test-env/jscoverage.css')
+	//if IE
+		link(rel='stylesheet', type='text/css', href='/js-test-env/jscoverage-ie.css')
+
+block append scripts
+	script(type='text/javascript', src='/js-test-env/jscoverage.head.js')
+	script(type='text/javascript', src='/js-test-env/jscoverage.js')
+
+block content
+	h2
+		| Coverage reports for 
+		=project.name
+
+	ul#tabs.nav.nav-tabs(data-tabs="tabs")
+		li.active
+			a(href='#summaryPage', data-toggle="tab") Summary
+		li.disabled
+			a#sourceTab(href='#sourcePage', data-toggle="tab") Source
+
+	#progress.progress
+		.progress-bar(role="progressbar", style="width: 60%")
+			span 60% Complete
+
+	.tab-content
+		.tab-pane.active#summaryPage
+			//- .panel-heading Code coverage summary
+			input#checkbox(type='checkbox', onclick='return jscoverage_checkbox_click();')
+			label(for='checkbox') Show missing statements column
+			#summaryErrorDiv
+
+			table.table.table-striped.table-bordered.table-condensed#summaryTable
+				thead
+					tr
+						th File
+						th(title='The number of statements actually executed / The total number of executable statements') Statements
+						th(title='The number of branches covered / The total number of branches') Branches
+						th(title='The number of functions covered / The total number of functions') Functions
+						th
+							a(href='javascript:jscoverage_recalculateSummaryTabBy(\'Coverage\')')
+								abbr(title='Number of executed statements as a percentage of total number of statements') Coverage
+						th
+							a(href='javascript:jscoverage_recalculateSummaryTabBy(\'Branch\')')
+								abbr(title='Number of executed branch paths as a percentage of total number of branch paths') Branch
+						th
+							a(href='javascript:jscoverage_recalculateSummaryTabBy(\'Function\')')
+								abbr(title='Number of executed functions as a percentage of total number of functions') Function
+					tr#summaryTotals
+						td.leftColumn
+							span.title Total:
+							span 0
+						td.numeric 0
+						td.numeric 0
+						td.numeric 0
+						td.coverage
+							.pctGraph
+								.covered
+							span#summaryTotal.pct 0%
+						td.coverage
+							.pctGraph
+								.covered
+							span#branchSummaryTotal.pct 0%
+						td.coverage
+							.pctGraph
+								.covered
+							span#functionSummaryTotal.pct 0%
+					//-
+						<tr>
+						<td>0</td>
+						<td>0</td>
+						<td>0</td>
+						<td>0%</td>
+						<td>0</td>
+						</tr>
+				tbody#summaryTbody
+
+		.tab-pane#sourcePage
+			.panel
+				h1#fileDiv
+				#sourceDiv
+		.tab-pane#storeTabPage
+			button.btn.btn-default#storeButton(href='/' + project.slug + '/jscoverage.json') Store Report
+			ul#storeDiv

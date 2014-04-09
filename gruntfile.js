@@ -22,10 +22,23 @@ module.exports = function (grunt) {
 				}
 			},
 			options: {
+				inject: path.join(__dirname, 'lib', 'phantom-bridge.js'),
 				reporter: 'Spec',
 				timeout: 20000,
 				run: false // default will be changing in grunt-mocha >= 0.5
 			}
+		},
+
+		watch: {
+			// grunt-watch to restart the web server
+			server: {
+				files: ['server.js', 'projects.json', 'lib/*.js'],
+				tasks: ['express', 'express-keepalive'],
+				options: {
+					atBegin: true,
+					interrupt: true
+				}
+			},
 		},
 
 		jshint: {
@@ -41,6 +54,7 @@ module.exports = function (grunt) {
 	});
 
 	grunt.loadNpmTasks('grunt-contrib-jshint');
+	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-express');
 	grunt.loadNpmTasks('grunt-mocha');
 
@@ -53,11 +67,15 @@ module.exports = function (grunt) {
 		}
 
 		var express = grunt.config.get('express');
+		var host = express.server.options.hostname || 'localhost';
+		var port = express.server.options.port;
+
+		grunt.log.ok('Checking server at http://' + host + ':' + port + '/alive');
 
 		// first make sure the web server is running
 		require('http').get({
-			host: express.server.options.hostname || 'localhost',
-			port: express.server.options.port,
+			host: host,
+			port: port,
 			path: '/alive',
 			timeout: 30
 		}, function (res) {
@@ -92,6 +110,7 @@ module.exports = function (grunt) {
 			return;
 		}
 
+		var coverage = !!grunt.option('coverage');
 		var jenkins = !!grunt.option('jenkins');
 		var projects = require('./lib/projects');
 		var tests = [];
@@ -154,7 +173,7 @@ module.exports = function (grunt) {
 
 		// set the config for mocha passing the correct URLs to be used
 		config.all.options.urls = tests.map(function (test) {
-			return 'http://localhost:8981' + test.url;
+			return 'http://localhost:8981' + test.url + (coverage ? '&coverage=1' : '');
 		});
 
 		// option: bail - exit on first error found
@@ -197,13 +216,12 @@ module.exports = function (grunt) {
 
 	// start the express server with keepalive
 	grunt.registerTask('server', 'Start server with keepalive.', ['express', 'express-keepalive']);
+	grunt.registerTask('server-live', 'Start web server under grunt:watch utility to live reload upon changes.', ['watch:server']);
 
 	// start the jscover proxy server
 	grunt.registerTask('jscover', 'Start JSCover proxy server.', function () {
-		var project = grunt.option('project'),
-			done = this.async(),
-			dir = path.join(__dirname, 'jscover', 'reports', project),
-			cmd = 'java -jar jscover/JSCover-all.jar -ws --proxy --port=3128 --no-instrument-reg=js-test-env --report-dir=' + dir + ' --local-storage',
+		var done = this.async(),
+			cmd = 'java -jar jscover/JSCover-all.jar -ws --proxy --port=3128', // --local-storage',
 			exec = require('child_process').exec;
 
 		grunt.log.ok('JSCover proxy server started.');
@@ -221,16 +239,5 @@ module.exports = function (grunt) {
 	});
 
 	// Run coverage reports
-	grunt.registerTask('coverage', 'Start the JSCover proxy server and the web server', function () {
-		// project should be the project slug (set in projects.json)
-		var project = grunt.option('project');
-
-		if (!project) {
-			grunt.fail.warn('You must provide a project via the --project argument');
-		} else {
-			grunt.log.ok('Starting coverage proxy for project:', project);
-		}
-
-		grunt.task.run(['jscover', 'server']);
-	});
+	grunt.registerTask('coverage', 'Start the JSCover proxy server and the web server', ['jscover', 'server']);
 };

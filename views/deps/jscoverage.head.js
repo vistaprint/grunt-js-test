@@ -1,215 +1,154 @@
-function BranchData() {
-    this.position = -1;
-    this.nodeLength = -1;
-    this.src = null;
-    this.evalFalse = 0;
-    this.evalTrue = 0;
+(function (window) {
+    'use strict';
 
-    this.init = function(position, nodeLength, src) {
-        this.position = position;
-        this.nodeLength = nodeLength;
-        this.src = src;
-        return this;
+    function BranchData() {
+        this.position = -1;
+        this.nodeLength = -1;
+        this.src = null;
+        this.evalFalse = 0;
+        this.evalTrue = 0;
+
+        this.init = function (position, nodeLength, src) {
+            this.position = position;
+            this.nodeLength = nodeLength;
+            this.src = src;
+            return this;
+        };
+
+        this.ranCondition = function (result) {
+            if (result) {
+                this.evalTrue++;
+            } else {
+                this.evalFalse++;
+            }
+        };
+
+        this.pathsCovered = function () {
+            var paths = 0;
+            if (this.evalTrue > 0) {
+                paths++;
+            }
+            if (this.evalFalse > 0) {
+                paths++;
+            }
+            return paths;
+        };
+
+        this.covered = function () {
+            return this.evalTrue > 0 && this.evalFalse > 0;
+        };
     }
 
-    this.ranCondition = function(result) {
-        if (result)
-            this.evalTrue++;
-        else
-            this.evalFalse++;
+    var toJson = BranchData.prototype.toJSON = function () {
+        return {
+            'position': this.position,
+            'nodeLength': this.nodeLength,
+            'src': this.src,
+            'evalFalse': this.evalFalse,
+            'evalTrue': this.evalTrue
+        };
     };
 
-    this.pathsCovered = function() {
-        var paths = 0;
-        if (this.evalTrue > 0)
-          paths++;
-        if (this.evalFalse > 0)
-          paths++;
-        return paths;
-    };
-
-    this.covered = function() {
-        return this.evalTrue > 0 && this.evalFalse > 0;
-    };
-
-    this.toJSON = function() {
-        return '{"position":' + this.position
-            + ',"nodeLength":' + this.nodeLength
-            + ',"src":' + jscoverage_quote(this.src)
-            + ',"evalFalse":' + this.evalFalse
-            + ',"evalTrue":' + this.evalTrue + '}';
-    };
-
-    this.message = function() {
-        if (this.evalTrue === 0 && this.evalFalse === 0)
+    BranchData.prototype.message = function () {
+        if (this.evalTrue === 0 && this.evalFalse === 0) {
             return 'Condition never evaluated         :\t' + this.src;
-        else if (this.evalTrue === 0)
+        } else if (this.evalTrue === 0) {
             return 'Condition never evaluated to true :\t' + this.src;
-        else if (this.evalFalse === 0)
+        } else if (this.evalFalse === 0) {
             return 'Condition never evaluated to false:\t' + this.src;
-        else
-            return 'Condition covered';
-    };
-}
-
-BranchData.fromJson = function(jsonString) {
-    var json = eval('(' + jsonString + ')');
-    var branchData = new BranchData();
-    branchData.init(json.position, json.nodeLength, json.src);
-    branchData.evalFalse = json.evalFalse;
-    branchData.evalTrue = json.evalTrue;
-    return branchData;
-};
-
-BranchData.fromJsonObject = function(json) {
-    var branchData = new BranchData();
-    branchData.init(json.position, json.nodeLength, json.src);
-    branchData.evalFalse = json.evalFalse;
-    branchData.evalTrue = json.evalTrue;
-    return branchData;
-};
-
-function buildBranchMessage(conditions) {
-    var message = 'The following was not covered:';
-    for (var i = 0; i < conditions.length; i++) {
-        if (conditions[i] !== undefined && conditions[i] !== null && !conditions[i].covered())
-          message += '\n- '+ conditions[i].message();
-    }
-    return message;
-};
-
-function convertBranchDataConditionArrayToJSON(branchDataConditionArray) {
-    var array = [];
-    var length = branchDataConditionArray.length;
-    for (var condition = 0; condition < length; condition++) {
-        var branchDataObject = branchDataConditionArray[condition];
-        if (branchDataObject === undefined || branchDataObject === null) {
-            value = 'null';
         } else {
-            value = branchDataObject.toJSON();
+            return 'Condition covered';
         }
-        array.push(value);
-    }
-    return '[' + array.join(',') + ']';
-}
+    };
 
-function convertBranchDataLinesToJSON(branchData) {
-    if (branchData === undefined) {
-        return '{}'
-    }
-    var json = '';
-    for (var line in branchData) {
-        if (isNaN(line))
-            continue;
-        if (json !== '')
-            json += ','
-        json += '"' + line + '":' + convertBranchDataConditionArrayToJSON(branchData[line]);
-    }
-    return '{' + json + '}';
-}
+    var fromJson = BranchData.fromJson = function (jsonString) {
+        if (typeof jsonString !== 'string') {
+            return BranchData.fromJsonObject(jsonString);
+        }
 
-function convertBranchDataLinesFromJSON(jsonObject) {
-    if (jsonObject === undefined) {
-        return {};
-    }
-    for (var line in jsonObject) {
-        var branchDataJSON = jsonObject[line];
-        if (branchDataJSON !== null) {
-            for (var conditionIndex = 0; conditionIndex < branchDataJSON.length; conditionIndex ++) {
-                var condition = branchDataJSON[conditionIndex];
-                if (condition !== null) {
-                    branchDataJSON[conditionIndex] = BranchData.fromJsonObject(condition);
+        var json = JSON.parse(jsonString);
+        var branchData = new BranchData();
+        branchData.init(json.position, json.nodeLength, json.src);
+        branchData.evalFalse = json.evalFalse;
+        branchData.evalTrue = json.evalTrue;
+        return branchData;
+    };
+
+    BranchData.fromJsonObject = function (json) {
+        var branchData = new BranchData();
+        branchData.init(json.position, json.nodeLength, json.src);
+        branchData.evalFalse = json.evalFalse;
+        branchData.evalTrue = json.evalTrue;
+        return branchData;
+    };
+
+    function saveCoverageData(data) {
+        // convert branch data to regular object to be JSON encoded
+        for (var file in data) {
+            if (data[file].branchData) {
+                for (var branchId in data[file].branchData) {
+                    if (data[file].branchData.hasOwnProperty(branchId)) {
+                        for (var i = 0, l = data[file].branchData[branchId].length; i < l; i++) {
+                            if (!data[file].branchData[branchId][i]) {
+                                continue;
+                            }
+
+                            // convert the BranchData object to a regular object
+                            // we need use it like this because
+                            data[file].branchData[branchId][i] = toJson.call(data[file].branchData[branchId][i]);
+                        }
+                    }
                 }
             }
         }
+
+        // now simply JSON.stringify the data
+        return JSON.stringify(data);
     }
-    return jsonObject;
-}
-function jscoverage_quote(s) {
-    return '"' + s.replace(/[\u0000-\u001f"\\\u007f-\uffff]/g, function (c) {
-        switch (c) {
-            case '\b':
-                return '\\b';
-            case '\f':
-                return '\\f';
-            case '\n':
-                return '\\n';
-            case '\r':
-                return '\\r';
-            case '\t':
-                return '\\t';
-            // IE doesn't support this
-            /*
-             case '\v':
-             return '\\v';
-             */
-            case '"':
-                return '\\"';
-            case '\\':
-                return '\\\\';
-            default:
-                return '\\u' + jscoverage_pad(c.charCodeAt(0).toString(16));
+
+    function restoreCoverageData(jsonString) {
+        var data = typeof jsonString === 'string' ? JSON.parse(jsonString) : jsonString;
+
+        // confirm the JSON.parse worked properly
+        if (!data) {
+            return;
         }
-    }) + '"';
-}
 
-function getArrayJSON(coverage) {
-    var array = [];
-    if (coverage === undefined)
-        return array;
+        // convert branch data to BranchData objects
+        for (var file in data) {
+            if (data[file].branchData) {
+                for (var branchId in data[file].branchData) {
+                    if (data[file].branchData.hasOwnProperty(branchId)) {
+                        for (var i = 0, l = data[file].branchData[branchId].length; i < l; i++) {
+                            if (!data[file].branchData[branchId][i]) {
+                                continue;
+                            }
 
-    var length = coverage.length;
-    for (var line = 0; line < length; line++) {
-        var value = coverage[line];
-        if (value === undefined || value === null) {
-            value = 'null';
+                            // convert the BranchData object to a regular object
+                            // we need use it like this because
+                            data[file].branchData[branchId][i] = fromJson(data[file].branchData[branchId][i]);
+                        }
+                    }
+                }
+            }
         }
-        array.push(value);
+
+        return data;
     }
-    return array;
-}
 
-function jscoverage_serializeCoverageToJSON() {
-    var json = [];
-    for (var file in _$jscoverage) {
-        var lineArray = getArrayJSON(_$jscoverage[file].lineData);
-        var fnArray = getArrayJSON(_$jscoverage[file].functionData);
+    // load from and save to window.localStorage when available
+    if (window.useLocalStorage && window.localStorage) {
+        if ('jscover' in window.localStorage) {
+            window._$jscoverage = restoreCoverageData(window.localStorage.jscover);
+        }
 
-        json.push(jscoverage_quote(file) + ':{"lineData":[' + lineArray.join(',') + '],"functionData":[' + fnArray.join(',') + '],"branchData":' + convertBranchDataLinesToJSON(_$jscoverage[file].branchData) + '}');
+        window.addEventListener('beforeunload', function () {
+            if (window._$jscoverage) {
+                window.localStorage.jscover = saveCoverageData(window._$jscoverage);
+            }
+        }, false);
     }
-    return '{' + json.join(',') + '}';
-}
 
-function jscoverage_parseCoverageJSON(data) {
-    var result = {};
-    var json = eval('(' + data + ')');
-    var file;
-    for (file in json) {
-        var fileCoverage = json[file];
-        result[file] = {};
-        result[file].lineData = fileCoverage.lineData;
-        result[file].functionData = fileCoverage.functionData;
-        result[file].branchData = convertBranchDataLinesFromJSON(fileCoverage.branchData);
-    }
-    return result;
-}
-
-function jscoverage_pad(s) {
-    return '0000'.substr(s.length) + s;
-}
-
-function jscoverage_html_escape(s) {
-    return s.replace(/[<>\&\"\']/g, function (c) {
-        return '&#' + c.charCodeAt(0) + ';';
-    });
-}
-if (typeof(_$jscoverage) === "undefined" && (typeof(Storage) !== "undefined") && localStorage["jscover"])
-    _$jscoverage = jscoverage_parseCoverageJSON(localStorage["jscover"]);
-if (typeof(jscoverbeforeunload) === "undefined") {
-    var jscoverbeforeunload = (window.onbeforeunload) ? window.onbeforeunload : function () {};
-    window.onbeforeunload = function () {
-        jscoverbeforeunload();
-        if ((typeof(_$jscoverage) !== "undefined") && (typeof(Storage) !== "undefined"))
-            localStorage["jscover"] = jscoverage_serializeCoverageToJSON();
-    };
-}
+    window.saveCoverageData = saveCoverageData;
+    window.restoreCoverageData = restoreCoverageData;
+})(this);

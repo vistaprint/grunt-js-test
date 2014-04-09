@@ -9,13 +9,21 @@ html(lang='en')
 		link(rel='stylesheet', href=defaultBaseUri + '/js-test-env/site.css', media='screen')
 		link(rel='stylesheet', href=defaultBaseUri + '/js-test-env/mocha.css', media='screen')
 		base(href=projectBaseUri)
-	body(data-modules=modules)
+	body(data-modules=modules, data-project=project.slug)
 		div(id='mocha')
 
 		//- global deps
 		script(src=defaultBaseUri + '/js-test-env/mocha.js')
 		script(src=defaultBaseUri + '/js-test-env/chai.js')
 		script(src=defaultBaseUri + '/js-test-env/sinon.js')
+		- if (coverage) {
+			script(src=defaultBaseUri + '/js-test-env/jscoverage.head.js')
+			- if (coverageData) {
+				script(type='text/json', id='coverageData')!=coverageData
+				script(text='text/javascript').
+					window._$jscoverage = restoreCoverageData(document.getElementById('coverageData').innerHTML);
+			- }
+		- }
 		script(src=defaultBaseUri + '/js-test-env/shared.js')
 
 		//- Inject HTML

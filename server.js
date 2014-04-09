@@ -16,7 +16,7 @@ app.configure(function () {
 	app.locals.pretty = true;
 	app.set('view engine', 'jade');
 	// app.use(express.logger('dev'));
-	// app.use(express.bodyParser());
+	app.use(express.bodyParser({ limit: '200mb' }));
 	// app.use(express.methodOverride());
 	app.use(express.errorHandler());
 
@@ -34,13 +34,11 @@ projects.forEach(function (project) {
 		app.use(function (req, res, next) {
 			res.header('Access-Control-Allow-Origin', '*');
 			res.header('Access-Control-Allow-Headers', 'X-Requested-With');
-			if (/.*\.js/.test(req.path)) {
-				res.charset = 'utf-8';
-			}
 			next();
 		});
 
 		// static file root
+		// app.use(use.baseUri, require('./lib/static')(use.root));
 		app.use(use.baseUri, express.static(use.root));
 
 		if (!project.port) {
@@ -48,6 +46,25 @@ projects.forEach(function (project) {
 		}
 
 		app.listen(project.port);
+	});
+
+	// coverage report proxy server
+	var http = require('http');
+	var request = require('request');
+
+	// setup request object with a proxy
+	var r = request.defaults({'proxy': 'http://localhost:3128'});
+
+	project.statics.forEach(function () {
+		var proxy = http.createServer(function (req, resp) {
+			r.get('http://localhost:' + project.port  + req.url).pipe(resp);
+		});
+
+		if (!project.coveragePort) {
+			project.coveragePort = _port++;
+		}
+
+		proxy.listen(project.coveragePort);
 	});
 });
 
@@ -59,21 +76,17 @@ app.get('/', function (req, res) {
 	});
 });
 
-// jscover page, in case someone makes this request by mistake
-app.get('/jscoverage.html', function (req, res) {
-	// if they're on the right hostname, this should be picked up by the proxy server
-	if (req.host === 'localhost-proxy') {
-		res.send('<h1>Error</h1><p>Ensure you have configured the HTTP Proxy for your web browser as described <a href="http://vistawiki.vistaprint.net/wiki/JavaScript_test_environment#Coverage_Reports">on the wiki</a> to <code>localhost:3128</code>.</p>');
-	}
-	// if they're not on the right hostname, they are never going to get a useful page here
-	else {
-		res.send('<h1>Error</h1><p>Please make this request using the jscover proxy at <a href="http://localhost-proxy:8981/jscoverage.html">http://localhost-proxy:8981/jscoverage.html</a></p>');
-	}
+app.get('/alive', function (req, res) {
+	res.send('hello world');
 });
 
 // list all tests for a given project
 app.get('/:project', function (req, res) {
 	var project = projects[req.params.project];
+
+	if (!project) {
+		return res.status(404).send('Project not found. Go back.');
+	}
 
 	res.render('index', {
 		project: project,
@@ -82,14 +95,62 @@ app.get('/:project', function (req, res) {
 	});
 });
 
-// jscover report for a given project
-app.get('/:project/jscover', function (req, res) {
-	res.render('jscoverage');
+// jscover page, in case someone makes this request by mistake
+app.get('/:project/jscoverage', function (req, res) {
+	var project = projects[req.params.project];
+
+	if (!project) {
+		return res.status(404).send('Project not found. Go back.');
+	}
+
+	res.render('jscoverage', {
+		project: project,
+		projectBaseUri: project.getBaseUri(req.host, false),
+	});
 });
 
 // jscoverage json report for a given project
 app.get('/:project/jscoverage.json', function (req, res) {
-	res.status(200).sendfile(projects[req.params.project].getCoverageReportFile());
+	var project = projects[req.params.project];
+
+	if (!project) {
+		return res.status(404).send('Project not found. Go back.');
+	}
+
+	if (project.doesCoverageReportExist()) {
+		res.status(200).sendfile(project.getCoverageReportFile());
+	} else {
+		res.status(404).send({
+			success: false,
+			message: 'Coverage report data does not exist for project.'
+		});
+	}
+});
+
+// store the jscover report to disk
+app.post('/:project/jscoverage.json', function (req, res) {
+	var project = projects[req.params.project];
+
+	// we need data to write to the file
+	if (!req.body.json || !project) {
+		return res.status(500).send('Project not found or no JSON data provided.');
+	}
+
+	var file = project.getCoverageReportFile();
+	console.log('Writting coverage report to:', file);
+
+	// ensure the project folder exists
+	if (!fs.existsSync(path.dirname(file))) {
+		fs.mkdirSync(path.dirname(file));
+	}
+
+	fs.writeFile(file, req.body.json, function (err) {
+		if (err) {
+			res.status(500).send({success: false});
+		} else {
+			res.send('success');
+		}
+	});
 });
 
 // run all tests for a given project
@@ -97,9 +158,16 @@ app.get('/:project/all', function (req, res) {
 	var testFiles = [];
 	var project = projects[req.params.project];
 
+	// determine if we want to generate coverage reports
+	var coverage = req.query.coverage || false;
+
+	// if we are running each test in isolation, we will
+	// actually create an iframe and all /test/:project/:test
+	// method below
 	if (project.isolate) {
 		res.render('test-all-isolate', {
-			project: project
+			project: project,
+			coverage: coverage,
 		});
 	} else {
 		project.tests().map(function (test) {
@@ -119,7 +187,7 @@ app.get('/:project/all', function (req, res) {
 		res.render('test', {
 			all: true,
 			defaultBaseUri: '//' + req.host + ':' + PORT,
-			projectBaseUri: project.getBaseUri(req.host),
+			projectBaseUri: project.getBaseUri(req.host, coverage),
 			project: project,
 			modules: modules.length > 0 ? modules.join(',') : '',
 			deps: deps.map(project.resolveDeps),
@@ -130,9 +198,18 @@ app.get('/:project/all', function (req, res) {
 app.get('/test/:project/:test', function (req, res) {
 	var project = projects[req.params.project];
 	var test = project.getTest(req.params.test);
+
+	// if we do not have this test, 404?
+	if (!test) {
+		return res.status(404).send('Project not found. Go back.');
+	}
+
 	var file = test.abs;
 	var deps = findDeps(file, project.requirejs);
 	var moduleName;
+
+	// determine if we want to generate coverage reports
+	var coverage = req.query.coverage || false;
 
 	// attempt to find the module name for this file
 	if (project.requirejs) {
@@ -140,14 +217,22 @@ app.get('/test/:project/:test', function (req, res) {
 	}
 
 	function render(injectHTML) {
+		var coverageData;
+
+		if (coverage && project.doesCoverageReportExist()) {
+			coverageData = fs.readFileSync(project.getCoverageReportFile());
+		}
+
 		res.render('test', {
 			defaultBaseUri: '//' + req.host + ':' + PORT,
-			projectBaseUri: project.getBaseUri(req.host),
+			projectBaseUri: project.getBaseUri(req.host, coverage),
 			project: project,
 			modules: moduleName || '',
 			injectHTML: injectHTML || '',
 			test: test,
 			deps: deps.map(project.resolveDeps),
+			coverage: coverage,
+			coverageData: coverageData
 		});
 	}
 
@@ -180,10 +265,6 @@ app.get('/test/:project/:test', function (req, res) {
 	else {
 		render(null);
 	}
-});
-
-app.get('/alive', function (req, res) {
-	res.send('hello world');
 });
 
 if (require.main === module) {

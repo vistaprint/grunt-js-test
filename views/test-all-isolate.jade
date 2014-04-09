@@ -26,5 +26,5 @@ html(lang='en')
 			p(style='font-size: 14px') Scroll down and check each test
 		//- test-specific deps, test file should be last in list
 		- project.tests().forEach(function (test) {
-			iframe(seamless="seamless", src=test.url + "&iframe=1")
+			iframe(seamless="seamless", src=test.url + "&iframe=1" + (coverage ? "&coverage=1" : ""))
 		- });
