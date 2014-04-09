@@ -98,6 +98,7 @@ module.exports = function (grunt) {
 		'--mocha-grep  Inc. Reg Ex run on test descriptions',
 		'--reporter    Mocha reporter to use, default Spec',
 		'--bail        Exit on first failed test',
+		'--coverage    Generate coverage report data'
 	];
 
 	grunt.registerTask('findTests', HELP.join('\n'), function (project) {
