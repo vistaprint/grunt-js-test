@@ -9,8 +9,10 @@ block content
 					a(href='/'+project.slug+'/all') Run all tests
 					|  &middot; 
 					a(href='/'+project.slug+'/all?coverage=1') Generate coverage report
-					| &middot; 
-					a(href='/'+project.slug+'/jscoverage') View coverage report
+					- if (project.doesCoverageReportExist()) {
+						| &middot; 
+						a(href='/'+project.slug+'/jscoverage') View coverage report
+					- }
 			table.table
 				thead
 					tr
