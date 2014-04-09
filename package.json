@@ -1,39 +1,40 @@
 {
-	"name": "js-test-env",
-	"description": "JavaScript Testing Environment",
-	"version": "0.0.4",
-	"homepage": "http://vistawiki.vistaprint.net/wiki/JavaScript_test_environment",
-	"dependencies": {
-		"express": "3.x",
-		"glob": "3.2.x",
-		"grunt-express": "~1.2.x",
-		"grunt-mocha": "0.4.x",
-		"jade": "~0.35"
-	},
-	"peerDependencies": {
-		"grunt": "~0.4"
-	},
-	"devDependencies": {
-		"grunt": "~0.4",
-		"grunt-contrib-jshint": "~0.7.x"
-	},
-	"engines": {
-		"node": "*"
-	},
-	"author": {
-		"name": "Vistaprint: Web Platform",
-		"email": "webplatform@vistaprint.com",
-		"url": "http://vistawiki.vistaprint.net/wiki/Web_platform"
-	},
-	"main": "gruntfile.js",
-	"scripts": {
-		"start": "./node_modules/.bin/grunt start"
-	},
-	"repository": {
-		"type": "https",
-		"url": "https://git.vistaprint.net/scm/wp/js-test-env.git"
-	},
-	"bugs": {
-		"url": "https://git.vistaprint.net/projects/WP/repos/js-test-env/browse"
-	}
+  "name": "js-test-env",
+  "description": "JavaScript Testing Environment",
+  "version": "0.0.4",
+  "homepage": "http://vistawiki.vistaprint.net/wiki/JavaScript_test_environment",
+  "dependencies": {
+    "express": "3.x",
+    "glob": "3.2.x",
+    "grunt-express": "~1.2.x",
+    "grunt-mocha": "0.4.x",
+    "jade": "~0.35",
+    "grunt-contrib-watch": "^0.6.1"
+  },
+  "peerDependencies": {
+    "grunt": "~0.4"
+  },
+  "devDependencies": {
+    "grunt": "~0.4",
+    "grunt-contrib-jshint": "~0.7.x"
+  },
+  "engines": {
+    "node": "*"
+  },
+  "author": {
+    "name": "Vistaprint: Web Platform",
+    "email": "webplatform@vistaprint.com",
+    "url": "http://vistawiki.vistaprint.net/wiki/Web_platform"
+  },
+  "main": "gruntfile.js",
+  "scripts": {
+    "start": "./node_modules/.bin/grunt start"
+  },
+  "repository": {
+    "type": "https",
+    "url": "https://git.vistaprint.net/scm/wp/js-test-env.git"
+  },
+  "bugs": {
+    "url": "https://git.vistaprint.net/projects/WP/repos/js-test-env/browse"
+  }
 }
