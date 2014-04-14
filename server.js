@@ -155,11 +155,25 @@ app.post('/:project/jscoverage.json', function (req, res) {
 
 // run all tests for a given project
 app.get('/:project/all', function (req, res) {
+	var project = projects[req.params.project];
+
+	// determine if we want to generate coverage reports
+	var coverage = !!(req.query.coverage || false);
+
+	// we run each each test in isolation, which creates an iframe
+	// to /test/:project/:test for each test
+	res.render('test-all-isolate', {
+		project: project,
+		coverage: coverage,
+	});
+});
+
+/*app.get('/:project/all-old', function (req, res) {
 	var testFiles = [];
 	var project = projects[req.params.project];
 
 	// determine if we want to generate coverage reports
-	var coverage = req.query.coverage || false;
+	var coverage = !!(req.query.coverage || false);
 
 	// if we are running each test in isolation, we will
 	// actually create an iframe and all /test/:project/:test
@@ -184,6 +198,8 @@ app.get('/:project/all', function (req, res) {
 			});
 		}
 
+		var coverageData = coverage && project.doesCoverageReportExist() ? fs.readFileSync(project.getCoverageReportFile()) : null;
+
 		res.render('test', {
 			all: true,
 			defaultBaseUri: '//' + req.host + ':' + PORT,
@@ -191,9 +207,11 @@ app.get('/:project/all', function (req, res) {
 			project: project,
 			modules: modules.length > 0 ? modules.join(',') : '',
 			deps: deps.map(project.resolveDeps),
+			coverage: coverage,
+			coverageData: coverageData
 		});
 	}
-});
+});*/
 
 app.get('/test/:project/:test', function (req, res) {
 	var project = projects[req.params.project];
@@ -209,7 +227,7 @@ app.get('/test/:project/:test', function (req, res) {
 	var moduleName;
 
 	// determine if we want to generate coverage reports
-	var coverage = req.query.coverage || false;
+	var coverage = !!(req.query.coverage || false);
 
 	// attempt to find the module name for this file
 	if (project.requirejs) {
