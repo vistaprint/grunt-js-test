@@ -9,7 +9,7 @@ html(lang='en')
 		link(rel='stylesheet', href=defaultBaseUri + '/js-test-env/site.css', media='screen')
 		link(rel='stylesheet', href=defaultBaseUri + '/js-test-env/mocha.css', media='screen')
 		base(href=projectBaseUri)
-	body(data-modules=modules, data-project=project.slug)
+	body(data-modules=modules, data-project=project.slug, data-coverage=coverage)
 		div(id='mocha')
 
 		//- global deps

@@ -55,7 +55,7 @@
 
 		// if we are generating coverage reprot data, then we need to
 		// save the results after tests have completed
-		if (document.location.search.indexOf('coverage=1') > -1) {
+		if ('coverage' in document.body.dataset) {
 			runner.on('end', function () {
 				saveCoverageDataToServer();
 			});
