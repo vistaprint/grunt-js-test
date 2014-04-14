@@ -53,11 +53,11 @@ projects.forEach(function (project) {
 	var request = require('request');
 
 	// setup request object with a proxy
-	var r = request.defaults({'proxy': 'http://localhost:3128'});
+	var r = request.defaults({'proxy': 'http://127.0.0.1:3128'});
 
 	project.statics.forEach(function () {
 		var proxy = http.createServer(function (req, resp) {
-			r.get('http://localhost:' + project.port  + req.url).pipe(resp);
+			r.get('http://127.0.0.1:' + project.port  + req.url).pipe(resp);
 		});
 
 		if (!project.coveragePort) {
