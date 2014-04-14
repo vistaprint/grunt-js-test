@@ -99,15 +99,12 @@ function jscoverage_recalculateSummaryTabBy(type) {
 }
 
 function jscoverage_recalculateSummaryTab(cc) {
-	var checkbox = document.getElementById('checkbox');
-	var showMissingColumn = checkbox.checked;
+	var showMissingColumn = $('#showMissing').is(':checked');
+
+	cc = cc || window._$jscoverage;
 
 	if (!cc) {
-		cc = window._$jscoverage;
-	}
-
-	if (! cc) {
-		throw 'No coverage information found.';
+		throw new Error('No coverage information found.');
 	}
 
 	var totals = {
@@ -132,12 +129,16 @@ function jscoverage_recalculateSummaryTab(cc) {
 		return;
 	}
 
-	if (sortReOrder || files.length !== sortedFiles.length) {
-		sortedFiles = getFilesSortedByCoverage(files);
-		sortOrder++;
-		sortReOrder = false;
-	}
-	files = sortedFiles;
+	// if (sortReOrder || files.length !== sortedFiles.length) {
+	// 	sortedFiles = getFilesSortedByCoverage(files);
+	// 	sortOrder++;
+	// 	sortReOrder = false;
+	// }
+	files = files.sort(function (a, b) {
+		if (a.toLowerCase() < b.toLowerCase()) return -1;
+		if (a.toLowerCase() > b.toLowerCase()) return 1;
+		return 0;
+	});
 
 	// empty out the summary tbody as we're about to insert a new table
 	var tbody = $('#summaryTbody').empty();
@@ -231,7 +232,18 @@ function jscoverage_recalculateSummaryTab(cc) {
 		// row.addClass(rowCounter++ % 2 == 0 ? "odd" : "even");
 		row.attr('id', 'row-' + file);
 
-		$('<td>').addClass('leftColumn').append(jscoverage_createLink(file)).appendTo(row);
+		var removeMe = $('<span class="right">x</span>').on('click', function () {
+			// delete the file from the global object
+			delete window._$jscoverage[this];
+
+			// show progress bar
+			jscoverage_beginLengthyOperation();
+
+			// recalculate data
+			jscoverage_recalculateSummaryTab();
+		}.bind(file));
+
+		$('<td>').addClass('leftColumn').append(jscoverage_createLink(file), removeMe).appendTo(row);
 		$('<td>').addClass('numeric').text(num_executed + '/' + num_statements).appendTo(row);
 		$('<td>').addClass('numeric').text(num_executed_branches + '/' + num_branches).appendTo(row);
 		$('<td>').addClass('numeric').text(num_executed_functions + '/' + num_functions).appendTo(row);
@@ -380,42 +392,34 @@ function getFilesSortedByCoverage(filesIn) {
 }
 
 function jscoverage_appendMissingColumn() {
-	var headerRow = document.getElementById('headerRow');
-	var missingHeader = document.createElement('th');
-	missingHeader.id = 'missingHeader';
-	missingHeader.innerHTML = '<abbr title="List of statements missed during execution">Missing</abbr>';
-	headerRow.appendChild(missingHeader);
-	var summaryTotals = document.getElementById('summaryTotals');
-	var empty = document.createElement('td');
-	empty.id = 'missingCell';
-	summaryTotals.appendChild(empty);
+	$('#headerRow').append(
+		$('<th id="missingHeader" title="List of statements missed during execution">Missing</th>')
+	);
+
+	$('#summaryTotals').append(
+		$('<td id="missingCell">')
+	);
 }
 
 function jscoverage_removeMissingColumn() {
-	var missingNode;
-	missingNode = document.getElementById('missingHeader');
-	missingNode.parentNode.removeChild(missingNode);
-	missingNode = document.getElementById('missingCell');
-	missingNode.parentNode.removeChild(missingNode);
+	$('#headerRow, #summaryTotals').remove();
 }
 
-function jscoverage_checkbox_click() {
+function jscoverage_checkbox_click(event) {
 	if (jscoverage_inLengthyOperation) {
+		event.preventDefault();
 		return false;
 	}
+
 	jscoverage_beginLengthyOperation();
-	var checkbox = document.getElementById('checkbox');
-	var showMissingColumn = checkbox.checked;
-	setTimeout(function() {
-		if (showMissingColumn) {
-			jscoverage_appendMissingColumn();
-		}
-		else {
-			jscoverage_removeMissingColumn();
-		}
-		jscoverage_recalculateSummaryTab();
-	}, 50);
-	return true;
+
+	if ($(this).is(':checked')) {
+		jscoverage_appendMissingColumn();
+	} else {
+		jscoverage_removeMissingColumn();
+	}
+
+	jscoverage_recalculateSummaryTab();
 }
 
 // -----------------------------------------------------------------------------
@@ -708,6 +712,8 @@ function createProgressBar(percentage, skip) {
 
 $(document).ready(function () {
 	jscoverage_body_load();
+
+	$('#showMissing').on('click', jscoverage_checkbox_click);
 
 	$('#storeButton').on('click', function () {
 		var url = $(this).attr('href');

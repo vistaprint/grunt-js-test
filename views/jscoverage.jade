@@ -31,13 +31,13 @@ block content
 	.tab-content
 		.tab-pane.active#summaryPage
 			//- .panel-heading Code coverage summary
-			input#checkbox(type='checkbox', onclick='return jscoverage_checkbox_click();')
+			input#showMissing(type='checkbox')
 			label(for='checkbox') Show missing statements column
 			#summaryErrorDiv
 
 			table.table.table-striped.table-bordered.table-condensed#summaryTable
 				thead
-					tr
+					tr#headerRow
 						th File
 						th(title='The number of statements actually executed / The total number of executable statements') Statements
 						th(title='The number of branches covered / The total number of branches') Branches
