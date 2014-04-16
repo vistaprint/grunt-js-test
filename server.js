@@ -137,7 +137,12 @@ app.post('/:project/jscoverage.json', function (req, res) {
 	}
 
 	var file = project.getCoverageReportFile();
-	console.log('Writting coverage report to:', file);
+
+	// ensure the reports folder exists
+	var reportsFolder = path.join(__dirname, 'jscover', 'reports');
+	if (!fs.existsSync(reportsFolder)) {
+		fs.mkdirSync(reportsFolder);
+	}
 
 	// ensure the project folder exists
 	if (!fs.existsSync(path.dirname(file))) {
