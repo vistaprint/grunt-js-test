@@ -1,58 +1,91 @@
 [
-	{
-		"name": "JS-Lib",
-		"slug": "js-lib",
-		"baseUri": "/vp/JS-Lib",
-		"root": "C:/vp/playpens/development/subversion/Web/www/vp/JS-Lib/",
-		"jenkins": "C:/Jenkins/workspace/JavaScript Unit Tests/",
-		"pattern": "**/*.tests.js"
-	},
-	{
-		"disabled": true,
-		"name": "SkinnyJS",
-		"slug": "skinny",
-		"baseUri": "/",
-		"root": "C:/vp/SkinnyJS",
-		"pattern": "test/*.unittests.js"
-	},
-	{
-		"name": "Studio",
-		"slug": "studio",
-		"isolate": true,
-		"baseUri": "/vp/JS-Lib",
-		"root": "C:/vp/playpens/development/subversion/Web/www/vp/JS-Lib/",
-		"jenkins": "C:/Jenkins/workspace/JavaScript Test Env - Studio/",
-		"pattern": "Areas/Studio/Tests/**/*.unittests.js",
-		"exclude": [],
-		"requirejs": {
-			"modulesRelativeTo": "C:/vp/playpens/development/subversion/Web/www/vp/JS-Lib/Areas/Studio"
-		},
-		"deps": [
-			"/vp/JS-Lib/jQuery/jquery-current.js",
+    {
+        "name": "JS-Lib",
+        "slug": "js-lib",
+        "baseUri": "/vp/JS-Lib",
+        "root": "C:/vp/playpens/development/subversion/Web/www/vp/JS-Lib/",
+        "jenkins": "C:/Jenkins/workspace/JavaScript Unit Tests/",
+        "pattern": "**/*.tests.js"
+    },
+    {
+        "disabled": true,
+        "name": "SkinnyJS",
+        "slug": "skinny",
+        "baseUri": "/",
+        "root": "C:/vp/SkinnyJS",
+        "pattern": "test/*.unittests.js"
+    },
+    {
+        "name": "Studio",
+        "slug": "studio",
+        "isolate": true,
+        "baseUri": "/vp/JS-Lib",
+        "root": "C:/vp/playpens/development/subversion/Web/www/vp/JS-Lib/",
+        "jenkins": "C:/Jenkins/workspace/JavaScript Test Env - Studio/",
+        "pattern": "Areas/Studio/Tests/**/*.unittests.js",
+        "exclude": [],
+        "requirejs": {
+            "modulesRelativeTo": "C:/vp/playpens/development/subversion/Web/www/vp/JS-Lib/Areas/Studio"
+        },
+        "deps": [
+            "/vp/JS-Lib/jQuery/jquery-current.js",
             "/vp/JS-Lib/jQuery/vpextensions/jquery.textbutton.js",
-			"/vp/JS-Lib/ThirdParty/lodash/lodash.compat.js",
-			"/vp/JS-Lib/ThirdParty/handlebars/handlebars.js",
-			"/vp/JS-Lib/ThirdParty/artejs/rangy.debug.js",
-			"/vp/JS-Lib/ThirdParty/artejs/rangy-textrange.js",
-			"/vp/JS-Lib/ThirdParty/artejs/arte.debug.js",
-			"/vp/JS-Lib/ThirdParty/skinnyjs/jquery.delimitedstring.js",
-			"/vp/JS-Lib/ThirdParty/skinnyjs/jquery.querystring.js",
-			"/vp/JS-Lib/ThirdParty/skinnyjs/jquery.url.js",
-			"/vp/JS-Lib/ThirdParty/skinnyjs/jquery.css.js",
-			"/vp/js-lib/ThirdParty/skinnyjs/jquery.proxyAll.js",
-			"/vp/js-lib/ThirdParty/skinnyjs/jquery.customEvent.js",
-			"/vp/js-lib/ThirdParty/skinnyjs/jquery.modalDialog.js",  
-            "vp/JS-Lib/ThirdParty/skinnyjs/jquery.disableEvent.js",            
-			"/vp/JS-Lib/common/vp.color.js",
-			"/vp/JS-Lib/ThirdParty/backbone/backbone.js",
-			"/vp/JS-Lib/ThirdParty/backbone/vpextensions/backbone.studio.js",
-			"/vp/JS-Lib/ThirdParty/backbone/vpextensions/backbone.nested.js",
-			"/vp/JS-Lib/ThirdParty/backbone/vpextensions/backbone.computedAttributes.js",
-			"/vp/JS-Lib/ThirdParty/backbone/backbone_handlebars.js",
-			"/vp/JS-Lib/ThirdParty/require.js",
-			"/vp/JS-Lib/Areas/Studio/RequireConfig.js",
-			"/vp/JS-Lib/Areas/Studio/ExternalDependencyModules.js",
-			"/vp/JS-Lib/Areas/Studio/Tests/test-bootstrapper.js"
-		]
-	}
+            "/vp/JS-Lib/ThirdParty/lodash/lodash.compat.js",
+            "/vp/JS-Lib/ThirdParty/handlebars/handlebars.js",
+            "/vp/JS-Lib/ThirdParty/artejs/rangy.debug.js",
+            "/vp/JS-Lib/ThirdParty/artejs/rangy-textrange.js",
+            "/vp/JS-Lib/ThirdParty/artejs/arte.debug.js",
+            "/vp/JS-Lib/ThirdParty/skinnyjs/jquery.delimitedstring.js",
+            "/vp/JS-Lib/ThirdParty/skinnyjs/jquery.querystring.js",
+            "/vp/JS-Lib/ThirdParty/skinnyjs/jquery.url.js",
+            "/vp/JS-Lib/ThirdParty/skinnyjs/jquery.css.js",
+            "/vp/js-lib/ThirdParty/skinnyjs/jquery.proxyAll.js",
+            "/vp/js-lib/ThirdParty/skinnyjs/jquery.customEvent.js",
+            "/vp/js-lib/ThirdParty/skinnyjs/jquery.modalDialog.js",
+            "vp/JS-Lib/ThirdParty/skinnyjs/jquery.disableEvent.js",
+            "/vp/JS-Lib/common/vp.color.js",
+            "/vp/JS-Lib/ThirdParty/backbone/backbone.js",
+            "/vp/JS-Lib/ThirdParty/backbone/vpextensions/backbone.studio.js",
+            "/vp/JS-Lib/ThirdParty/backbone/vpextensions/backbone.nested.js",
+            "/vp/JS-Lib/ThirdParty/backbone/vpextensions/backbone.computedAttributes.js",
+            "/vp/JS-Lib/ThirdParty/backbone/backbone_handlebars.js",
+            "/vp/JS-Lib/ThirdParty/require.js",
+            "/vp/JS-Lib/Areas/Studio/RequireConfig.js",
+            "/vp/JS-Lib/Areas/Studio/ExternalDependencyModules.js",
+            "/vp/JS-Lib/Areas/Studio/Tests/test-bootstrapper.js"
+        ]
+    },
+    {
+        "name": "Checkout",
+        "slug": "checkout",
+        "isolate": true,
+        "baseUri": "/vp/JS-Lib",
+        "root": "C:/vp/playpens/development/subversion/Web/www/vp/JS-Lib/",
+        "pattern": "Sales/Checkout/Tests/**/*.unittests.js",
+        "exclude": [],
+        "requirejs": {
+            "modulesRelativeTo": "C:/vp/playpens/development/subversion/Web/www/vp/JS-Lib/Sales/Checkout"
+        },
+        "deps": [
+            "/vp/JS-Lib/jQuery/jquery-current.js",
+            "/vp/JS-Lib/ThirdParty/lodash/lodash.compat.js",
+            "/vp/JS-Lib/ThirdParty/handlebars/handlebars.js",
+            "/vp/JS-Lib/ThirdParty/skinnyjs/jquery.delimitedstring.js",
+            "/vp/JS-Lib/ThirdParty/skinnyjs/jquery.querystring.js",
+            "/vp/JS-Lib/ThirdParty/skinnyjs/jquery.url.js",
+            "/vp/JS-Lib/ThirdParty/skinnyjs/jquery.css.js",
+            "/vp/js-lib/ThirdParty/skinnyjs/jquery.proxyAll.js",
+            "/vp/js-lib/ThirdParty/skinnyjs/jquery.customEvent.js",
+            "/vp/js-lib/ThirdParty/skinnyjs/jquery.modalDialog.js",
+            "/vp/js-lib/ThirdParty/skinnyjs/jquery.richTooltip.js",
+            "/vp/js-lib/ThirdParty/skinnyjs/jquery.calcRestrainedPos.js",
+            "/vp/js-lib/ThirdParty/skinnyjs/jquery.clientRect.js",
+            "/vp/JS-Lib/ThirdParty/backbone/backbone.js",
+            "/vp/JS-Lib/ThirdParty/backbone/backbone_handlebars.js",
+            "/vp/JS-Lib/ThirdParty/require.js",
+            "/vp/JS-Lib/Sales/Checkout/ExternalDependencies.js",
+            "/vp/JS-Lib/Sales/Checkout/ConfigureRequire.js",
+            "/vp/JS-Lib/Sales/Checkout/Tests/TestBootstrapper.js"
+        ]
+    }
 ]
