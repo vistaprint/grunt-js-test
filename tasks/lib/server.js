@@ -16,178 +16,178 @@ var findReferenceTags = require('./deps');
 var app = express();
 
 app.configure(function () {
-	app.locals.pretty = true;
-	app.set('view engine', 'jade');
-	// app.use(express.logger('dev'));
-	app.use(express.bodyParser({ limit: '200mb' }));
-	// app.use(express.methodOverride());
-	app.use(express.errorHandler());
+  app.locals.pretty = true;
+  app.set('view engine', 'jade');
+  // app.use(express.logger('dev'));
+  app.use(express.bodyParser({ limit: '200mb' }));
+  // app.use(express.methodOverride());
+  app.use(express.errorHandler());
 
-	// proxy static js-test-env javascript files
-	app.use('/js-test-env', express.static(path.join(__dirname, '..', '..', 'views', 'deps')));
+  // proxy static js-test-env javascript files
+  app.use('/js-test-env', express.static(path.join(__dirname, '..', '..', 'views', 'deps')));
 });
 
 module.exports = function (grunt, options) {
-	var tests = require('./findTests')(options);
-	var utils = require('./utils')(options);
+  var tests = require('./findTests')(options);
+  var utils = require('./utils')(options);
 
-	app.use(function (req, res, next) {
-		res.locals.tests = tests;
-		res.locals.options = options;
-		res.locals.utils = utils;
-		res.locals.defaultBaseUri = '//' + req.host + ':' + options.port;
-		res.locals.coverage = typeof req.query.coverage !== 'undefined';
-		res.locals.projectBaseUri =  getBaseUri(req.host, res.locals.coverage);
-		next();
-	});
+  app.use(function (req, res, next) {
+    res.locals.tests = tests;
+    res.locals.options = options;
+    res.locals.utils = utils;
+    res.locals.defaultBaseUri = '//' + req.host + ':' + options.port;
+    res.locals.coverage = typeof req.query.coverage !== 'undefined';
+    res.locals.projectBaseUri =  getBaseUri(req.host, res.locals.coverage);
+    next();
+  });
 
-	// create a static file server for project assets
-	var statics = express();
+  // create a static file server for project assets
+  var statics = express();
 
-	// ensure all responses are utf8 and are accessible cross-domain
-	statics.use(function (req, res, next) {
-		res.header('Access-Control-Allow-Origin', '*');
-		res.header('Access-Control-Allow-Headers', 'X-Requested-With');
-		next();
-	});
+  // ensure all responses are utf8 and are accessible cross-domain
+  statics.use(function (req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'X-Requested-With');
+    next();
+  });
 
-	statics.use(options.baseUri, express.static(options.root));
-	statics.listen(options.staticPort);
+  statics.use(options.baseUri, express.static(options.root));
+  statics.listen(options.staticPort);
 
-	// coverage report proxy server
-	if (options.coverage) {
-		// setup request object with a proxy
-		var r = request.defaults({'proxy': 'http://127.0.0.1:3128'});
+  // coverage report proxy server
+  if (options.coverage) {
+    // setup request object with a proxy
+    var r = request.defaults({'proxy': 'http://127.0.0.1:3128'});
 
-		var proxy = http.createServer(function (req, resp) {
-			grunt.verbose.write('Coverage Proxy Request:', req.url);
-			r.get('http://' + options.hostname + ':' + options.staticPort  + req.url).pipe(resp);
-		});
+    var proxy = http.createServer(function (req, resp) {
+      grunt.verbose.write('Coverage Proxy Request:', req.url);
+      r.get('http://' + options.hostname + ':' + options.staticPort  + req.url).pipe(resp);
+    });
 
-		proxy.listen(options.coverageProxyPort);
+    proxy.listen(options.coverageProxyPort);
 
-		grunt.log.ok('Started proxy web server on port ' + options.coverageProxyPort + '.\n');
-	}
+    grunt.log.ok('Started proxy web server on port ' + options.coverageProxyPort + '.\n');
+  }
 
-	function getBaseUri(host, coverage) {
-		return '//' + (host || options.hostname) + ':' + (coverage ? options.coverageProxyPort || options.staticPort : options.staticPort) + '/';
-	}
+  function getBaseUri(host, coverage) {
+    return '//' + (host || options.hostname) + ':' + (coverage ? options.coverageProxyPort || options.staticPort : options.staticPort) + '/';
+  }
 
-	// list of unit tests
-	app.get('/', function (req, res) {
-		res.render('index');
-	});
+  // list of unit tests
+  app.get('/', function (req, res) {
+    res.render('index');
+  });
 
-	// simple is-alive test
-	app.get('/alive', function (req, res) {
-		res.send('hello world');
-	});
+  // simple is-alive test
+  app.get('/alive', function (req, res) {
+    res.send('hello world');
+  });
 
-	// jscover page, in case someone makes this request by mistake
-	app.get('/jscoverage', function (req, res) {
-		res.render('jscoverage');
-	});
+  // jscover page, in case someone makes this request by mistake
+  app.get('/jscoverage', function (req, res) {
+    res.render('jscoverage');
+  });
 
-	// jscoverage json report for a given project
-	app.get('/jscoverage.json', function (req, res) {
-		res.status(200).sendfile(utils.jscoverageFile(), {}, function (err) {
-			if (err) {
-				res.status(404).send({
-					success: false,
-					message: 'No coverage report data found.'
-				});
-			}
-		});
-	});
+  // jscoverage json report for a given project
+  app.get('/jscoverage.json', function (req, res) {
+    res.status(200).sendfile(utils.jscoverageFile(), {}, function (err) {
+      if (err) {
+        res.status(404).send({
+          success: false,
+          message: 'No coverage report data found.'
+        });
+      }
+    });
+  });
 
-	// store the jscover report to disk
-	app.post('/jscoverage.json', function (req, res) {
-		// we need data to write to the file
-		if (!req.body.json) {
-			return res.status(500).send('No JSON data provided.');
-		}
+  // store the jscover report to disk
+  app.post('/jscoverage.json', function (req, res) {
+    // we need data to write to the file
+    if (!req.body.json) {
+      return res.status(500).send('No JSON data provided.');
+    }
 
-		fs.writeFile(utils.jscoverageFile(), req.body.json, function (err) {
-			if (err) {
-				res.status(500).send({success: false});
-			} else {
-				res.send('success');
-			}
-		});
-	});
+    fs.writeFile(utils.jscoverageFile(), req.body.json, function (err) {
+      if (err) {
+        res.status(500).send({success: false});
+      } else {
+        res.send('success');
+      }
+    });
+  });
 
-	// run all tests for a given project
-	app.get('/all', function (req, res) {
-		// we run each each test in isolation, which creates an iframe
-		// to /test/:test for each test
-		res.render('test-all-isolate', {
-			coverage: typeof req.query.coverage !== 'undefined'
-		});
-	});
+  // run all tests for a given project
+  app.get('/all', function (req, res) {
+    // we run each each test in isolation, which creates an iframe
+    // to /test/:test for each test
+    res.render('test-all-isolate', {
+      coverage: typeof req.query.coverage !== 'undefined'
+    });
+  });
 
-	app.get('/test/:test', function (req, res) {
-		var test = tests[req.params.test];
+  app.get('/test/:test', function (req, res) {
+    var test = tests[req.params.test];
 
-		// if we do not have this test, 404?
-		if (!test) {
-			return res.status(404).send('Test not found.');
-		}
+    // if we do not have this test, 404?
+    if (!test) {
+      return res.status(404).send('Test not found.');
+    }
 
-		var file = test.abs;
-		var deps = findReferenceTags(file).map(utils.resolveReferenceTag);
-		var moduleName;
+    var file = test.abs;
+    var deps = findReferenceTags(file).map(utils.resolveReferenceTag);
+    var moduleName;
 
-		// determine if we want to generate coverage reports
-		var coverage = typeof req.query.coverage !== 'undefined';
+    // determine if we want to generate coverage reports
+    var coverage = typeof req.query.coverage !== 'undefined';
 
-		// attempt to find the module name for this file
-		if (options.requirejs) {
-			moduleName = path.relative(options.requirejs.modulesRelativeTo, file).replace(/\\/g, '/').replace(/\.js$/, '');
-		}
+    // attempt to find the module name for this file
+    if (options.requirejs) {
+      moduleName = path.relative(options.requirejs.modulesRelativeTo, file).replace(/\\/g, '/').replace(/\.js$/, '');
+    }
 
-		function render(injectHTML) {
-			var coverageData = coverage ? utils.getCoverageData() : null;
+    function render(injectHTML) {
+      var coverageData = coverage ? utils.getCoverageData() : null;
 
-			res.render('test', {
-				modules: moduleName || '',
-				injectHTML: injectHTML || '',
-				test: test,
-				deps: deps,
-				coverage: coverage,
-				coverageData: coverageData
-			});
-		}
+      res.render('test', {
+        modules: moduleName || '',
+        injectHTML: injectHTML || '',
+        test: test,
+        deps: deps,
+        coverage: coverage,
+        coverageData: coverageData
+      });
+    }
 
-		// if test has an inject HTML file, inject it
-		if (test.injectFiles && test.injectFiles.length > 0) {
-			var injectHTML = '';
-			test.injectFiles.forEach(function (injectFile) {
-				injectHTML += fs.readFileSync(injectFile);
-			});
-			render(injectHTML);
-		}
-		// if the test has an inject URL, request it and inject it
-		else if (test.injectUrl) {
-			http.get(test.injectUrl, function (res) {
-				var data = '';
+    // if test has an inject HTML file, inject it
+    if (test.injectFiles && test.injectFiles.length > 0) {
+      var injectHTML = '';
+      test.injectFiles.forEach(function (injectFile) {
+        injectHTML += fs.readFileSync(injectFile);
+      });
+      render(injectHTML);
+    }
+    // if the test has an inject URL, request it and inject it
+    else if (test.injectUrl) {
+      http.get(test.injectUrl, function (res) {
+        var data = '';
 
-	            res.on('data', function (chunk) {
-	                data += chunk;
-	            });
+              res.on('data', function (chunk) {
+                  data += chunk;
+              });
 
-	            res.on('end', function () {
-					render(data);
-				});
-			}).on('error', function () {
-				console.log('Error requesting inject url!');
-				render(null);
-			});
-		}
-		// no inject HTML, most tests go here, just render the response
-		else {
-			render(null);
-		}
-	});
+              res.on('end', function () {
+          render(data);
+        });
+      }).on('error', function () {
+        console.log('Error requesting inject url!');
+        render(null);
+      });
+    }
+    // no inject HTML, most tests go here, just render the response
+    else {
+      render(null);
+    }
+  });
 
-	return app;
+  return app;
 };

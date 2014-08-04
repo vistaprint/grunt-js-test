@@ -1,12 +1,12 @@
 extends base
 
 block content
-	.panel.panel-default
-		.panel-heading.clearfix Tests
-		table.table
-			tbody
-				- tests.forEach(function (test, testNumber) {
-					tr
-						td
-							a(href=test.url)= test.file
-				- });
+  .panel.panel-default
+    .panel-heading.clearfix Tests
+    table.table
+      tbody
+        - tests.forEach(function (test, testNumber) {
+          tr
+            td
+              a(href=test.url)= test.file
+        - });

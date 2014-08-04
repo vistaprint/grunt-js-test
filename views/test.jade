@@ -1,44 +1,44 @@
 !!! 5
 html(lang='en')
-	head
-		title= "JS Test Env: " + (all ? "All tests" : test.file)
-		meta(charset='utf-8')
-		meta(name='viewport', content='width=device-width, initial-scale=1.0')
-		meta(name='description', content='')
-		meta(name='author', content='')
-		link(rel='stylesheet', href=defaultBaseUri + '/js-test-env/site.css', media='screen')
-		link(rel='stylesheet', href=defaultBaseUri + '/js-test-env/mocha.css', media='screen')
-		base(href=projectBaseUri)
-	body(data-modules=modules, data-coverage=coverage)
-		div(id='mocha')
+  head
+    title= "JS Test Env: " + test.file
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    meta(name='description', content='')
+    meta(name='author', content='')
+    link(rel='stylesheet', href=defaultBaseUri + '/js-test-env/site.css', media='screen')
+    link(rel='stylesheet', href=defaultBaseUri + '/js-test-env/mocha.css', media='screen')
+    base(href=projectBaseUri)
+  body(data-modules=modules, data-coverage=coverage)
+    div(id='mocha')
 
-		//- global deps
-		script(src=defaultBaseUri + '/js-test-env/mocha.js')
-		script(src=defaultBaseUri + '/js-test-env/chai.js')
-		script(src=defaultBaseUri + '/js-test-env/sinon.js')
-		- if (coverage) {
-			script(src=defaultBaseUri + '/js-test-env/jscoverage.head.js')
-			- if (coverageData) {
-				script(type='text/json', id='coverageData')!=coverageData
-				script(text='text/javascript').
-					window._$jscoverage = restoreCoverageData(document.getElementById('coverageData').innerHTML);
-			- }
-		- }
-		script(src=defaultBaseUri + '/js-test-env/shared.js')
+    //- global deps
+    script(src=defaultBaseUri + '/js-test-env/mocha.js')
+    script(src=defaultBaseUri + '/js-test-env/chai.js')
+    script(src=defaultBaseUri + '/js-test-env/sinon.js')
+    - if (coverage) {
+      script(src=defaultBaseUri + '/js-test-env/jscoverage.head.js')
+      - if (coverageData) {
+        script(type='text/json', id='coverageData')!=coverageData
+        script(text='text/javascript').
+          window._$jscoverage = restoreCoverageData(document.getElementById('coverageData').innerHTML);
+      - }
+    - }
+    script(src=defaultBaseUri + '/js-test-env/shared.js')
 
-		//- Inject HTML
-		- if (injectHTML) {
-			div!= injectHTML
-		- }
+    //- Inject HTML
+    - if (injectHTML) {
+      div!= injectHTML
+    - }
 
-		//- project deps
-		- if (options.deps) {
-			- options.deps.forEach(function (dep) {
-				script(src=dep)
-			- })
-		- }
+    //- project deps
+    - if (options.deps) {
+      - options.deps.forEach(function (dep) {
+        script(src=dep)
+      - })
+    - }
 
-		//- test-specific deps, test file should be last in list
-		- for (var i=0; i<deps.length; i++) {
-			script(src=deps[i])
-		- }
+    //- test-specific deps, test file should be last in list
+    - for (var i=0; i<deps.length; i++) {
+      script(src=deps[i])
+    - }

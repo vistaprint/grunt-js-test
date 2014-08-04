@@ -1,63 +1,45 @@
 !!! 5
 html(lang='en')
-	head
-		title
-			block title
-				| JS Test Env
+  head
+    title
+      block title
+        | JS Test Env
 
-		meta(charset='utf-8')
-		meta(name='viewport', content='width=device-width, initial-scale=1.0')
-		meta(name='description', content='')
-		meta(name='author', content='')
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    meta(name='description', content='')
+    meta(name='author', content='')
 
-		block styles
-			link(rel='stylesheet', href='/js-test-env/bootstrap.min.css', media='screen')
-			link(rel='stylesheet', href='/js-test-env/site.css', media='screen')
+    block styles
+      link(rel='stylesheet', href='/js-test-env/bootstrap.min.css', media='screen')
+      link(rel='stylesheet', href='/js-test-env/site.css', media='screen')
 
-	body.bootstrap(base=projectBaseUri)
-		.container-fluid
-			.navbar.navbar-default.navbar-fixed-top
-				.navbar-header
-					button.navbar-toggle(type='button', data-toggle='collapse', data-target='.navbar-collapse')
-						span.icon-bar
-						span.icon-bar
-						span.icon-bar
-					a.navbar-brand(href='/', title='JavaScript Test Environment') JS Test Env
-				.navbar-collapse.collapse
-					ul.nav.navbar-nav
-						li
-							a(href='/all') Run all tests
-						- if (options.coverage) {
-							li
-								a(href='/all?coverage=1') Generate coverage report
-						- }
-						- if (utils.jscoverageFileExists()) {
-							li
-								a(href='/jscoverage') View coverage report
-						- }
-						//- li.dropdown
-						//- 	a(href='#', data-toggle='dropdown').dropdown-toggle
-						//- 		| Run all tests
-						//- 		b.caret
-						//- 	ul.dropdown-menu
-						//- 		- allProjects.forEach(function (project) {
-						//- 			li
-						//- 				a(href='/'+project.slug+'/all')= project.name
-						//- 		- });
-						//- li.dropdown
-						//- 	a(href='#', data-toggle='dropdown').dropdown-toggle
-						//- 		| Coverage report
-						//- 		b.caret
-						//- 	ul.dropdown-menu
-						//- 		- allProjects.forEach(function (project) {
-						//- 			li
-						//- 				a(href='/'+project.slug+'/jscoverage')= project.name
-						//- 		- });
-						li
-							a(href='http://vistawiki.vistaprint.net/wiki/JavaScript_test_environment', target='_blank') Help
+  body.bootstrap(base=projectBaseUri)
+    .container-fluid
+      .navbar.navbar-default.navbar-fixed-top
+        .navbar-header
+          button.navbar-toggle(type='button', data-toggle='collapse', data-target='.navbar-collapse')
+            span.icon-bar
+            span.icon-bar
+            span.icon-bar
+          a.navbar-brand(href='/', title='JavaScript Test Environment') JS Test Env
+        .navbar-collapse.collapse
+          ul.nav.navbar-nav
+            li
+              a(href='/all') Run all tests
+            - if (options.coverage) {
+              li
+                a(href='/all?coverage=1') Generate coverage report
+            - }
+            - if (utils.jscoverageFileExists()) {
+              li
+                a(href='/jscoverage') View coverage report
+            - }
+            li
+              a(href='http://vistawiki.vistaprint.net/wiki/JavaScript_test_environment', target='_blank') Help
 
-			block content
+      block content
 
-		block scripts
-			script(src='/js-test-env/jquery.js')
-			script(src='/js-test-env/bootstrap.min.js')
+    block scripts
+      script(src='/js-test-env/jquery.js')
+      script(src='/js-test-env/bootstrap.min.js')
