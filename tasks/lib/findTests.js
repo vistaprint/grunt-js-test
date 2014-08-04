@@ -133,10 +133,6 @@ Project.prototype.findTests = function () {
   }, this);
 };
 
-Project.prototype.getTest = function (fileNum) {
-  return this.tests()[fileNum];
-};
-
 // return a sorted the list of tests
 Project.prototype.tests = function () {
   return this.findTests().sort(function (a, b) {
