@@ -25,16 +25,15 @@ html(lang='en')
 					a.navbar-brand(href='/', title='JavaScript Test Environment') JS Test Env
 				.navbar-collapse.collapse
 					ul.nav.navbar-nav
-						- if (typeof allProjects !== 'undefined') {
 						li
-							a(href='/', data-toggle='dropdown').dropdown-toggle
-								| Projects
-								b.caret
-							ul.dropdown-menu
-								- allProjects.forEach(function (project) {if (project) {
-									li
-										a(href='/'+project.slug)= project.name
-								- }});
+							a(href='/all') Run all tests
+						- if (options.coverage) {
+							li
+								a(href='/all?coverage=1') Generate coverage report
+						- }
+						- if (utils.jscoverageFileExists()) {
+							li
+								a(href='/jscoverage') View coverage report
 						- }
 						//- li.dropdown
 						//- 	a(href='#', data-toggle='dropdown').dropdown-toggle

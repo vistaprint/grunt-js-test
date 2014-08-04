@@ -1,41 +1,55 @@
 {
   "name": "js-test-env",
-  "description": "JavaScript Testing Environment",
-  "version": "0.0.4",
-  "homepage": "http://vistawiki.vistaprint.net/wiki/JavaScript_test_environment",
+  "version": "0.0.5",
+  "description": "Grunt task for running client-side based Mocha tests in PhantomJS along with code coverage reports",
+  "keywords": [
+    "grunt",
+    "gruntplugin",
+    "mocha",
+    "unit",
+    "test",
+    "coverage",
+    "report",
+    "phantomjs"
+  ],
+  "homepage": "https://github.com/benhutchins/js-test-env",
+  "bugs": {
+    "url": "https://github.com/benhutchins/js-test-env/issues",
+    "email": "js-test-env@vistaprint.com"
+  },
+  "license": "",
+  "author": "Vistaprint (https://www.vistaprint.com/)",
+  "contributors": [
+    "Benjamin Hutchins <ben@hutchins.co> (https://github.com/benhutchins/)"
+  ],
+  "files": [
+    "tasks",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/benhutchins/js-test-env.git"
+  },
+  "engines": {
+    "node": "*"
+  },
+  "scripts": {
+    "start": "grunt start",
+    "test": "grunt test-self"
+  },
   "dependencies": {
     "express": "3.x",
     "glob": "3.2.x",
-    "grunt-express": "~1.2.x",
+    "grunt-express": "~1.4.0",
     "grunt-mocha": "0.4.x",
     "jade": "~0.35",
-    "grunt-contrib-watch": "^0.6.1",
-    "request": "^2.34.0"
+    "request": "^2.34.0",
+    "lodash": "^2.4.1"
   },
   "peerDependencies": {
     "grunt": "~0.4"
   },
   "devDependencies": {
-    "grunt": "~0.4",
     "grunt-contrib-jshint": "~0.7.x"
-  },
-  "engines": {
-    "node": "*"
-  },
-  "author": {
-    "name": "Vistaprint: Web Platform",
-    "email": "webplatform@vistaprint.com",
-    "url": "http://vistawiki.vistaprint.net/wiki/Web_platform"
-  },
-  "main": "gruntfile.js",
-  "scripts": {
-    "start": "./node_modules/.bin/grunt start"
-  },
-  "repository": {
-    "type": "https",
-    "url": "https://git.vistaprint.net/scm/wp/js-test-env.git"
-  },
-  "bugs": {
-    "url": "https://git.vistaprint.net/projects/WP/repos/js-test-env/browse"
   }
 }

@@ -1,7 +1,7 @@
 !!! 5
 html(lang='en')
 	head
-		title= "JS Test Env: " + project.name + ": All tests"
+		title= "JS Test Env: All tests"
 		meta(charset='utf-8')
 		meta(name='viewport', content='width=device-width, initial-scale=1.0')
 		meta(name='description', content='')
@@ -22,9 +22,9 @@ html(lang='en')
 						| failures:
 						em#failures 0
 
-			h1 Isolated Tests, report separately
+			h1 Isolated tests, report separately
 			p(style='font-size: 14px') Scroll down and check each test
 		//- test-specific deps, test file should be last in list
-		- project.tests().forEach(function (test) {
+		- tests.forEach(function (test) {
 			iframe(seamless="seamless", src=test.url + "&iframe=1" + (coverage ? "&coverage=1" : ""))
 		- });

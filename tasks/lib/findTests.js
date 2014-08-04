@@ -1,9 +1,9 @@
 'use strict';
 
+// Nodejs libs.
 var fs = require('fs');
 var path = require('path');
-
-var DEFAULT_PATTERN = '*.tests.js';
+var glob = require('glob');
 
 // convert an array of strings into an array of regular expressions
 function getRegExs(list) {
@@ -38,59 +38,21 @@ function Project(project) {
 	}
 
 	// override some things
-	this.name    = project.name;
-	this.slug    = project.slug || encodeURIComponent(this.name);
-	this.deps    = project.deps || null;
-	this.baseUri = project.baseUri;
-	this.root    = path.normalize(project.root);
 	this.include = getRegExs(project.include);
 	this.exclude = getRegExs(project.exclude);
-	this._tests  = null;
-
-	this.statics = [
-		{
-			baseUri: this.baseUri,
-			root: this.root
-		}
-	];
-
-	this.resolveDeps = this.resolveDeps.bind(this);
 }
 
-Project.prototype.getCoverageReportFile = function () {
-	return path.join(__dirname, '..', 'jscover', 'reports', this.slug, 'jscoverage.json');
-};
+Project.prototype.findTests = function () {
+	// var re = /tests\.js$/;
+	var root = path.resolve(this.root);
 
-Project.prototype.doesCoverageReportExist = function () {
-	var f = this.getCoverageReportFile();
-	if (fs.existsSync(f)) {
-		return f;
-	} else {
-		return null;
-	}
-};
-
-Project.prototype.getBaseUri = function (host, coverage) {
-	if (!this.port) {
-		throw new Error('No port for this project, unable to process');
-	}
-
-	return '//' + host + ':' + (coverage ? this.coveragePort || this.port : this.port) + '/';
-};
-
-Project.prototype.findTests = function (jenkins) {
-	var re = /tests\.js$/;
-	var root = this.root;
-
-	// when using jenkins, use a different root folder
-	if (jenkins && this.jenkins) {
-		root = this.jenkins;
-	}
-
-	// look for all *.tests.html and *.tests.js files
-	var files = require('glob').sync(this.pattern || DEFAULT_PATTERN, {cwd: root})
+	// look for all unit test files
+	var files = glob.sync(this.pattern, {
+		cwd: root,
+		nosort: true
+	});
 		// make sure all files are *tests.html or *tests.js
-		.filter(re.test.bind(re));
+		// .filter(re.test.bind(re));
 
 	// filter out paths by the inclusive "include" option
 	if (this.include) {
@@ -117,7 +79,7 @@ Project.prototype.findTests = function (jenkins) {
 		var abs = path.join(root, file);
 		var dir = path.dirname(abs);
 
-		url = '/test/' + this.slug + '/' + fileNum + '?js=' + file;
+		url = '/test/' + fileNum + '?js=' + file;
 
 		if (!this.injectServer) {
 			var lines = fs.readFileSync(abs, {encoding: 'utf8'}).toString().split('\n').map(function (line) {
@@ -175,61 +137,22 @@ Project.prototype.getTest = function (fileNum) {
 	return this.tests()[fileNum];
 };
 
-Project.prototype.tests = function (jenkins) {
-	if (this._tests === null) {
-		this._tests = this.findTests(jenkins);
+// return a sorted the list of tests
+Project.prototype.tests = function () {
+	return this.findTests().sort(function (a, b) {
+		a = a.file.toLowerCase();
+		b = b.file.toLowerCase();
 
-		// sort the list of tests
-		this._tests = this._tests.sort(function (a, b) {
-			a = a.file.toLowerCase();
-			b = b.file.toLowerCase();
-
-			if (a < b) {
-				return -1;
-			} else if (a > b) {
-				return 1;
-			} else {
-				return 0;
-			}
-		});
-	}
-
-	return this._tests;
-};
-
-// convert a provided dependency (which is an absolute file path)
-// to web-accessible URIs for the given location
-Project.prototype.resolveDeps = function (dep) {
-	return path.join(this.baseUri, path.relative(this.root, dep)).replace(/\\/g, '/');
-};
-
-module.exports = (function () {
-	var data = fs.readFileSync(path.join(__dirname, '..', 'projects.json'), 'utf8');
-
-	if (!data) {
-		console.error('Error: Failed to read projects.json');
-		process.exit(1);
-	}
-
-	var projects = [];
-	var projectData;
-
-	try {
-		projectData = JSON.parse(data);
-	} catch (ex) {
-		console.error('Error: Invalid syntax within projects.json', ex);
-		process.exit(1);
-	}
-
-	// convert the generic json data to an array of Project objects
-	projectData.forEach(function (project) {
-		// ensure the project is not disabled within the projects.json config
-		if (!project.disabled) {
-			project = new Project(project);
-			projects.push(project);
-			projects[project.slug] = project;
+		if (a < b) {
+			return -1;
+		} else if (a > b) {
+			return 1;
+		} else {
+			return 0;
 		}
 	});
+};
 
-	return projects;
-})();
+module.exports = function findTests(options) {
+	return new Project(options).findTests();
+};

@@ -33,7 +33,7 @@
 
 	function Reporter(runner) {
 		// Setup HTML reporter to output data on the screen
-		window.Mocha.reporters.HTML.call(this, runner);
+		Mocha.reporters.HTML.apply(this, arguments);
 
 		function fixHeight() { // test, err
 			try {
@@ -62,6 +62,10 @@
 		}
 	}
 
+	for (var prop in Mocha.reporters.HTML.prototype) {
+		Reporter.prototype[prop] = Mocha.reporters.HTML.prototype[prop];
+	}
+
 	// we need to call setup before page load,
 	// this is what exposes describe() to the global
 	// window object to allow the unit tests to 
@@ -77,7 +81,7 @@
 		window.expect = chai.expect;
 
 		// if this is not a require.js test, then run mocha on page load
-		if (!document.body.dataset.modules) {
+		if (document.body.getAttribute('data-modules') == '') {
 			if (window.mochaPhantomJS) {
 				mochaPhantomJS.run();
 			} else {
@@ -92,7 +96,11 @@
 	}
 
 	function saveCoverageDataToServer(onComplete) {
-		var url = document.location.origin + '/' + document.body.getAttribute('data-project') + '/jscoverage.json?' + (+(new Date()));
+		if (!window._$jscoverage) {
+			return;
+		}
+
+		var url = document.location.origin + '/jscoverage.json?' + (+(new Date()));
 
 		var request = new XMLHttpRequest();
 		request.open('POST', url, true);

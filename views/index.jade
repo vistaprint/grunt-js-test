@@ -1,30 +1,12 @@
 extends base
 
 block content
-	- projects.forEach(function (project) {if (project) {
-		.panel.panel-default
-			.panel-heading.clearfix
-				a.left(href='/'+project.slug)= project.name
-				div.right
-					a(href='/'+project.slug+'/all') Run all tests
-					|  &middot; 
-					a(href='/'+project.slug+'/all?coverage=1') Generate coverage report
-					- if (project.doesCoverageReportExist()) {
-						| &middot; 
-						a(href='/'+project.slug+'/jscoverage') View coverage report
-					- }
-			table.table
-				thead
+	.panel.panel-default
+		.panel-heading.clearfix Tests
+		table.table
+			tbody
+				- tests.forEach(function (test, testNumber) {
 					tr
-						th(style='width: 5%; max-width: 20px') #
-						th Test file
-						th Filename
-				tbody
-					- project.tests().forEach(function (test, testNumber) {
-						tr
-							td= testNumber
-							td
-								a(href=test.url)= test.file
-							td= test.filename
-					- });
-	- }});
+						td
+							a(href=test.url)= test.file
+				- });

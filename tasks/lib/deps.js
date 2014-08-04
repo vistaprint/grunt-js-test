@@ -22,18 +22,18 @@ function findDeps(filePath) {
 	return deps;
 }
 
-function sortDeps(data, files, dontIncludeSelf) {
+function sortDeps(data, files, excludeSpecifiedFiles) {
 	var included = {};
 
 	function include(name) {
 		// confirm this file has not been included
 		if (included[name]) {
-			return '';
+			return;
 		}
 
 		if (typeof data[name] === 'undefined') {
 			console.log('Script ' + name + ' not found!');
-			return false;
+			return;
 		}
 
 		// include all deps before including this
@@ -46,7 +46,7 @@ function sortDeps(data, files, dontIncludeSelf) {
 	files.forEach(include);
 
 	// optionally remove the files and only return the deps for the file
-	if (dontIncludeSelf) {
+	if (excludeSpecifiedFiles) {
 		files.forEach(function (file) {
 			delete included[file];
 		});
@@ -55,7 +55,7 @@ function sortDeps(data, files, dontIncludeSelf) {
 	return Object.keys(included);
 }
 
-module.exports = function (files, dontIncludeSelf) {
+module.exports = function (files, excludeSpecifiedFiles) {
 	// ensure files is an array
 	if (!Array.isArray(files)) {
 		files = [files];
@@ -77,5 +77,5 @@ module.exports = function (files, dontIncludeSelf) {
 	files.forEach(recursive);
 
 	// sort the dependencies, ensuring every required file is included
-	return sortDeps(data, files, dontIncludeSelf);
+	return sortDeps(data, files, excludeSpecifiedFiles);
 };
