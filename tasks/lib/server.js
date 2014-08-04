@@ -150,7 +150,7 @@ module.exports = function (grunt, options) {
 
       res.render('test', {
         modules: moduleName || '',
-        injectHTML: injectHTML || '',
+        injectHTML: injectHTML,
         test: test,
         deps: deps,
         coverage: coverage,
@@ -158,34 +158,36 @@ module.exports = function (grunt, options) {
       });
     }
 
+    var injectHTML = options.injectHTML || '';
+
     // if test has an inject HTML file, inject it
     if (test.injectFiles && test.injectFiles.length > 0) {
-      var injectHTML = '';
       test.injectFiles.forEach(function (injectFile) {
         injectHTML += fs.readFileSync(injectFile);
       });
-      render(injectHTML);
     }
+
     // if the test has an inject URL, request it and inject it
-    else if (test.injectUrl) {
-      http.get(test.injectUrl, function (res) {
-        var data = '';
+    if (options.injectServer) {
+      var injectUrl = options.injectServer + '?file=' + test.file; // TODO: sanitize the injectUrl
 
-              res.on('data', function (chunk) {
-                  data += chunk;
-              });
+      http.get(injectUrl, function (res) {
+        var injectHTML = '';
 
-              res.on('end', function () {
-          render(data);
+        res.on('data', function (chunk) {
+            injectHTML += chunk;
+        });
+
+        res.on('end', function () {
+          render(injectHTML);
         });
       }).on('error', function () {
-        console.log('Error requesting inject url!');
-        render(null);
+        console.log.warn('Error requesting inject url!');
+        render(injectHTML);
       });
-    }
-    // no inject HTML, most tests go here, just render the response
-    else {
-      render(null);
+    } else {
+      // no inject url, so we have all the inject HTML we need, most tests go here, just render the response
+      render(injectHTML);
     }
   });
 

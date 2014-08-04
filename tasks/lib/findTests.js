@@ -29,96 +29,102 @@ function getRegExs(list) {
   }
 }
 
-function Project(project) {
-  // merge all the config from the projects.json into the project object
-  for (var key in project) {
-    if (project.hasOwnProperty(key)) {
-      this[key] = project[key];
-    }
-  }
-
+module.exports = function findTests(options) {
   // override some things
-  this.include = getRegExs(project.include);
-  this.exclude = getRegExs(project.exclude);
-}
+  var include = getRegExs(options.include);
+  var exclude = getRegExs(options.exclude);
 
-Project.prototype.findTests = function () {
-  // var re = /tests\.js$/;
-  var root = path.resolve(this.root);
+  var files = [];
+
+  var root = path.resolve(options.root);
 
   // look for all unit test files
-  var files = glob.sync(this.pattern, {
-    cwd: root,
-    nosort: true
+  var files = [];
+
+  // go through the list of glob patterns
+  if (!Array.isArray(options.pattern)) {
+    options.pattern = [options.pattern];
+  }
+
+  options.pattern.forEach(function (pattern) {
+    files = files.concat(
+      glob.sync(options.pattern, {
+        cwd: root,
+        nosort: true
+      })
+    );
   });
-    // make sure all files are *tests.html or *tests.js
-    // .filter(re.test.bind(re));
 
   // filter out paths by the inclusive "include" option
-  if (this.include) {
+  if (include) {
     files = files.filter(function (file) {
-      return this.include.every(function (regEx) {
-        return regEx.test(file);
+      return include.every(function (regEx) {
+        if (typeof regEx === 'string') {
+          return file.toLowerCase().indexOf(regEx.toLowerCase()) > -1;
+        } else {
+          return regEx.test(file);
+        }
       });
-    }, this);
+    });
   }
 
   // filter out paths by the "exclude" option
-  if (this.exclude) {
+  if (exclude) {
     files = files.filter(function (file) {
-      return this.exclude.every(function (regEx) {
-        return !regEx.test(file);
+      return !exclude.every(function (regEx) {
+        if (typeof regEx === 'string') {
+          return file.toLowerCase().indexOf(regEx.toLowerCase()) > -1;
+        } else {
+          return regEx.test(file);
+        }
       });
-    }, this);
+    });
   }
 
   // add test to the tests
   return files.map(function (file, fileNum) {
-    var url;
     var injectFiles = [];
     var abs = path.join(root, file);
     var dir = path.dirname(abs);
+    var url = '/test/' + fileNum + '?js=' + file;
 
-    url = '/test/' + fileNum + '?js=' + file;
+    var lines = fs.readFileSync(abs, {encoding: 'utf8'}).toString().split('\n').map(function (line) {
+      return line.replace(/^\s+/, '').replace(/\s+$/, '');
+    });
 
-    if (!this.injectServer) {
-      var lines = fs.readFileSync(abs, {encoding: 'utf8'}).toString().split('\n').map(function (line) {
-        return line.replace(/^\s+/, '').replace(/\s+$/, '');
-      });
+    var inject = new RegExp(/\/\/\/\s*<inject\s*path=['|"]([^'"]+)['|"]\s*\/>/i);
+    var reference = new RegExp(/\/\/\/\s*<reference.+path=['|"]([^'"]+)['|"].*\/>/i);
 
-      var inject = new RegExp(/\/\/\/\s*<inject\s*path=['|"]([^'"]+)['|"]\s*\/>/i);
-      var reference = new RegExp(/\/\/\/\s*<reference.+path=['|"]([^'"]+)['|"].*\/>/i);
-
-      lines.every(function (line) {
-        // ignore empty lines
-        if (line.length === 0) {
-          return true;
-        }
-
-        // ignore comments /* */
-        if (line.substr(0, 2) === '/*') {
-          return true;
-        }
-
-        // ignore <reference> tags
-        if (reference.test(line)) {
-          return true;
-        }
-
-        // parse comments beginning with /// <inject file="">
-        var match = inject.exec(line);
-        if (match) {
-          var injectFile = path.normalize(path.join(dir, match[1]));
-          injectFiles.push(injectFile);
-          return true;
-        }
-
-        return false;
-      });
-
-      if (fs.existsSync(abs.replace(/\.js$/, '.inject.html'))) {
-        injectFiles.push(abs.replace(/\.js$/, '.inject.html'));
+    lines.every(function (line) {
+      // ignore empty lines
+      if (line.length === 0) {
+        return true;
       }
+
+      // ignore comments /* */
+      if (line.substr(0, 2) === '/*') {
+        return true;
+      }
+
+      // ignore <reference> tags
+      if (reference.test(line)) {
+        return true;
+      }
+
+      // parse comments beginning with /// <inject path="">
+      var match = inject.exec(line);
+      if (match) {
+        var injectFile = path.normalize(path.join(dir, match[1]));
+        injectFiles.push(injectFile);
+        return true;
+      }
+
+      // stop processing the file
+      return false;
+    });
+
+    if (fs.existsSync(abs.replace(/\.js$/, '.inject.html'))) {
+      injectFiles.push(abs.replace(/\.js$/, '.inject.html'));
     }
 
     return {
@@ -127,15 +133,9 @@ Project.prototype.findTests = function () {
       filename: path.basename(file),
       dir: dir,
       abs: abs,
-      injectFiles: injectFiles,
-      injectUrl: this.injectServer ? this.injectServer + '?file=' + file : null
+      injectFiles: injectFiles
     };
-  }, this);
-};
-
-// return a sorted the list of tests
-Project.prototype.tests = function () {
-  return this.findTests().sort(function (a, b) {
+  }).sort(function (a, b) {
     a = a.file.toLowerCase();
     b = b.file.toLowerCase();
 
@@ -147,8 +147,4 @@ Project.prototype.tests = function () {
       return 0;
     }
   });
-};
-
-module.exports = function findTests(options) {
-  return new Project(options).findTests();
 };

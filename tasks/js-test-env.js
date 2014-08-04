@@ -99,6 +99,8 @@ module.exports = function (grunt) {
   var defaults = {
     root: process.cwd(),            // root path to your website javascript files
     pattern: '**/*.unittests.js',   // search pattern to locate your unit tests
+    include: [],
+    exclude: ['/node_modules/'],
     baseUri: '/',                   // the path to use for web assets, usually / will work
     deps: [],                       // global dependencies for each test that you don't want to <reference>
     referenceTags: true,            // indicate whether the js-test-env should look for <reference> tags
@@ -110,7 +112,7 @@ module.exports = function (grunt) {
     coverageProxyPort: 8983,        // port used as a proxy web server to instrument javascript files for coverage
 
     mocha: {},                      // grunt-mocha overrides
-    reporter: 'Spec',               // mocha reporter to used, by default Spec is used
+    reporter: 'Spec',               // mocha reporter to use
     coverage: false,                // should we generate coverage reports (slows down tests)
 
     // further filters to narrow tests that are run

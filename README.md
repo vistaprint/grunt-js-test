@@ -1,19 +1,174 @@
 # JavaScript Test Environment [![Dependency Status](https://gemnasium.com/benhutchins/js-test-env.png)](https://gemnasium.com/benhutchins/js-test-env)
 
+## Getting Started
+
+This plugin requires Grunt '~0.4.0'
+
+```shell
+npm install js-test-env --save-dev
+```
+
+Once the plugin has been installed, it may be enabled inside your Gruntfile with this line of JavaScript:
+
+```js
+grunt.loadNpmTasks('js-test-env');
+```
+
 ## Grunt tasks
 
 ### js-test
 
-Run all your project's client-side unit tests.
+_Run this task with the `grunt js-test` command._
 
-  var HELP = [
-    'Locate tests that match given filters.',
-    '--project     Specify project',
-    '--file        Specify test file, rel to project base',
-    '--re          Inc. Reg Ex run on test file names',
-    '--search      Inc. str match run on test file names',
-    '--mocha-grep  Inc. Reg Ex run on test descriptions',
-    '--reporter    Mocha reporter to use, default Spec',
-    '--bail        Exit on first failed test',
-    '--coverage    Generate coverage report data'
-  ];
+Run all test files with PhantomJS. The minimal config would be:
+
+```js
+  grunt.initConfig({
+    'js-test': {
+        'default': {
+            'options': {}
+        }
+    }
+  });
+
+  grunt.loadNpmTasks('js-test-env');
+
+  grunt.registerTask('test', ['js-test'env']);
+```
+
+### js-test-server
+
+_Run this task with the `grunt js-test-server` command._
+
+Start a web server on your local host to allow you to run the unit tests individually.
+
+## Options
+
+All options of `js-test` are optional, if you specify nothing, it will run all JavaScript files anywhere in your project matching `*.unittests.js`.
+
+#### root
+Type: `String`
+Default: `process.cwd()`
+
+Defines the root path to your project files. A static file web server is started on this path to allow your unit tests to load their dependencies.
+
+#### pattern
+Type: `String|Array<String>`
+Default: `**/*.unittests.js`
+
+Glob search pattern to locate your unit tests. For more information on glob patterns please see [node-glob](https://github.com/isaacs/node-glob). This can optionally be an array of globs which will all be used to find a file matching any of the glob patterns.
+
+#### include
+Type: `Array<String|RegExp>`
+Default: `[]`
+
+Array of simple string searches or regular expression used to whitelist tests. If a test does not match all of these filters it is ignored.
+
+#### exclude
+Type: `Array<String|RegExp>`
+Default: `['/node_modules/']`
+
+Array of simple string searches or regular expressions used to blacklist tests. If a test matches one of these filters it is ignored.
+
+#### baseUri
+Type: `String`
+Default: `/`
+
+Base path used when loading web assets.
+
+#### deps
+Type: `Array<String>`
+Default: `[]`
+
+A list of paths to JavaScript files relative to your `baseUri` you want loaded as global dependencies for each test.
+
+Dependencies can be injected on a per test file absis using `<reference>` tags. See `referenceTags` below.
+
+#### referenceTags
+Type: `Boolean`
+Default: `true`
+
+Look for `<reference>` tags within unit test files. Usually never hurts to leave it on.
+
+#### express
+Type: `Object`
+Default: `{}`
+
+Object of options to pass to the [grunt-express](https://github.com/blai/grunt-express) task. Hopefully uou never need to override anything here.
+
+#### hostname
+Type: `String`
+Default: `localhost`
+
+Hostname used for web server when running the `js-test-server` grunt task.
+
+#### port
+Type: `Number`
+Default: `8981`
+
+Port used for web server when running the `js-test-server` grunt task.
+
+#### staticPort
+Type: `number`
+Default: `8982`
+
+Port used for static web server that serves up your unit test dependency files. Should never have to change this unless something else uses this port.
+
+#### coverageProxyPort
+Type: `number`
+Default: `8983`
+
+Port used for proxy web server that instruments your javascript files for code coverage reporting. Should never have to change this unless something else uses this port.
+
+#### mocha
+Type: `Object`
+Default: `{}`
+
+Object of options to pass to the [grunt-mocha](https://github.com/kmiyashiro/grunt-mocha/) task. Hopefully uou never need to override anything here.
+
+#### reporter
+Type: `String`
+Default: `Spec`
+
+Mocha reporter used by `js-test` when reporting to the console.
+
+#### coverage
+Type: `Boolean`
+Default: `false`
+
+Should the test environment generate coverage reports? This can slow down running the tests, but will generate you code coverage reporting data.
+
+#### Filters
+
+    file: null,                     // run only this file, by file name
+    re: null,                       // run tests with file names that match this regular expression
+    search: null,                   // run tests with file names that contain the string passed (case insensitive)
+    bail: false,                    // if true we'll stop running tests once we find a single failure
+    grep: false,                    // passed to mocha, runs a regex test on the test descriptions
+    log: false,                     // if true, will pass console.log data from phantomjs to node console for debugging
+
+#### injectHTML
+Type: `String`
+Default: `null`
+
+Optional raw HTML string that added to all of the test pages generated by js-test-env.
+
+A useful example of this would be loading some setup HTML, like:
+
+```js
+{
+    ...
+    "injectHTML": require('fs').readFileSync('tests/setup.html'),
+    ...
+}
+```
+
+#### injectServer
+Type: `String`
+Default: `null`
+
+Optional web server address that provides HTML responses that should be injected into test pages. Similar to ``injectHTML``. This can be used to inject rendered templates into your tests, if needed.
+
+An example value would be: `http://localhost:3000/dev/render`
+
+A request will be made to the url you provide and will provide the test file with it's path relative from the `root` directory as a query string paramater `file`. Example: `?file=test/example.unittests.js`
