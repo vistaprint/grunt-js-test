@@ -26,8 +26,8 @@ var findTests  = require('./lib/findTests');
 
 module.exports = function (grunt) {
 
-  grunt.loadNpmTasks('grunt-express');
-  grunt.loadNpmTasks('grunt-mocha');
+  grunt.loadTasks(path.join(__dirname, '../node_modules/grunt-express/tasks'));
+  grunt.loadTasks(path.join(__dirname, '../node_modules/grunt-mocha/tasks'));
 
   function startCoverageServer() {
     // start the jscover proxy server
@@ -51,7 +51,7 @@ module.exports = function (grunt) {
         startCoverageServer();
       }
 
-      var express = Object.merge({
+      var express = _.extend({}, {
         options: {
           hostname: options.hostname,
           port: options.port,
@@ -133,7 +133,7 @@ module.exports = function (grunt) {
     var options = this.options(defaults);
 
     ensureServerIsRunning(options, function () {
-      var mochaConfig = Object.merge({
+      var mochaConfig = _.extend({}, {
         urls: ['test/*.unittests.html'],
 
         inject: path.join(__dirname, 'lib', 'phantom-bridge.js'),
@@ -221,7 +221,8 @@ module.exports = function (grunt) {
 
   // start the js-test-env web server with keepalive
   grunt.registerTask('js-test-server', 'Start server with keepalive.', function (target) {
-    var options = Object.merge(
+    var options = _.extend(
+      {},
       defaults,
       grunt.config.get('js-test.options') || {},
       grunt.config.get('js-test.' + target + '.options')
