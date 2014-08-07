@@ -48,7 +48,7 @@ module.exports = function findTests(options) {
 
   options.pattern.forEach(function (pattern) {
     files = files.concat(
-      glob.sync(options.pattern, {
+      glob.sync(pattern, {
         cwd: root,
         nosort: true
       })
