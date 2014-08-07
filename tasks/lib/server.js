@@ -118,7 +118,7 @@ module.exports = function (grunt, options) {
   app.get('/all', function (req, res) {
     // we run each each test in isolation, which creates an iframe
     // to /test/:test for each test
-    res.render('test-all-isolate', {
+    res.render('all', {
       coverage: typeof req.query.coverage !== 'undefined'
     });
   });
@@ -131,8 +131,7 @@ module.exports = function (grunt, options) {
       return res.status(404).send('Test not found.');
     }
 
-    var file = test.abs;
-    var deps = findReferenceTags(file).map(utils.resolveReferenceTag);
+    var deps = findReferenceTags(test.abs, options.requirejs).map(utils.resolveReferenceTag);
     var moduleName;
 
     // determine if we want to generate coverage reports
@@ -140,7 +139,7 @@ module.exports = function (grunt, options) {
 
     // attempt to find the module name for this file
     if (options.requirejs) {
-      moduleName = path.relative(options.requirejs.modulesRelativeTo, file).replace(/\\/g, '/').replace(/\.js$/, '');
+      moduleName = path.relative(options.modulesRelativeTo || options.root, test.abs).replace(/\\/g, '/').replace(/\.js$/, '');
     }
 
     function render(injectHTML) {

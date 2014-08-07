@@ -122,6 +122,9 @@ module.exports = function (grunt) {
     bail: false,                    // if true we'll stop running tests once we find a single failure
     grep: false,                    // passed to mocha, runs a regex test on the test descriptions
     log: false,                     // if true, will pass console.log data from phantomjs to node console for debugging
+
+    requirejs: false,               // if your project is requirejs based, set this to true
+    modulesRelativeTo: null,        // allows you to override how we determine the module name with its path
   };
 
   // run all the tests (or a single test, if the --file argument is used)
