@@ -50,6 +50,6 @@
     "grunt": "~0.4"
   },
   "devDependencies": {
-    "grunt-contrib-jshint": "~0.7.x"
+    "grunt-eslint": ">=0.6.0"
   }
 }
