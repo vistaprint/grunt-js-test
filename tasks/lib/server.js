@@ -16,6 +16,7 @@ var findReferenceTags = require('./deps');
 var app = express();
 
 app.locals.pretty = true; // output pretty HTML
+app.set('views', path.join(__dirname, '..', '..', 'views'));
 app.set('view engine', 'jade');
 // app.use(express.logger('dev'));
 // app.use(express.bodyParser({ limit: '200mb' }));
@@ -32,9 +33,9 @@ module.exports = function (grunt, options) {
     res.locals.tests = tests;
     res.locals.options = options;
     res.locals.utils = utils;
-    res.locals.defaultBaseUri = '//' + req.host + ':' + options.port;
+    res.locals.defaultBaseUri = '//' + req.hostname + ':' + options.port;
     res.locals.coverage = typeof req.query.coverage !== 'undefined';
-    res.locals.projectBaseUri =  getBaseUri(req.host, res.locals.coverage);
+    res.locals.projectBaseUri =  getBaseUri(req.hostname, res.locals.coverage);
     next();
   });
 
