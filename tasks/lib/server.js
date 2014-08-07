@@ -18,8 +18,8 @@ var app = express();
 app.locals.pretty = true; // output pretty HTML
 app.set('view engine', 'jade');
 // app.use(express.logger('dev'));
-app.use(express.bodyParser({ limit: '200mb' }));
-app.use(express.errorHandler());
+// app.use(express.bodyParser({ limit: '200mb' }));
+// app.use(express.errorHandler());
 
 // proxy static js-test-env javascript files
 app.use('/js-test-env', express.static(path.join(__dirname, '..', '..', 'views', 'deps')));

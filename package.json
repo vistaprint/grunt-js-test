@@ -38,11 +38,11 @@
     "test": "grunt test-self"
   },
   "dependencies": {
-    "express": "3.x",
-    "glob": "3.2.x",
+    "express": "4.x",
+    "glob": "4.x",
     "grunt-express": "benhutchins/grunt-express",
     "grunt-mocha": "0.4.x",
-    "jade": "~0.35",
+    "jade": "1.x",
     "request": "^2.34.0",
     "lodash": "^2.4.1"
   },

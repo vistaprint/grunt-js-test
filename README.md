@@ -1,4 +1,4 @@
-# JavaScript Test Environment [![Dependency Status](https://gemnasium.com/benhutchins/grunt-js-test.png)](https://gemnasium.com/benhutchins/grunt-js-test)
+# Grunt JavaScript Test Runner [![Dependency Status](https://gemnasium.com/benhutchins/grunt-js-test.png)](https://gemnasium.com/benhutchins/grunt-js-test)
 
 ## Getting Started
 
