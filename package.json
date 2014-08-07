@@ -1,7 +1,7 @@
 {
   "name": "grunt-js-test",
   "version": "1.0.0",
-  "description": "Grunt task for running client-side based Mocha tests in PhantomJS along with code coverage reports",
+  "description": "Grunt task for running client-side, mocha-based unit tests in PhantomJS with code coverage reports",
   "keywords": [
     "grunt",
     "gruntplugin",
