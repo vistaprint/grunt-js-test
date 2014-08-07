@@ -23,8 +23,10 @@
     "Benjamin Hutchins <ben@hutchins.co> (https://github.com/benhutchins/)"
   ],
   "files": [
+    "jscover",
+    "README.md",
     "tasks",
-    "README.md"
+    "views"
   ],
   "repository": {
     "type": "git",
