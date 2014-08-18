@@ -82,6 +82,15 @@
         return branchData;
     };
 
+    window.buildBranchMessage = function buildBranchMessage(conditions) {
+        var message = 'The following was not covered:';
+        for (var i = 0; i < conditions.length; i++) {
+            if (conditions[i] !== undefined && conditions[i] !== null && !conditions[i].covered())
+              message += '\n- '+ conditions[i].message();
+        }
+        return message;
+    };
+
     function saveCoverageData(data) {
         // convert branch data to regular object to be JSON encoded
         for (var file in data) {

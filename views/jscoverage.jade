@@ -15,8 +15,7 @@ block append scripts
 
 block content
 	h2
-		| Coverage reports for 
-		=project.name
+		| Coverage report
 
 	ul#tabs.nav.nav-tabs(data-tabs="tabs")
 		li.active
@@ -85,5 +84,5 @@ block content
 				h1#fileDiv
 				#sourceDiv
 		.tab-pane#storeTabPage
-			button.btn.btn-default#storeButton(href='/' + project.slug + '/jscoverage.json') Store Report
+			button.btn.btn-default#storeButton(href='/jscoverage.json') Store Report
 			ul#storeDiv
