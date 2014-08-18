@@ -82,7 +82,18 @@ module.exports = function findTests(options) {
   }
 
   // add test to the tests
-  return files.map(function (file, fileNum) {
+  return files.sort(function (a, b) {
+    a = a.toLowerCase();
+    b = b.toLowerCase();
+
+    if (a < b) {
+      return -1;
+    } else if (a > b) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }).map(function (file, fileNum) {
     var injectFiles = [];
     var abs = path.join(root, file);
     var dir = path.dirname(abs);
@@ -135,16 +146,5 @@ module.exports = function findTests(options) {
       abs: abs,
       injectFiles: injectFiles
     };
-  }).sort(function (a, b) {
-    a = a.file.toLowerCase();
-    b = b.file.toLowerCase();
-
-    if (a < b) {
-      return -1;
-    } else if (a > b) {
-      return 1;
-    } else {
-      return 0;
-    }
   });
 };
