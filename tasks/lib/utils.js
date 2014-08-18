@@ -1,8 +1,9 @@
 var fs = require('fs');
 var path = require('path');
+var moment = require('moment');
 
 module.exports = function (options) {
-  var JSCOVERAGE = path.resolve('./jscoverage.json');
+  var JSCOVERAGE = path.resolve('./jscoverage ' + moment().format('YYYY-MM-DD') + '.json');
 
   return {
 
@@ -14,7 +15,11 @@ module.exports = function (options) {
       }
     },
 
-    jscoverageFile: function () {
+    jscoverageFile: function (reportFileName) {
+      if (reportFileName) {
+        return path.resolve('./' + reportFileName);
+      }
+
       return JSCOVERAGE;
     },
 

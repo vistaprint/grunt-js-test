@@ -84,19 +84,56 @@ module.exports = function (grunt, options) {
 
   // jscover page, in case someone makes this request by mistake
   app.get('/jscoverage', function (req, res) {
-    res.render('jscoverage');
+    var coverageReports = grunt.file.expand('jscoverage*.json');
+
+    res.render('jscoverage', {
+      coverageReports: coverageReports,
+      report: req.query.report
+    });
   });
 
   // jscoverage json report for a given project
   app.get('/jscoverage.json', function (req, res) {
-    res.status(200).sendfile(utils.jscoverageFile(), {}, function (err) {
-      if (err) {
-        res.status(404).send({
-          success: false,
-          message: 'No coverage report data found.'
-        });
-      }
-    });
+    if (!req.query.report) {
+      res.status(404).send({
+        success: false,
+        message: 'No report specified.'
+      });
+      return;
+    }
+
+    var f = utils.jscoverageFile(req.query.report);
+    if (req.query.file) {
+      fs.readFile(f, function (err, data) {
+        if (err) {
+          grunt.log.error('Failed to read coverage file.', err);
+          res.status(404).send({
+            success: false,
+            message: 'No coverage report data found.'
+          });
+        } else {
+          var coverageJson = JSON.parse(data);
+
+          if (coverageJson[req.query.file]) {
+            res.status(200).send(coverageJson[req.query.file]);
+          } else {
+            res.status(404).send({
+              success: false,
+              message: 'No coverage data found for desired file.'
+            });
+          }
+        }
+      });
+    } else {
+      res.status(200).sendFile(f, {}, function (err) {
+        if (err) {
+          res.status(404).send({
+            success: false,
+            message: 'No coverage report data found.'
+          });
+        }
+      });
+    }
   });
 
   // store the jscover report to disk

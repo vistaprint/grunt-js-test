@@ -47,7 +47,8 @@
     "jade": "1.x",
     "request": "^2.34.0",
     "lodash": "^2.4.1",
-    "body-parser": "^1.6.5"
+    "body-parser": "^1.6.5",
+    "moment": "^2.8.1"
   },
   "peerDependencies": {
     "grunt": "~0.4"

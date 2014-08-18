@@ -10,12 +10,20 @@ block append styles
 		link(rel='stylesheet', type='text/css', href='/js-test-env/jscoverage-ie.css')
 
 block append scripts
+	script(type='text/javascript', src='/js-test-env/coverage.js')
 	script(type='text/javascript', src='/js-test-env/jscoverage.head.js')
 	script(type='text/javascript', src='/js-test-env/jscoverage.js')
 
 block content
 	h2
 		| Coverage report
+
+	- if (coverageReports.length > 1) {
+		select#report
+			- coverageReports.forEach(function (reportFile) {
+				option(value=reportFile, selected=(report==reportFile))= reportFile
+			- });
+	- }
 
 	ul#tabs.nav.nav-tabs(data-tabs="tabs")
 		li.active

@@ -44,6 +44,7 @@ function jscoverage_body_load() {
 		// jscoverage_beginLengthyOperation();
 		$.ajax({
 			url: 'jscoverage.json',
+			data: {'report': $('#report').val()},
 			cache: false,
 			dataType: 'json',
 			timeout: 10000,
