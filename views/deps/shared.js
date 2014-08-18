@@ -118,8 +118,8 @@
       alert('There was an error saving the coverage report data. Verify server is up?');
     };
 
-    request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    request.send('json=' + encodeURIComponent(window.saveCoverageData(window._$jscoverage)));
+    request.setRequestHeader('Content-Type', 'text/plain');
+    request.send(window.saveCoverageData(window._$jscoverage));
   }
 
   window.jscoverage_report = saveCoverageDataToServer;

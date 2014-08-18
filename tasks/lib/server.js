@@ -8,6 +8,7 @@ var path = require('path');
 
 var express = require('express');
 var request = require('request');
+var bodyParser = require('body-parser');
 
 // Helpers.
 var findReferenceTags = require('./deps');
@@ -19,7 +20,7 @@ app.locals.pretty = true; // output pretty HTML
 app.set('views', path.join(__dirname, '..', '..', 'views'));
 app.set('view engine', 'jade');
 // app.use(express.logger('dev'));
-// app.use(express.bodyParser({ limit: '200mb' }));
+app.use(bodyParser.text({ limit: '200mb' }));
 // app.use(express.errorHandler());
 
 // proxy static js-test-env javascript files
@@ -58,7 +59,7 @@ module.exports = function (grunt, options) {
     var r = request.defaults({'proxy': 'http://127.0.0.1:3128'});
 
     var proxy = http.createServer(function (req, resp) {
-      grunt.verbose.write('Coverage Proxy Request:', req.url);
+      grunt.verbose.writeln('Coverage Proxy Request:', req.url);
       r.get('http://' + options.hostname + ':' + options.staticPort  + req.url).pipe(resp);
     });
 
@@ -101,14 +102,16 @@ module.exports = function (grunt, options) {
   // store the jscover report to disk
   app.post('/jscoverage.json', function (req, res) {
     // we need data to write to the file
-    if (!req.body.json) {
+    if (!req.body) {
+      grunt.log.error('No Coverage JSON data provided in POST, should never happen.');
       return res.status(500).send('No JSON data provided.');
     }
 
-    fs.writeFile(utils.jscoverageFile(), req.body.json, function (err) {
+    fs.writeFile(utils.jscoverageFile(), req.body, function (err) {
       if (err) {
         res.status(500).send({success: false});
       } else {
+        grunt.verbose.writeln('Saved coverage data to:', utils.jscoverageFile());
         res.send('success');
       }
     });

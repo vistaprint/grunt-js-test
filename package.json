@@ -46,7 +46,8 @@
     "grunt-mocha": "0.4.x",
     "jade": "1.x",
     "request": "^2.34.0",
-    "lodash": "^2.4.1"
+    "lodash": "^2.4.1",
+    "body-parser": "^1.6.5"
   },
   "peerDependencies": {
     "grunt": "~0.4"

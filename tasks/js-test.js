@@ -31,7 +31,7 @@ module.exports = function (grunt) {
 
   function startCoverageServer() {
     // start the jscover proxy server
-    var cmd = 'java -jar jscover/JSCover-all.jar -ws --proxy --port=3128';
+    var cmd = 'java -jar "' + path.resolve(path.join(__dirname, '../jscover/JSCover-all.jar')) + '" -ws --proxy --port=3128';
     var exec = require('child_process').exec;
 
     grunt.log.ok('JSCover proxy server started.');
