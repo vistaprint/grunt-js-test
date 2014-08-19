@@ -1,15 +1,6 @@
 /*
- * grunt
- * https://github.com/cowboy/grunt
- *
- * Copyright (c) 2012 "Cowboy" Ben Alman
- * Licensed under the MIT license.
- * http://benalman.com/about/license/
- *
- * Mocha task
- * Copyright (c) 2012 Kelly Miyashiro
- * Licensed under the MIT license.
- * http://benalman.com/about/license/
+ * grunt-js-test
+ * https://github.com/benhutchins/grunt-js-test
  */
 
 'use strict';
