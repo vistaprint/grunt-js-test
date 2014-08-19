@@ -5,44 +5,65 @@ var path = require('path');
 var express = require('express');
 var istanbul = require('istanbul');
 
-module.exports = function (grunt, options) {
-  var app = express();
-  // app.use('/_coverage', im.createHandler());
-  // app.use(options.baseUri, im.createClientHandler(options.root));
-
+module.exports = function (grunt, options, reportDirectory) {
   var instrumenter = new istanbul.Instrumenter();
+  var collector = new istanbul.Collector();
+  var app;
 
-  app.use(options.baseUri, function (req, res, next) {
-    var file = path.join(options.root, req.path);
+  return {
+    start: function () {
+      app = express();
 
-    fs.readFile(file, function (err, contents) {
-      if (err) {
-        res.status(404).send({
-          success: false,
-          message: 'Requested file was not found.'
-        });
+      app.use(options.baseUri, function (req, res, next) {
+        var file = path.join(options.root, req.path);
 
-        grunt.log.error('Failed to read requested file to instrument.', err);
-        return;
-      }
+        fs.readFile(file, function (err, contents) {
+          if (err) {
+            res.status(404).send({
+              success: false,
+              message: 'Requested file was not found.'
+            });
 
-      instrumenter.instrument(contents.toString(), req.path, function (err, instrumentedCode) {
-        if (err) {
-          res.status(500).send({
-            success: false,
-            message: 'Failed to instrument code.'
+            grunt.log.error('Failed to read requested file to instrument.', err);
+            return;
+          }
+
+          instrumenter.instrument(contents.toString(), path.join(options.root, req.path), function (err, instrumentedCode) {
+            if (err) {
+              res.status(500).send({
+                success: false,
+                message: 'Failed to instrument code.'
+              });
+
+              grunt.log.error('Failed to instrument code.', err);
+            } else {
+              res.set('Content-Type', 'text/javascript');
+              res.status(200).send(instrumentedCode);
+            }
           });
-
-          grunt.log.error('Failed to instrument code.', err);
-        } else {
-          res.set('Content-Type', 'text/javascript');
-          res.status(200).send(instrumentedCode);
-        }
+        });
       });
-    });
-  });
 
-  app.listen(options.coverageProxyPort);
+      app.listen(options.coverageProxyPort);
 
-  grunt.log.ok('Started proxy web server on port ' + options.coverageProxyPort + '.\n');
+      grunt.log.ok('Started proxy web server on port ' + options.coverageProxyPort + '.\n');
+    },
+
+    save: function (coverageData, cb) {
+      collector.add(JSON.parse(coverageData));
+      cb(null);
+    },
+
+    aggregate: function (cb) {
+      var reporter = new istanbul.Reporter(null, reportDirectory);
+
+      reporter.add('html');
+      // reporter.add('lcov');
+
+      reporter.write(collector, true, function () {
+        console.log('Reports generated?');
+        cb(null);
+      });
+    }
+  };
 };

@@ -24,13 +24,6 @@ module.exports = function (grunt, options) {
   var tests = require('./findTests')(options);
   var utils = require('./utils')(options);
 
-  // validate coverage reporting tool
-  if (options.coverageTool !== 'jscover' && options.coverageTool !== 'istanbul') {
-    options.coverageTool = null;
-    options.coverage = false;
-    grunt.log.error('Unsupported coverage reporter, disabling coverage.');
-  }
-
   // set template data
   app.locals.tests = tests;
   app.locals.options = options;
@@ -58,69 +51,23 @@ module.exports = function (grunt, options) {
   statics.listen(options.staticPort);
 
   // start coverage instrumentation proxy server
+  var coverageTool, coverageReportDirectory, createdCoverageReportDirectory;
   if (options.coverage) {
-    require('./coverage-reporters/' + options.coverageTool)(grunt, options);
+    try {
+      coverageReportDirectory = utils.coverageReportDirectory();
+      coverageTool = require('./coverage-reporters/' + options.coverageTool)(grunt, options, coverageReportDirectory);
+    } catch (ex) {
+      options.coverageTool = null;
+      options.coverage = false;
+      grunt.log.error('Unsupported coverage reporter, disabling coverage.');
+    } finally {
+      coverageTool.start();
+    }
   }
 
   // list of unit tests
   app.get('/', function (req, res) {
     res.render('index');
-  });
-
-  // coverage report viewer
-  app.get('/coverage', function (req, res) {
-    var coverageReports = grunt.file.expand(path.join(options.coverageReportDirectory, '.json'));
-
-    if (options.coverageTool == 'jscover') {
-      res.render('jscoverage', {
-        coverageReports: coverageReports,
-        report: req.query.report
-      });
-    }
-  });
-
-  // jscoverage json report for a given project
-  app.get('/jscoverage.json', function (req, res) {
-    if (!req.query.report) {
-      res.status(404).send({
-        success: false,
-        message: 'No report specified.'
-      });
-      return;
-    }
-
-    var f = utils.jscoverageFile(req.query.report);
-    if (req.query.file) {
-      fs.readFile(f, function (err, data) {
-        if (err) {
-          grunt.log.error('Failed to read coverage file.', err);
-          res.status(404).send({
-            success: false,
-            message: 'No coverage report data found.'
-          });
-        } else {
-          var coverageJson = JSON.parse(data);
-
-          if (coverageJson[req.query.file]) {
-            res.status(200).send(coverageJson[req.query.file]);
-          } else {
-            res.status(404).send({
-              success: false,
-              message: 'No coverage data found for desired file.'
-            });
-          }
-        }
-      });
-    } else {
-      res.status(200).sendFile(f, {}, function (err) {
-        if (err) {
-          res.status(404).send({
-            success: false,
-            message: 'No coverage report data found.'
-          });
-        }
-      });
-    }
   });
 
   // store the jscover report to disk
@@ -131,12 +78,30 @@ module.exports = function (grunt, options) {
       return res.status(500).send('No JSON data provided.');
     }
 
-    fs.writeFile(utils.jscoverageFile(), req.body, function (err) {
+    if (!createdCoverageReportDirectory) {
+      fs.mkdirSync(coverageReportDirectory);
+      createdCoverageReportDirectory = true;
+    }
+
+    coverageTool.save(req.body, function (err) {
       if (err) {
-        res.status(500).send({success: false});
+        grunt.log.error('Failed to save coverage data.');
+        res.status(500).send({ success: false });
       } else {
-        grunt.verbose.writeln('Saved coverage data to:', utils.jscoverageFile());
-        res.send('success');
+        grunt.verbose.writeln('Saved coverage data.');
+        res.status(200).send({ success: true });
+      }
+    });
+  });
+
+  app.get('/save-coverage-data', function (req, res) {
+    coverageTool.aggregate(function (err) {
+      if (err) {
+        grunt.log.error('Failed to create coverage report.');
+        res.status(500).send({ success: false });
+      } else {
+        grunt.verbose.writeln('Saved coverage report.');
+        res.status(200).send({ success: true });
       }
     });
   });
@@ -150,6 +115,8 @@ module.exports = function (grunt, options) {
     });
   });
 
+  // run a single test given the index number
+  // TODO: change from index numbers to paths
   app.get('/test/:test', function (req, res) {
     var test = tests[req.params.test];
 
@@ -170,15 +137,12 @@ module.exports = function (grunt, options) {
     }
 
     function render(injectHTML) {
-      var coverageData = coverage ? utils.getCoverageData() : null;
-
       res.render('test', {
         modules: moduleName || '',
         injectHTML: injectHTML,
         test: test,
         deps: deps,
-        coverage: coverage,
-        coverageData: coverageData
+        coverage: coverage
       });
     }
 

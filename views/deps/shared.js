@@ -92,13 +92,10 @@
     }
   }, false);
 
-  // sometimes the localStorage gets into an odd state
-  if (window.location.search.indexOf('clear=1') > -1) {
-    delete window.localStorage.jscover;
-  }
-
   function saveCoverageDataToServer(onComplete) {
-    if (!window._$jscoverage) {
+    // window._$jscoverage is created by JSCover / JSCoverage
+    // window.__coverage__ is created by Istanbul
+    if (!window._$jscoverage && !window.__coverage__) {
       return;
     }
 
@@ -117,9 +114,12 @@
     request.onerror = function () {
       alert('There was an error saving the coverage report data. Verify server is up?');
     };
-
     request.setRequestHeader('Content-Type', 'text/plain');
-    request.send(window.saveCoverageData(window._$jscoverage));
+    if (window.__coverage__) {
+      request.send(JSON.stringify(window.__coverage__));
+    } else {
+      request.send(window.saveCoverageData(window._$jscoverage));
+    }
   }
 
   window.jscoverage_report = saveCoverageDataToServer;
