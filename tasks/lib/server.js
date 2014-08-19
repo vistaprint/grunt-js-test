@@ -67,11 +67,6 @@ module.exports = function (grunt, options) {
     res.render('index');
   });
 
-  // simple is-alive test
-  app.get('/alive', function (req, res) {
-    res.send('hello world');
-  });
-
   // coverage report viewer
   app.get('/coverage', function (req, res) {
     var coverageReports = grunt.file.expand('jscoverage*.json');

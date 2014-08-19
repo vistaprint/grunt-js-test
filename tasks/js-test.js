@@ -20,54 +20,26 @@ module.exports = function (grunt) {
   grunt.loadTasks(path.join(__dirname, '../node_modules/grunt-express/tasks'));
   grunt.loadTasks(path.join(__dirname, '../node_modules/grunt-mocha/tasks'));
 
-  function ensureServerIsRunning(options, done) {
-    function startServer() {
-      var express = _.extend({}, {
-        options: {
-          hostname: options.hostname,
-          port: options.port,
-          server: require(path.resolve(__dirname, 'lib', 'server.js'))(grunt, options)
-        }
-      }, options.express || {});
-
-      grunt.config.set('express.js-test-env', express);
-
-      grunt.task.run('express:js-test-env');
-
-      if (done) {
-        done();
+  function startServer(options, done) {
+    var express = _.extend({}, {
+      options: {
+        hostname: options.hostname,
+        port: options.port,
+        server: require(path.resolve(__dirname, 'lib', 'server.js'))(grunt, options)
       }
+    }, options.express || {});
+
+    grunt.config.set('express.js-test-env', express);
+
+    grunt.task.run('express:js-test-env');
+
+    if (done) {
+      done();
     }
-
-    var host = options.hostname;
-    var port = options.port;
-
-    grunt.log.ok('Checking server at http://' + host + ':' + port + '/alive');
-
-    // first make sure the web server is running
-    // http.get({
-    //   host: host,
-    //   port: port,
-    //   path: '/alive',
-    //   timeout: 30
-    // }, function (res) {
-    //   console.log('HERE???');
-    //   if (res.statusCode === 200) {
-    //     if (done) {
-    //       done();
-    //     }
-    //   } else {
-    //     startServer();
-    //   }
-    // }).on('error', function () {
-    //   console.log('ERRORS?', arguments);
-    //   startServer();
-    // });
-
-    startServer();
   }
 
   var defaults = {
+    // project options
     root: process.cwd(),            // root path to your website javascript files
     pattern: '**/*.unittests.js',   // search pattern to locate your unit tests
     include: [],
@@ -76,15 +48,18 @@ module.exports = function (grunt) {
     deps: [],                       // global dependencies for each test that you don't want to <reference>
     referenceTags: true,            // indicate whether the js-test-env should look for <reference> tags
 
+    // web server options
     express: {},                    // grunt-express overrides
     hostname: 'localhost',          // hostname for grunt-express server
     port: 8981,                     // port for grunt-express server
     staticPort: 8982,               // port used for secondary web server that serves your static project files
     coverageProxyPort: 8983,        // port used as a proxy web server to instrument javascript files for coverage
 
+    // unit testing service options
     mocha: {},                      // grunt-mocha overrides
     reporter: 'Spec',               // mocha reporter to use
 
+    // coverage reporting options
     coverage: false,                // should we generate coverage reports (slows down tests)
     coverageReporter: 'jscover',    // which reporter should we use, jscover or istanbul
 
@@ -108,7 +83,7 @@ module.exports = function (grunt) {
     // standardize the options
     var options = this.options(defaults);
 
-    ensureServerIsRunning(options, function () {
+    startServer(options, function () {
       var mochaConfig = _.extend({}, {
         urls: ['test/*.unittests.html'],
 
@@ -204,7 +179,7 @@ module.exports = function (grunt) {
       grunt.config.get('js-test.' + target + '.options')
     );
 
-    ensureServerIsRunning(options, function () {
+    startServer(options, function () {
       grunt.task.run('express-keepalive');
     });
   });
