@@ -9,7 +9,22 @@ function normalize(file) {
 }
 
 module.exports = function (options) {
-  var JSCOVERAGE = path.resolve('./jscoverage ' + moment().format('YYYY-MM-DD') + '.json');
+  if (!options.coverageReportDirectory) {
+    options.coverageReportDirectory = path.join(process.cwd(), 'coverage');
+
+    fs.exists(options.coverageReportDirectory, function (exists) {
+      if (!exists) {
+        fs.mkdir(options.coverageReportDirectory, function (err) {
+          if (err) {
+            grunt.log.error('Failed to create coverage report directory, please specify one in your Gruntfile.js', err);
+            process.exit(1);
+          }
+        });
+      }
+    });
+  }
+
+  var JSCOVERAGE = path.join(options.coverageReportDirectory, options.coverageTool + ' ' + moment().format('YYYY-MM-DD') + '.json');
 
   return {
 
@@ -23,14 +38,10 @@ module.exports = function (options) {
 
     jscoverageFile: function (reportFileName) {
       if (reportFileName) {
-        return path.resolve('./' + reportFileName);
+        return path.join(options.coverageReportDirectory, reportFileName);
       }
 
       return JSCOVERAGE;
-    },
-
-    jscoverageFileExists: function () {
-      return fs.existsSync(this.jscoverageFile());
     },
 
     findReferenceTags: function (files) {

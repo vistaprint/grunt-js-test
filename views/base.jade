@@ -30,10 +30,8 @@ html(lang='en')
             - if (options.coverage) {
               li
                 a(href='/all?coverage=1') Generate coverage report
-            - }
-            - if (utils.jscoverageFileExists()) {
               li
-                a(href='/jscoverage') View coverage report
+                a(href='/coverage') View coverage report
             - }
             li
               a(href='http://vistawiki.vistaprint.net/wiki/JavaScript_test_environment', target='_blank') Help

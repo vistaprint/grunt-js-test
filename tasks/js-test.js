@@ -61,7 +61,8 @@ module.exports = function (grunt) {
 
     // coverage reporting options
     coverage: false,                // should we generate coverage reports (slows down tests)
-    coverageReporter: 'jscover',    // which reporter should we use, jscover or istanbul
+    coverageTool: 'jscover',        // which reporter should we use, jscover or instanbul
+    coverageReportDirectory: null,  // directory to save reports to
 
     // further filters to narrow tests that are run
     file: null,                     // run only this file, by file name

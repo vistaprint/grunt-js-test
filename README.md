@@ -138,6 +138,18 @@ Default: `false`
 
 Should the test environment generate coverage reports? This can slow down running the tests, but will generate you code coverage reporting data.
 
+#### coverageTool
+Type: `String`
+Default: `jscover`
+
+Choose between either `jscover` or `istanbul` for your coverage instrumentation and reporting service.
+
+#### coverageReportDirectory
+Type: `String`
+Default: `process.cwd() + '/coverage'`
+
+Specify a directory where coverage report data should be saved.
+
 #### Filters
 
 These filters allow you to narrow down the tests you run via the `js-test` CLI. This is useful when updating a single test or when using grunt-js-test from a continuous integration service.

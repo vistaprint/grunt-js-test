@@ -25,8 +25,8 @@ module.exports = function (grunt, options) {
   var utils = require('./utils')(options);
 
   // validate coverage reporting tool
-  if (options.coverageReporter !== 'jscover' && options.coverageReporter !== 'istanbul') {
-    options.coverageReporter = null;
+  if (options.coverageTool !== 'jscover' && options.coverageTool !== 'istanbul') {
+    options.coverageTool = null;
     options.coverage = false;
     grunt.log.error('Unsupported coverage reporter, disabling coverage.');
   }
@@ -59,7 +59,7 @@ module.exports = function (grunt, options) {
 
   // start coverage instrumentation proxy server
   if (options.coverage) {
-    require('./coverage-reporters/' + options.coverageReporter)(grunt, options);
+    require('./coverage-reporters/' + options.coverageTool)(grunt, options);
   }
 
   // list of unit tests
@@ -69,9 +69,9 @@ module.exports = function (grunt, options) {
 
   // coverage report viewer
   app.get('/coverage', function (req, res) {
-    var coverageReports = grunt.file.expand('jscoverage*.json');
+    var coverageReports = grunt.file.expand(path.join(options.coverageReportDirectory, '.json'));
 
-    if (options.coverageReporter == 'jscover') {
+    if (options.coverageTool == 'jscover') {
       res.render('jscoverage', {
         coverageReports: coverageReports,
         report: req.query.report

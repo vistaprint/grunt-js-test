@@ -16,7 +16,7 @@ html(lang='en')
     script(src=defaultBaseUri + '/js-test-env/mocha.js')
     script(src=defaultBaseUri + '/js-test-env/chai.js')
     script(src=defaultBaseUri + '/js-test-env/sinon.js')
-    - if (coverage) {
+    - if (coverage && options.coverageTool == 'jscover') {
       script(src=defaultBaseUri + '/js-test-env/jscoverage.head.js')
       - if (coverageData) {
         script(type='text/json', id='coverageData')!=coverageData
