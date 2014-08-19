@@ -53,7 +53,6 @@ module.exports = function (grunt) {
     hostname: 'localhost',          // hostname for grunt-express server
     port: 8981,                     // port for grunt-express server
     staticPort: 8982,               // port used for secondary web server that serves your static project files
-    coverageProxyPort: 8983,        // port used as a proxy web server to instrument javascript files for coverage
 
     // unit testing service options
     mocha: {},                      // grunt-mocha overrides
@@ -63,6 +62,7 @@ module.exports = function (grunt) {
     coverage: false,                // should we generate coverage reports (slows down tests)
     coverageTool: 'jscover',        // which reporter should we use, jscover or instanbul
     coverageReportDirectory: null,  // directory to save reports to
+    coverageProxyPort: 8983,        // port used as a proxy web server to instrument javascript files for coverage
 
     // further filters to narrow tests that are run
     file: null,                     // run only this file, by file name
