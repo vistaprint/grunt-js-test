@@ -29,28 +29,8 @@ module.exports = function (grunt) {
   grunt.loadTasks(path.join(__dirname, '../node_modules/grunt-express/tasks'));
   grunt.loadTasks(path.join(__dirname, '../node_modules/grunt-mocha/tasks'));
 
-  function startCoverageServer() {
-    // start the jscover proxy server
-    var cmd = 'java -jar "' + path.resolve(path.join(__dirname, '../jscover/JSCover-all.jar')) + '" -ws --proxy --port=3128';
-    var exec = require('child_process').exec;
-
-    grunt.log.ok('JSCover proxy server started.');
-
-    exec(cmd, function (err, stdout, stderr) {
-      if (err) {
-        console.log(err, stdout, stderr);
-      }
-
-      grunt.log.ok('JSCover proxy server terminated.');
-    });
-  }
-
   function ensureServerIsRunning(options, done) {
     function startServer() {
-      if (options.coverage) {
-        startCoverageServer();
-      }
-
       var express = _.extend({}, {
         options: {
           hostname: options.hostname,
@@ -113,7 +93,9 @@ module.exports = function (grunt) {
 
     mocha: {},                      // grunt-mocha overrides
     reporter: 'Spec',               // mocha reporter to use
+
     coverage: false,                // should we generate coverage reports (slows down tests)
+    coverageReporter: 'jscover',    // which reporter should we use, jscover or istanbul
 
     // further filters to narrow tests that are run
     file: null,                     // run only this file, by file name

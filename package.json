@@ -23,7 +23,6 @@
     "Benjamin Hutchins <ben@hutchins.co> (https://github.com/benhutchins/)"
   ],
   "files": [
-    "jscover",
     "README.md",
     "tasks",
     "views"
@@ -48,7 +47,8 @@
     "request": "^2.34.0",
     "lodash": "^2.4.1",
     "body-parser": "^1.6.5",
-    "moment": "^2.8.1"
+    "moment": "^2.8.1",
+    "istanbul": "^0.3.0"
   },
   "peerDependencies": {
     "grunt": "~0.4"

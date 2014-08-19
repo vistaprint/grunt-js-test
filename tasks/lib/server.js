@@ -1,18 +1,12 @@
-#!/usr/bin/env node
 'use strict';
 
 // Nodejs libs.
 var fs = require('fs');
-var http = require('http');
 var path = require('path');
 
 var express = require('express');
-var request = require('request');
 var bodyParser = require('body-parser');
-
-// Helpers.
-var findReferenceTags = require('./deps');
-
+var request = require('request');
 
 var app = express();
 
@@ -30,13 +24,21 @@ module.exports = function (grunt, options) {
   var tests = require('./findTests')(options);
   var utils = require('./utils')(options);
 
+  // validate coverage reporting tool
+  if (options.coverageReporter !== 'jscover' && options.coverageReporter !== 'istanbul') {
+    options.coverageReporter = null;
+    options.coverage = false;
+    grunt.log.error('Unsupported coverage reporter, disabling coverage.');
+  }
+
+  // set template data
+  app.locals.tests = tests;
+  app.locals.options = options;
+  app.locals.utils = utils;
   app.use(function (req, res, next) {
-    res.locals.tests = tests;
-    res.locals.options = options;
-    res.locals.utils = utils;
-    res.locals.defaultBaseUri = '//' + req.hostname + ':' + options.port;
     res.locals.coverage = typeof req.query.coverage !== 'undefined';
-    res.locals.projectBaseUri =  getBaseUri(req.hostname, res.locals.coverage);
+    res.locals.defaultBaseUri = '//' + req.hostname + ':' + options.port;
+    res.locals.projectBaseUri = '//' + req.hostname + ':' + (res.locals.coverage ? options.coverageProxyPort : options.staticPort) + '/';
     next();
   });
 
@@ -44,6 +46,8 @@ module.exports = function (grunt, options) {
   var statics = express();
 
   // ensure all responses are utf8 and are accessible cross-domain
+  // this is needed so we can perform ajax requests to get the contents
+  // of these static files from within the coverage report viewer
   statics.use(function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', 'X-Requested-With');
@@ -53,23 +57,9 @@ module.exports = function (grunt, options) {
   statics.use(options.baseUri, express.static(options.root));
   statics.listen(options.staticPort);
 
-  // coverage report proxy server
+  // start coverage instrumentation proxy server
   if (options.coverage) {
-    // setup request object with a proxy
-    var r = request.defaults({'proxy': 'http://127.0.0.1:3128'});
-
-    var proxy = http.createServer(function (req, resp) {
-      grunt.verbose.writeln('Coverage Proxy Request:', req.url);
-      r.get('http://' + options.hostname + ':' + options.staticPort  + req.url).pipe(resp);
-    });
-
-    proxy.listen(options.coverageProxyPort);
-
-    grunt.log.ok('Started proxy web server on port ' + options.coverageProxyPort + '.\n');
-  }
-
-  function getBaseUri(host, coverage) {
-    return '//' + (host || options.hostname) + ':' + (coverage ? options.coverageProxyPort || options.staticPort : options.staticPort) + '/';
+    require('./coverage-reporters/' + options.coverageReporter)(grunt, options);
   }
 
   // list of unit tests
@@ -82,14 +72,16 @@ module.exports = function (grunt, options) {
     res.send('hello world');
   });
 
-  // jscover page, in case someone makes this request by mistake
-  app.get('/jscoverage', function (req, res) {
+  // coverage report viewer
+  app.get('/coverage', function (req, res) {
     var coverageReports = grunt.file.expand('jscoverage*.json');
 
-    res.render('jscoverage', {
-      coverageReports: coverageReports,
-      report: req.query.report
-    });
+    if (options.coverageReporter == 'jscover') {
+      res.render('jscoverage', {
+        coverageReports: coverageReports,
+        report: req.query.report
+      });
+    }
   });
 
   // jscoverage json report for a given project
@@ -171,7 +163,7 @@ module.exports = function (grunt, options) {
       return res.status(404).send('Test not found.');
     }
 
-    var deps = findReferenceTags(test.abs, options.requirejs).map(utils.resolveReferenceTag);
+    var deps = utils.findReferenceTags(test.abs);
     var moduleName;
 
     // determine if we want to generate coverage reports
@@ -208,19 +200,13 @@ module.exports = function (grunt, options) {
     if (options.injectServer) {
       var injectUrl = options.injectServer + '?file=' + test.file; // TODO: sanitize the injectUrl
 
-      http.get(injectUrl, function (res) {
-        var injectHTML = '';
+      request(injectUrl, function (err, res, body) {
+        if (err) {
+          grunt.log.error('Inject server request failed', err);
+          if (typeof body !== 'string') body = '';
+        }
 
-        res.on('data', function (chunk) {
-            injectHTML += chunk;
-        });
-
-        res.on('end', function () {
-          render(injectHTML);
-        });
-      }).on('error', function () {
-        console.log.warn('Error requesting inject url!');
-        render(injectHTML);
+        render(injectHTML + body);
       });
     } else {
       // no inject url, so we have all the inject HTML we need, most tests go here, just render the response
