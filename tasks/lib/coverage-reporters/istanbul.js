@@ -58,10 +58,9 @@ module.exports = function (grunt, options, reportDirectory) {
       var reporter = new istanbul.Reporter(null, reportDirectory);
 
       reporter.add('html');
-      // reporter.add('lcov');
 
       reporter.write(collector, true, function () {
-        console.log('Reports generated?');
+        grunt.verbose.writeln('Generated coverage report to: ' + reportDirectory);
         cb(null);
       });
     }

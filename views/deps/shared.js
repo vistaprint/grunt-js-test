@@ -3,14 +3,16 @@
 (function (window) {
   'use strict';
 
-  // function sendMessage() {
-  //  var args = [].slice.call(arguments);
-  //  if (window.PHANTOMJS) {
-  //    alert(JSON.stringify(args));
-  //  } else {
-  //    console.log.call(console.log, args);
-  //  }
-  // }
+  // 1.4.2 moved reporters to Mocha instead of mocha
+  var Mocha = window.Mocha || window.mocha;
+
+  // Send messages to the parent phantom.js process via alert! Good times!!
+  function sendMessage() {
+    if (window.PHANTOMJS) {
+      var args = [].slice.call(arguments);
+      alert(JSON.stringify(args));
+    }
+  }
 
   function debounce(func, threshold) {
     var timeout;
@@ -43,6 +45,16 @@
 
     // Create a Grunt listener for each Mocha events
     // start, test, test end, suite, suite end, fail, pass, pending, end
+    var events = [
+      'start',
+      'test',
+      'test end',
+      'suite',
+      'suite end',
+      'fail',
+      'pass',
+      'pending'
+    ];
 
     // if this test is within a frame, then listen for test results
     // and resize as data is added to make the parent page usable.
@@ -57,24 +69,75 @@
     // save the results after tests have completed
     if ('coverage' in document.body.dataset) {
       runner.on('end', function () {
-        saveCoverageDataToServer();
+        // save coverage data to server, on complete, let phantom know the tests are over
+        saveCoverageDataToServer(function () {
+          sendMessage('mocha.end');
+        });
       });
+    } else {
+      events.push('end');
+    }
+
+    function createGruntListener(ev, runner) {
+      runner.on(ev, function (test, err) {
+        var data = {
+          err: err
+        };
+
+        if (test) {
+          data.title = test.title;
+          data.fullTitle = test.fullTitle();
+          data.state = test.state;
+          data.duration = test.duration;
+          data.slow = test.slow;
+        }
+
+        sendMessage('mocha.' + ev, data);
+      });
+    }
+
+    for (var i = 0; i < events.length; i++) {
+      createGruntListener(events[i], runner);
     }
   }
 
+  // extend our own Reporter will all the methods of Mocha's HTML reporter
+  // var Klass = function () {};
+  // Klass.prototype = Mocha.reporters.HTML.prototype;
+  // Reporter.prototype = new Klass();
+
   for (var prop in Mocha.reporters.HTML.prototype) {
     Reporter.prototype[prop] = Mocha.reporters.HTML.prototype[prop];
+  }
+
+  // mocha setup config
+  var setup = {
+    ui: 'bdd',
+    ignoreLeaks: true,
+    reporter: Reporter
+  };
+
+  // add config from PHANTOMJS settings
+  if (window.PHANTOMJS) {
+    // Default mocha options
+    // If options is a string, assume it is to set the UI (bdd/tdd etc)
+    if (typeof window.PHANTOMJS === 'string') {
+      config.ui = window.PHANTOMJS;
+    } else {
+      // Extend defaults with passed options
+      for (var key in window.PHANTOMJS.mocha) {
+        if (window.PHANTOMJS.mocha[key]) {
+          config[key] = window.PHANTOMJS.mocha[key];
+        }
+      }
+    }
   }
 
   // we need to call setup before page load,
   // this is what exposes describe() to the global
   // window object to allow the unit tests to 
   // register themselves to the test runner.
-  mocha.setup({
-    ui: 'bdd',
-    ignoreLeaks: true,
-    reporter: Reporter
-  });
+  mocha.setup(setup);
 
   // mocha.checkLeaks();
 
@@ -84,11 +147,7 @@
 
     // if this is not a require.js test, then run mocha on page load
     if (document.body.getAttribute('data-modules') == '') {
-      if (window.mochaPhantomJS) {
-        mochaPhantomJS.run();
-      } else {
-        mocha.run();
-      }
+      mocha.run();
     }
   }, false);
 

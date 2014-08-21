@@ -13,14 +13,11 @@ module.exports = function (options) {
 
     coverageReportDirectory: function () {
       // ensure the coverage report directory exists
-      if (!options.coverageReportDirectory) {
-        options.coverageReportDirectory = path.join(process.cwd(), 'coverage');
-      }
-
       if (!fs.existsSync(options.coverageReportDirectory)) {
         fs.mkdirSync(options.coverageReportDirectory);
       }
 
+      // create a unique test identifier
       var identifier = moment().format('YYYY-MM-DD HHMMSS');
       var reportDirectory = path.join(options.coverageReportDirectory, identifier);
 

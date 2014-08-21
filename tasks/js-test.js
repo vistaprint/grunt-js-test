@@ -8,9 +8,6 @@
 // Nodejs libs.
 var _             = require('lodash');
 var path          = require('path');
-// var reporters     = require('mocha').reporters;
-var http          = require('http');
-var exec          = require('child_process').exec;
 
 // Helpers.
 var findTests  = require('./lib/findTests');
@@ -20,18 +17,21 @@ module.exports = function (grunt) {
   grunt.loadTasks(path.join(__dirname, '../node_modules/grunt-express/tasks'));
   grunt.loadTasks(path.join(__dirname, '../node_modules/grunt-mocha/tasks'));
 
+  var server;
+
   function startServer(options, done) {
+    server = require(path.resolve(__dirname, 'lib', 'server.js'))(grunt, options);
+
     var express = _.extend({}, {
       options: {
         hostname: options.hostname,
         port: options.port,
-        server: require(path.resolve(__dirname, 'lib', 'server.js'))(grunt, options)
+        server: server
       }
     }, options.express || {});
 
-    grunt.config.set('express.js-test-env', express);
-
-    grunt.task.run('express:js-test-env');
+    grunt.config.set('express.grunt-js-test', express);
+    grunt.task.run('express:grunt-js-test');
 
     if (done) {
       done();
@@ -60,8 +60,8 @@ module.exports = function (grunt) {
 
     // coverage reporting options
     coverage: false,                // should we generate coverage reports (slows down tests)
-    coverageTool: 'jscover',        // which reporter should we use, jscover or instanbul
-    coverageReportDirectory: null,  // directory to save reports to
+    coverageTool: 'instanbul',      // which reporter should we use, jscover or instanbul
+    coverageReportDirectory: path.join(process.cwd(), 'coverage'),  // directory to save reports to
     coverageProxyPort: 8983,        // port used as a proxy web server to instrument javascript files for coverage
 
     // further filters to narrow tests that are run
@@ -76,6 +76,22 @@ module.exports = function (grunt) {
     modulesRelativeTo: null,        // allows you to override how we determine the module name with its path
   };
 
+  function acceptCLI(options) {
+    // --coverage
+    var coverage = grunt.option('coverage');
+    if (coverage !== undefined) {
+      options.coverage = true;
+      if (typeof coverage === 'string') {
+        options.coverageTool = coverage;
+      }
+    }
+
+    // --log || --debug turns on test debugging
+    if (grunt.option('log') || grunt.option('debug')) {
+      options.log = true;
+    }
+  }
+
   // run all the tests (or a single test, if the --file argument is used)
   grunt.registerTask('js-test', 'Run your client-side unit tests.', function () {
     // test to see if the web server is running
@@ -84,17 +100,21 @@ module.exports = function (grunt) {
     // standardize the options
     var options = this.options(defaults);
 
+    // accept CLI options to change options
+    acceptCLI(options);
+
     startServer(options, function () {
       var mochaConfig = _.extend({}, {
-        urls: ['test/*.unittests.html'],
-
-        inject: path.join(__dirname, 'lib', 'phantom-bridge.js'),
+        urls: ['test/*.unittests.html'], // this is a dummy, it's overridden below
+        inject: null, // we disable grunt-mocha's phantom-bridge, we implement our own in /view/deps/shared.js
         reporter: options.reporter,
         timeout: 20000,
         run: false // default will be changing in grunt-mocha >= 0.5
       }, options.mocha || {});
 
       var tests = findTests(options);
+
+      // standardize some toggles that can be passed via cli
 
       // filter: find a specific test file
       if (options.file) {
@@ -136,7 +156,7 @@ module.exports = function (grunt) {
 
       // set the config for mocha passing the correct URLs to be used
       mochaConfig.urls = tests.map(function (test) {
-        return 'http://localhost:8981' + test.url + (options.coverage ? '&coverage=1' : '');
+        return 'http://' + options.hostname + ':' + options.port + test.url + (options.coverage ? '&coverage=1' : '');
       });
 
       // option: bail - exit on first error found
@@ -153,6 +173,8 @@ module.exports = function (grunt) {
 
       // option: send over console messages
       if (options.log) {
+        grunt.verbose.writeln('Enabling console.log within phantomjs.');
+
         // log console.log messages
         mochaConfig.log = true;
 
@@ -160,18 +182,44 @@ module.exports = function (grunt) {
         mochaConfig.logErrors = true;
       }
 
-      grunt.config.set('mocha', {
-        'js-test-env': {
-          options: mochaConfig
-        }
+      grunt.config.set('mocha.grunt-js-test', {
+        options: mochaConfig
       });
 
-      grunt.task.run('mocha:js-test-env');
+      if (options.coverage) {
+        grunt.task.run(['mocha:grunt-js-test', 'js-test-save']);
+      } else {
+        grunt.task.run('mocha:grunt-js-test');
+      }
+
       taskComplete();
     });
   });
 
-  // start the js-test-env web server with keepalive
+  grunt.registerTask('js-test-save', 'Runs after completing tests from `js-test` to generate a coverage report.', function (target) {
+    var options = _.extend(
+      {},
+      defaults,
+      grunt.config.get('js-test.options') || {},
+      grunt.config.get('js-test.' + target + '.options')
+    );
+
+    acceptCLI(options);
+
+    var done = this.async();
+
+    grunt.log.writeln('Generating coverage report.');
+
+    server.saveCoverageReport(function (err) {
+      if (err) {
+        grunt.log.error('Failed to generate coverage report.');
+      }
+
+      done();
+    });
+  });
+
+  // start the grunt-js-test web server with keepalive
   grunt.registerTask('js-test-server', 'Start server with keepalive.', function (target) {
     var options = _.extend(
       {},
@@ -180,7 +228,17 @@ module.exports = function (grunt) {
       grunt.config.get('js-test.' + target + '.options')
     );
 
+    acceptCLI(options);
+
     startServer(options, function () {
+      // attempt to open a web browser
+      if (process.platform == 'win32') {
+        try {
+          var exec = require('child_process').exec;
+          exec('start "" "http://' + options.hostname + ':' + options.port + '"');
+        } catch (ex) {}
+      }
+
       grunt.task.run('express-keepalive');
     });
   });

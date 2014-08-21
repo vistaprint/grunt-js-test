@@ -94,8 +94,14 @@ module.exports = function (grunt, options) {
     });
   });
 
-  app.get('/save-coverage-data', function (req, res) {
+  app.saveCoverageReport = function (cb) {
     coverageTool.aggregate(function (err) {
+      cb(err);
+    });
+  };
+
+  app.get('/save-coverage-data', function (req, res) {
+    app.saveCoverageReport(function (err) {
       if (err) {
         grunt.log.error('Failed to create coverage report.');
         res.status(500).send({ success: false });
