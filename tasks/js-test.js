@@ -63,6 +63,7 @@ module.exports = function (grunt) {
     coverageTool: 'instanbul',      // which reporter should we use, jscover or instanbul
     coverageReportDirectory: path.join(process.cwd(), 'coverage'),  // directory to save reports to
     coverageProxyPort: 8983,        // port used as a proxy web server to instrument javascript files for coverage
+    identifier: null,               // unique job identifier used when creating the folder for a new coverage report
 
     // further filters to narrow tests that are run
     file: null,                     // run only this file, by file name
@@ -89,6 +90,11 @@ module.exports = function (grunt) {
     // --log || --debug turns on test debugging
     if (grunt.option('log') || grunt.option('debug')) {
       options.log = true;
+    }
+
+    // --identifier
+    if (grunt.option('identifier') !== undefined) {
+      options.identifier = grunt.option('identifier');
     }
   }
 

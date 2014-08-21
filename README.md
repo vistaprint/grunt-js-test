@@ -44,6 +44,20 @@ Start a web server on your local host to allow you to run the unit tests individ
 
 ## Options
 
+### Command Line Interface Options
+
+#### --coverage
+
+Pass `--coverage` while running Grunt to turn on coverage with the default `coverageTool`. You can pass a value of a string to select the coverage tool you'd like to use, such as `--coverage=jscover`.
+
+#### --identifier="commit deadbeef"
+
+Pass `--identifier` with a value of a string you'd like to use as your job identifier. This will be the folder name used when savign your coverage reports to the directory configured with `coverageReportDirectory`. This is useful when using grunt-js-test through continous integration and want to provide it either the job number or the commit id (or revision number if you're still on SVN).
+
+By default a datetime in the format of `YYYY-MM-DD HHMMSS` will be used.
+
+### Task Options
+
 All options of `js-test` are optional, if you specify nothing, it will run all JavaScript files anywhere in your project matching `*.unittests.js`.
 
 #### root

@@ -17,11 +17,13 @@ module.exports = function (options) {
         fs.mkdirSync(options.coverageReportDirectory);
       }
 
-      // create a unique test identifier
-      var identifier = moment().format('YYYY-MM-DD HHMMSS');
-      var reportDirectory = path.join(options.coverageReportDirectory, identifier);
+      // create a unique test identifier if none is provided
+      if (!options.identifier) {
+        options.identifier = moment().format('YYYY-MM-DD HHMMSS');
+      }
 
-      return reportDirectory;
+      // return the new path (do not create the directory at this time)
+      return path.join(options.coverageReportDirectory, options.identifier);
     },
 
     findReferenceTags: function (files) {
