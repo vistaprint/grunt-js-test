@@ -138,7 +138,7 @@ Port used for proxy web server that instruments your javascript files for code c
 Type: `Object`
 Default: `{}`
 
-Object of options to pass to the [grunt-mocha](https://github.com/kmiyashiro/grunt-mocha/) task. Hopefully uou never need to override anything here.
+Object of options to pass to the [grunt-mocha](https://github.com/kmiyashiro/grunt-mocha/) task. Hopefully you never need to override anything here.
 
 #### reporter
 Type: `String`
