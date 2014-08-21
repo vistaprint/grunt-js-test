@@ -33,7 +33,7 @@ Run all test files with PhantomJS. The minimal config would be:
 
   grunt.loadNpmTasks('grunt-js-test');
 
-  grunt.registerTask('test', ['js-test'env']);
+  grunt.registerTask('test', ['js-test']);
 ```
 
 ### js-test-server
