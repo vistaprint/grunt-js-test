@@ -14,7 +14,6 @@ var findTests  = require('./lib/findTests');
 
 module.exports = function (grunt) {
 
-  grunt.loadTasks(path.join(__dirname, '../node_modules/grunt-express/tasks'));
   grunt.loadTasks(path.join(__dirname, '../node_modules/grunt-mocha/tasks'));
 
   var server;
@@ -22,20 +21,23 @@ module.exports = function (grunt) {
   function startServer(options, done) {
     server = require(path.resolve(__dirname, 'lib', 'server.js'))(grunt, options);
 
-    var express = _.extend({}, {
-      options: {
-        hostname: options.hostname,
-        port: options.port,
-        server: server
+    var args = [
+      options.port,
+      function () {
+        grunt.log.writeln('Web server started on port:' + options.port + (options.hostname ? ', hostname: ' + options.hostname : ', no hostname specified') + ' [pid: ' + process.pid + ']');
+
+        if (done) {
+          done();
+        }
       }
-    }, options.express || {});
+    ];
 
-    grunt.config.set('express.grunt-js-test', express);
-    grunt.task.run('express:grunt-js-test');
-
-    if (done) {
-      done();
+    // always default hostname to 'localhost' would prevent access using IP address
+    if (options.hostname && options.hostname !== '*') {
+      args.splice(1, 0, options.hostname);
     }
+
+    server.listen.apply(server, args).on('error', grunt.fatal);
   }
 
   var defaults = {
@@ -75,6 +77,8 @@ module.exports = function (grunt) {
 
     requirejs: false,               // if your project is requirejs based, set this to true
     modulesRelativeTo: null,        // allows you to override how we determine the module name with its path
+
+    openBrowser: true,              // open web browser automatically when running `js-test-server` task
   };
 
   function acceptCLI(options) {
@@ -236,16 +240,23 @@ module.exports = function (grunt) {
 
     acceptCLI(options);
 
+    var done = this.async();
+
     startServer(options, function () {
       // attempt to open a web browser
-      if (process.platform == 'win32') {
+      if (options.openBrowser && process.platform == 'win32') {
         try {
           var exec = require('child_process').exec;
           exec('start "" "http://' + options.hostname + ':' + options.port + '"');
         } catch (ex) {}
       }
 
-      grunt.task.run('express-keepalive');
+      grunt.task.run('js-test-server-keepalive');
+      done();
     });
+  });
+
+  grunt.registerTask('js-test-server-keepalive', 'Keep server running', function () {
+    this.async();
   });
 };

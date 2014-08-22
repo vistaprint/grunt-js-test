@@ -41,7 +41,6 @@
   "dependencies": {
     "express": "4.x",
     "glob": "4.x",
-    "grunt-express": "benhutchins/grunt-express",
     "grunt-mocha": "0.4.x",
     "jade": "1.x",
     "request": "^2.34.0",
