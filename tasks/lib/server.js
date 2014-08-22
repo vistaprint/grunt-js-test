@@ -21,7 +21,7 @@ app.use(bodyParser.text({ limit: '200mb' }));
 app.use('/js-test-env', express.static(path.join(__dirname, '..', '..', 'views', 'deps')));
 
 module.exports = function (grunt, options) {
-  var tests = require('./findTests')(options);
+  var tests = require('./findTests')(grunt, options);
   var utils = require('./utils')(options);
 
   // set template data
@@ -131,7 +131,7 @@ module.exports = function (grunt, options) {
       return res.status(404).send('Test not found.');
     }
 
-    var deps = utils.findReferenceTags(test.abs);
+    var deps = options.referenceTags ? utils.getDependencies(test.abs) : [];
     var moduleName;
 
     // determine if we want to generate coverage reports

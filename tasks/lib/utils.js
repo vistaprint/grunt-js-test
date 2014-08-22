@@ -26,7 +26,23 @@ module.exports = function (options) {
       return path.join(options.coverageReportDirectory, options.identifier);
     },
 
-    findReferenceTags: function (files) {
+    findReferenceTags: function (file) {
+      var directory = path.dirname(file);
+      var re = /\/\/\/\s*<reference.+path=\"(.+)\".*\/>/gi;
+      var contents = fs.readFileSync(file, {encoding: 'utf8'}).toString();
+      var files = [];
+      var match;
+
+      while ((match = re.exec(contents))) {
+        files.push(
+          path.join(directory, match[1])
+        );
+      }
+
+      return files;
+    },
+
+    getDependencies: function (files) {
       // ensure files is an array
       if (!Array.isArray(files)) {
         files = [files];
@@ -39,18 +55,9 @@ module.exports = function (options) {
       var data = {};
 
       function findDeps(filePath) {
-        var re = /\/\/\/\s*<reference.+path=\"(.+)\".*\/>/gi;
-        var contents = fs.readFileSync(filePath, {encoding: 'utf8'});
-        var deps = [];
-        var match;
-
-        while ((match = re.exec(contents))) {
-          deps.push(
-            normalize(path.join(path.dirname(filePath), match[1]))
-          );
-        }
-
-        return deps;
+        return findReferenceTags(filePath).filter(function (reference) {
+          return path.extname(reference) === '.js';
+        }).map(normalize);
       }
 
       function recursive(file) {
