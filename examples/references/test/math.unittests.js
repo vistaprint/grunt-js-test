@@ -325,7 +325,6 @@ describe('math.js', function () {
       chai.assert.ok(r >= 1 && r <= 3);
 
       r = Trig.random(-10, -5);
-      console.log('r', r);
       chai.assert.ok(r >= -10 && r <= -5);
     });
   })
