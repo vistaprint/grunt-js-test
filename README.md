@@ -1,5 +1,7 @@
 # Grunt JavaScript Test Runner [![Dependency Status](https://gemnasium.com/benhutchins/grunt-js-test.png)](https://gemnasium.com/benhutchins/grunt-js-test)
 
+grunt-js-test is a plugin for [Grunt](http://gruntjs.com/) that is designed to run client-side unit tests using [Mocha](http://visionmedia.github.io/mocha/). You can easily run tests through the command line or a continuous integration suite using PhantomJS or you can pop up a simply server to run your tests in a browser using WebDriver, for development or testing of specific unit tests. grunt-js-test can also generate coverage reports using either [JSCover](https://tntim96.github.io/JSCover/) or [Istanbul](https://gotwarlost.github.io/istanbul/).
+
 ## Getting Started
 
 This plugin requires Grunt '~0.4.0'
@@ -12,6 +14,55 @@ Once the plugin has been installed, it may be enabled inside your Gruntfile with
 
 ```js
 grunt.loadNpmTasks('grunt-js-test');
+```
+
+### Configure your Grunt task
+
+Open your `Gruntfile.js` and add your project's configuration as desired (all the options are described below). If you rely on all the defaults, you don't even need to provide anything.
+
+A few simple example projects are available in the [examples](https://github.com/benhutchins/grunt-js-test/tree/master/examples) directory.
+
+### Write your tests
+
+Tests are loaded already wrapped up including [Mocha](http://visionmedia.github.io/mocha/), [Chai](http://chaijs.com/) and [Sinon](http://sinonjs.org/). This means you are good to start writing tests immediately.
+
+A simple example unit test using Mocha:
+
+```js
+describe('Array', function(){
+  describe('#indexOf()', function(){
+    it('should return -1 when the value is not present', function(){
+      chai.assert.equal(-1, [1,2,3].indexOf(5));
+      chai.assert.equal(-1, [1,2,3].indexOf(0));
+    });
+  });
+});
+```
+
+If you prefer to use another assert library other than Chai, you can optionally include it as a dependency (see `deps` option below).
+
+#### Loading dependencies
+
+grunt-js-test generates the test HTML page for you, making it quicker to write client-side tests. However, this means that you need a way to load the dependent JavaScript files. grunt-js-test supports [require.js](http://requirejs.org/) projects natively, simply configure the options `requirejs` and `modulesRelativeTo` as needed. If you are not creating a require.js based project, then grunt-js-test implements support for [JScript IntelliSense Reference Tags](http://blogs.msdn.com/b/webdev/archive/2007/11/06/jscript-intellisense-a-reference-for-the-reference-tag.aspx). This allows you to easily load dependencies using a format of:
+
+```js
+/// <reference path="../relative/file.js" />
+```
+
+There is an example project using these reference tags in our [examples](https://github.com/benhutchins/grunt-js-test/tree/master/examples) directory as [examples/references](https://github.com/benhutchins/grunt-js-test/tree/master/examples/references).
+
+#### Adding custom HTML to test pages
+
+As grunt-js-test generates the test HTML pages for you, on occasion you need to add some HTML to the DOM of the page prior to your JavaScript running. There are two ways to do this, the easiest is to simply create a file named `.inject.html` alonside your test JavaScript file.
+
+For example, if you had a test file called `something.unittests.js` you could have a similarly named file `something.unittests.inject.html`, the contents of which would be added to the body of the generated test page.
+
+There is an example project using these reference tags in our [examples](https://github.com/benhutchins/grunt-js-test/tree/master/examples) directory as [examples/injectHTML](https://github.com/benhutchins/grunt-js-test/tree/master/examples/injectHTML).
+
+You can also reference `.html` files you wish to have injected using a `reference` tags similar to referencing JavaScript dependencies. The format of which is simply:
+
+```js
+/// <reference path="../relative/path/to/file/to/inject.html" />
 ```
 
 ## Grunt tasks
