@@ -15,7 +15,13 @@ module.exports = function (grunt, options, reportDirectory) {
       app = express();
 
       app.use(options.baseUri, function (req, res, next) {
-        var file = path.join(options.root, req.path);
+        var file = path.join(options.root, req.path)
+
+        // if we're not requesting a JS file, do not instrunment it
+        if (path.extname(file) != '.js') {
+          res.sendFile(file);
+          return;
+        }
 
         fs.readFile(file, function (err, contents) {
           if (err) {
