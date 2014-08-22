@@ -43,26 +43,6 @@ module.exports = function (grunt, options, reportDirectory) {
       grunt.log.ok('Started proxy web server on port ' + options.coverageProxyPort + '.\n');
     },
 
-    // get: function (reportFileName, sourceFile, cb) {
-    //   var file = path.join(options.coverageReportDirectory, reportFileName);
-
-    //   fs.readFile(file, function (err, jsonCov) {
-    //     if (err) {
-    //       cb(err);
-    //     } else if (sourceFile) {
-    //       var coverageJson = JSON.parse(jsonCov);
-
-    //       if (coverageJson[req.query.file]) {
-    //         cb(null, coverageJson[req.query.file]);
-    //       } else {
-    //         cb('No coverage data for desired source file.');
-    //       }
-    //     } else {
-    //       cb(null, jsonCov);
-    //     }
-    //   });
-    // },
-
     save: function (coverageData, cb) {
       _.merge(collector, JSON.parse(coverageData));
       cb(null);

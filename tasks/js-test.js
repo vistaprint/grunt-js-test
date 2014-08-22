@@ -60,7 +60,7 @@ module.exports = function (grunt) {
 
     // coverage reporting options
     coverage: false,                // should we generate coverage reports (slows down tests)
-    coverageTool: 'instanbul',      // which reporter should we use, jscover or instanbul
+    coverageTool: 'istanbul',       // which reporter should we use, jscover or istanbul
     coverageReportDirectory: path.join(process.cwd(), 'coverage'),  // directory to save reports to
     coverageProxyPort: 8983,        // port used as a proxy web server to instrument javascript files for coverage
     identifier: null,               // unique job identifier used when creating the folder for a new coverage report

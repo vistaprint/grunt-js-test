@@ -1,14 +1,17 @@
 'use strict';
 
+var path = require('path');
+
 module.exports = function (grunt) {
 
   // Project configuration.
   grunt.initConfig({
     'js-test': {
       options: {
+        root: path.join(__dirname, '../references'),
+        pattern: 'test/*.js',
         referenceTags: true,
         coverage: true,
-        pattern: 'test/*.js',
         deps: [
           'http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.js'
         ]

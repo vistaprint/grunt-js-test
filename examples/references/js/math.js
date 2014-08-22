@@ -156,6 +156,11 @@
       if (angle < 0) {
         return angle + 360;
       }
+
+      else if (angle > 360) {
+        return angle - Math.floor(angle / 360) * 360;
+      }
+
       return angle;
     }
   };
