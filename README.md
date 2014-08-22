@@ -53,7 +53,7 @@ There is an example project using these reference tags in our [examples](https:/
 
 #### Adding custom HTML to test pages
 
-As grunt-js-test generates the test HTML pages for you, on occasion you need to add some HTML to the DOM of the page prior to your JavaScript running. There are two ways to do this, the easiest is to simply create a file named `.inject.html` alonside your test JavaScript file.
+As grunt-js-test generates the test HTML pages for you, on occasion you need to add some HTML to the DOM of the page prior to your JavaScript running. There are two ways to do this, the easiest is to simply create a file named `.inject.html` alongside your test JavaScript file.
 
 For example, if you had a test file called `something.unittests.js` you could have a similarly named file `something.unittests.inject.html`, the contents of which would be added to the body of the generated test page.
 
@@ -103,13 +103,13 @@ Pass `--coverage` while running Grunt to turn on coverage with the default `cove
 
 #### --identifier="commit deadbeef"
 
-Pass `--identifier` with a value of a string you'd like to use as your job identifier. This will be the folder name used when savign your coverage reports to the directory configured with `coverageReportDirectory`. This is useful when using grunt-js-test through continous integration and want to provide it either the job number or the commit id (or revision number if you're still on SVN).
+Pass `--identifier` with a value of a string you'd like to use as your job identifier. This will be the folder name used when saving your coverage reports to the directory configured with `coverageReportDirectory`. This is useful when using grunt-js-test through continuous integration and want to provide it either the job number or the commit id (or revision number if you're still on SVN).
 
 By default a datetime in the format of `YYYY-MM-DD HHMMSS` will be used.
 
 ### Task Options
 
-All options of `js-test` are optional, if you specify nothing, it will run all JavaScript files anywhere in your project matching `*.unittests.js`.
+All options of `js-test` are optional, if you specify nothing, it will run all JavaScript files anywhere in your project directory, recursively matching `*.unittests.js`.
 
 #### root
 Type: `String`
@@ -145,33 +145,27 @@ Base path used when loading web assets.
 Type: `Array<String>`
 Default: `[]`
 
-A list of paths to JavaScript files relative to your `baseUri` you want loaded as global dependencies for each test.
+A list of paths to JavaScript files relative to your `baseUri` you want loaded as global dependencies for each test. You can also include external dependencies, such as `http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.js`.
 
-Dependencies can be injected on a per test file absis using `<reference>` tags. See `referenceTags` below.
+Dependencies can be injected on a per test file basis using `<reference>` tags. See [loading dependencies](https://github.com/benhutchins/grunt-js-test#loading-dependencies).
 
 #### referenceTags
 Type: `Boolean`
 Default: `true`
 
-Look for `<reference>` tags within unit test files. Usually never hurts to leave it on.
-
-#### express
-Type: `Object`
-Default: `{}`
-
-Object of options to pass to the [grunt-express](https://github.com/blai/grunt-express) task. Hopefully uou never need to override anything here.
+Look for `<reference>` tags within unit test files to automatically include additional dependencies. See [loading dependencies](https://github.com/benhutchins/grunt-js-test#loading-dependencies). Usually never hurts to leave it on.
 
 #### hostname
 Type: `String`
 Default: `localhost`
 
-Hostname used for web server when running the `js-test-server` grunt task.
+Hostname for web server when running the `js-test-server` grunt task.
 
 #### port
 Type: `Number`
 Default: `8981`
 
-Port used for web server when running the `js-test-server` grunt task.
+Port for web server when running the `js-test-server` grunt task.
 
 #### staticPort
 Type: `number`
@@ -183,7 +177,7 @@ Port used for static web server that serves up your unit test dependency files. 
 Type: `number`
 Default: `8983`
 
-Port used for proxy web server that instruments your javascript files for code coverage reporting. Should never have to change this unless something else uses this port.
+Port used for proxy web server that instruments your JavaScript files for code coverage reporting. Should never have to change this unless something else uses this port.
 
 #### mocha
 Type: `Object`

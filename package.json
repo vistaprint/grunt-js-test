@@ -1,6 +1,6 @@
 {
   "name": "grunt-js-test",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "description": "Grunt task for running client-side, mocha-based unit tests in PhantomJS with code coverage reports",
   "keywords": [
     "grunt",
@@ -45,7 +45,8 @@
     "lodash": "^2.4.1",
     "body-parser": "^1.6.5",
     "moment": "^2.8.1",
-    "istanbul": "^0.3.0"
+    "istanbul": "^0.3.0",
+    "morgan": "^1.2.3"
   },
   "peerDependencies": {
     "grunt": "~0.4"

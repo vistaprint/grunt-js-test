@@ -51,7 +51,6 @@ module.exports = function (grunt) {
     referenceTags: true,            // indicate whether the js-test-env should look for <reference> tags
 
     // web server options
-    express: {},                    // grunt-express overrides
     hostname: 'localhost',          // hostname for grunt-express server
     port: 8981,                     // port for grunt-express server
     staticPort: 8982,               // port used for secondary web server that serves your static project files
