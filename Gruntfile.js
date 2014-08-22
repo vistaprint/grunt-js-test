@@ -6,11 +6,15 @@ module.exports = function (grunt) {
   grunt.initConfig({
     eslint: {
       options: {
-        config: "eslint.json",
-        format: "compact"
+        config: 'eslint.json',
+        format: 'compact'
       },
-      "default": {
-        src: ["task/**/*.js"]
+      'default': {
+        src: [
+          'tasks/**/*.js',
+          'tests/**/*.js',
+          'Gruntfile.js',
+        ]
       }
     }
   });

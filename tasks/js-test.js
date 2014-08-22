@@ -13,12 +13,12 @@ var path          = require('path');
 var findTests  = require('./lib/findTests');
 
 module.exports = function (grunt) {
-
   grunt.loadTasks(path.join(__dirname, '../node_modules/grunt-mocha/tasks'));
 
+  // express server app, loaded from lib/server.js within startServer
   var server;
 
-  function startServer(options, done) {
+  var startServer = function (options, done) {
     server = require(path.resolve(__dirname, 'lib', 'server.js'))(grunt, options);
 
     var args = [
@@ -38,7 +38,7 @@ module.exports = function (grunt) {
     }
 
     server.listen.apply(server, args).on('error', grunt.fatal);
-  }
+  };
 
   var defaults = {
     // project options
@@ -80,7 +80,7 @@ module.exports = function (grunt) {
     openBrowser: true,              // open web browser automatically when running `js-test-server` task
   };
 
-  function acceptCLI(options) {
+  var acceptCLI = function (options) {
     // --coverage
     var coverage = grunt.option('coverage');
     if (coverage !== undefined) {
@@ -99,7 +99,7 @@ module.exports = function (grunt) {
     if (grunt.option('identifier') !== undefined) {
       options.identifier = grunt.option('identifier');
     }
-  }
+  };
 
   // run all the tests (or a single test, if the --file argument is used)
   grunt.registerTask('js-test', 'Run your client-side unit tests.', function () {

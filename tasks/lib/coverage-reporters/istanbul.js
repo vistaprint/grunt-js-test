@@ -8,14 +8,13 @@ var istanbul = require('istanbul');
 module.exports = function (grunt, options, reportDirectory) {
   var instrumenter = new istanbul.Instrumenter();
   var collector = new istanbul.Collector();
-  var app;
 
   return {
     start: function () {
-      app = express();
+      var app = express();
 
-      app.use(options.baseUri, function (req, res, next) {
-        var file = path.join(options.root, req.path)
+      app.use(options.baseUri, function (req, res) {
+        var file = path.join(options.root, req.path);
 
         // if we're not requesting a JS file, do not instrunment it
         if (path.extname(file) != '.js') {

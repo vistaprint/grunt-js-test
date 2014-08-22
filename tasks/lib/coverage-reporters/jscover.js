@@ -7,7 +7,7 @@ var request = require('request');
 var _ = require('lodash');
 
 module.exports = function (grunt, options, reportDirectory) {
-  function startCoverageServer() {
+  var startCoverageServer = function () {
     // start the jscover proxy server
     var cmd = 'java -jar "' + path.join(__dirname, 'jscover/JSCover-all.jar') + '" -ws --proxy --port=3128';
     var exec = require('child_process').exec;
@@ -21,7 +21,7 @@ module.exports = function (grunt, options, reportDirectory) {
 
       grunt.log.ok('JSCover proxy server terminated.');
     });
-  }
+  };
 
   var collector = {};
 

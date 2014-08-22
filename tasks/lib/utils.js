@@ -4,11 +4,11 @@ var fs = require('fs');
 var path = require('path');
 var moment = require('moment');
 
-function normalize(file) {
+var normalize = function (file) {
   return path.normalize(file).toLowerCase();
-}
+};
 
-module.exports = function (options) {
+module.exports = function (grunt, options) {
   return {
 
     coverageReportDirectory: function () {
@@ -66,18 +66,18 @@ module.exports = function (options) {
         return this.findReferenceTags(filePath, '.js').map(normalize);
       }.bind(this);
 
-      function recursive(file) {
+      var recursive = function (file) {
         var deps = findDeps(file);
         data[file] = deps;
         deps.forEach(recursive);
-      }
+      };
 
       // go through each file we need and find their dependencies, recursively
       files.forEach(recursive);
 
       var included = {};
 
-      function include(name) {
+      var include = function (name) {
         // confirm this file has not been included
         if (included[name]) {
           return;
@@ -93,7 +93,7 @@ module.exports = function (options) {
 
         // mark this file as being included so we do not re-include
         included[name] = true;
-      }
+      };
 
       files.forEach(include);
 
@@ -106,9 +106,9 @@ module.exports = function (options) {
 
       // convert a provided dependency (which is an absolute file path)
       // to web-accessible URIs for the given location
-      function resolveReferenceTag(dep) {
+      var resolveReferenceTag = function (dep) {
         return path.join(options.baseUri, path.relative(options.root, dep)).replace(/\\/g, '/');
-      }
+      };
 
       // the included object will now be the sorted dependencies
       return Object.keys(included).map(resolveReferenceTag);

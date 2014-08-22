@@ -13,7 +13,6 @@ var app = express();
 app.locals.pretty = true; // output pretty HTML
 app.set('views', path.join(__dirname, '..', '..', 'views'));
 app.set('view engine', 'jade');
-// app.use(express.logger('dev'));
 app.use(bodyParser.text({ limit: '200mb' }));
 // app.use(express.errorHandler());
 
@@ -22,7 +21,7 @@ app.use('/js-test-env', express.static(path.join(__dirname, '..', '..', 'views',
 
 module.exports = function (grunt, options) {
   var tests = require('./findTests')(grunt, options);
-  var utils = require('./utils')(options);
+  var utils = require('./utils')(grunt, options);
 
   // set template data
   app.locals.tests = tests;
@@ -142,7 +141,7 @@ module.exports = function (grunt, options) {
       moduleName = path.relative(options.modulesRelativeTo || options.root, test.abs).replace(/\\/g, '/').replace(/\.js$/, '');
     }
 
-    function render(injectHTML) {
+    var render = function (injectHTML) {
       res.render('test', {
         modules: moduleName || '',
         injectHTML: injectHTML,
@@ -150,7 +149,7 @@ module.exports = function (grunt, options) {
         deps: deps,
         coverage: coverage
       });
-    }
+    };
 
     var injectHTML = options.injectHTML || '';
 
@@ -168,7 +167,9 @@ module.exports = function (grunt, options) {
       request(injectUrl, function (err, res, body) {
         if (err) {
           grunt.log.error('Inject server request failed', err);
-          if (typeof body !== 'string') body = '';
+          if (typeof body !== 'string') {
+            body = '';
+          }
         }
 
         render(injectHTML + body);

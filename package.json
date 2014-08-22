@@ -45,8 +45,7 @@
     "lodash": "^2.4.1",
     "body-parser": "^1.6.5",
     "moment": "^2.8.1",
-    "istanbul": "^0.3.0",
-    "morgan": "^1.2.3"
+    "istanbul": "^0.3.0"
   },
   "peerDependencies": {
     "grunt": "~0.4"

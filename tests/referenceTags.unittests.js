@@ -1,7 +1,9 @@
+'use strict';
+
 var assert = require('assert');
 var path = require('path');
 
-var utils = require('../tasks/lib/utils')({});
+var utils = require('../tasks/lib/utils')({}, {});
 
 describe('<reference> tags', function () {
 	it('should find all dependencies', function () {
