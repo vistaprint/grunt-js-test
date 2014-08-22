@@ -35,8 +35,7 @@
     "node": "*"
   },
   "scripts": {
-    "start": "grunt start",
-    "test": "grunt test-self"
+    "test": "mocha tests/*.unittests.js"
   },
   "dependencies": {
     "express": "4.x",

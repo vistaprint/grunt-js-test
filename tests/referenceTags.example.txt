@@ -1,0 +1,4 @@
+/// <reference path="something.js" />
+/// <reference path="something.html" />
+/// <reference path="invalid-not-self-closing.js">
+/// <reference path="useless.png" />

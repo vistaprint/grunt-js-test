@@ -63,9 +63,7 @@ module.exports = function findTests(grunt, options) {
     var injectFiles = [];
 
     if (options.referenceTags) {
-      injectFiles = utils.findReferenceTags(abs).filter(function (reference) {
-        return path.extname(reference) === '.html';
-      });
+      injectFiles = utils.findReferenceTags(abs, '.html');
     }
 
     if (fs.existsSync(abs.replace(/\.js$/, '.inject.html'))) {

@@ -26,7 +26,9 @@ module.exports = function (options) {
       return path.join(options.coverageReportDirectory, options.identifier);
     },
 
-    findReferenceTags: function (file) {
+    // look in given file for <reference> tags
+    // filter down to return only files with given extension
+    findReferenceTags: function (file, extFilter) {
       var directory = path.dirname(file);
       var re = /\/\/\/\s*<reference.+path=\"(.+)\".*\/>/gi;
       var contents = fs.readFileSync(file, {encoding: 'utf8'}).toString();
@@ -37,6 +39,12 @@ module.exports = function (options) {
         files.push(
           path.join(directory, match[1])
         );
+      }
+
+      if (typeof extFilter === 'string') {
+        return files.filter(function (reference) {
+          return path.extname(reference) === extFilter;
+        });
       }
 
       return files;
@@ -54,11 +62,9 @@ module.exports = function (options) {
       // a {file: dependencies} dictionary object
       var data = {};
 
-      function findDeps(filePath) {
-        return findReferenceTags(filePath).filter(function (reference) {
-          return path.extname(reference) === '.js';
-        }).map(normalize);
-      }
+      var findDeps = function findDeps(filePath) {
+        return this.findReferenceTags(filePath, '.js').map(normalize);
+      }.bind(this);
 
       function recursive(file) {
         var deps = findDeps(file);
