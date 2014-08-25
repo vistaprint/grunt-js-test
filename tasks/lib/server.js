@@ -153,7 +153,7 @@ module.exports = function (grunt, options) {
       } else {
         return null;
       }
-    })();
+    }());
 
     // render the output of the http request
     var render = function (injectHTML) {

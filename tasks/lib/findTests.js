@@ -5,8 +5,6 @@ var fs = require('fs');
 var path = require('path');
 
 module.exports = function findTests(grunt, options) {
-  var utils = require('./utils')(grunt, options);
-
   // go through the list of glob patterns
   if (!Array.isArray(options.pattern)) {
     options.pattern = [options.pattern];
