@@ -51,6 +51,36 @@ grunt-js-test generates the test HTML page for you, making it quicker to write c
 
 There is an example project using these reference tags in our [examples](https://github.com/benhutchins/grunt-js-test/tree/master/examples) directory as [examples/references](https://github.com/benhutchins/grunt-js-test/tree/master/examples/references).
 
+These reference tags are processed recursively and a dependency tree is created, then sorted, to generate a complete list of dependencies needed in an appropriate order. Therefore you can include files such as:
+
+*test.js*
+
+```js
+/// <reference path="test.setup.html" />
+/// <reference path="dosomething.js" />
+````
+
+*dosomething.js*
+```js
+/// <reference path="library.js" />
+/// <reference path="app.css" />
+````
+
+and so on. Until a tree is built like:
+
+```text
+- js:
+  library.js
+  dosomething.js
+  test.js
+- css:
+  app.css
+- html:
+  test.setup.html
+```
+
+When rendering the test page, all of these dependencies will be included. You can disable all of this functionality if not desired by setting the `referenceTags` option to `false`.
+
 #### Adding custom HTML to test pages
 
 As grunt-js-test generates the test HTML pages for you, on occasion you need to add some HTML to the DOM of the page prior to your JavaScript running. There are two ways to do this, the easiest is to simply create a file named `.inject.html` alongside your test JavaScript file.
@@ -63,6 +93,14 @@ You can also reference `.html` files you wish to have injected using a `referenc
 
 ```js
 /// <reference path="../relative/path/to/file/to/inject.html" />
+```
+
+#### Adding CSS stylesheets to test pages
+
+If you need to add a dependency for a stylesheet, you can include one globally using the `stylesheets` option or include one on a per-test-file basis using reference tags similarly to how they are used for JavaScript and HTML file dependencies. The format of which is simply:
+
+```js
+/// <reference path="../relative/path/to/stylesheet/to/include.css" />
 ```
 
 ## Grunt tasks
@@ -148,6 +186,14 @@ Default: `[]`
 A list of paths to JavaScript files relative to your `baseUri` you want loaded as global dependencies for each test. You can also include external dependencies, such as `http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.js`.
 
 Dependencies can be injected on a per test file basis using `<reference>` tags. See [loading dependencies](https://github.com/benhutchins/grunt-js-test#loading-dependencies).
+
+#### stylesheets
+Type: `Array<String>`
+Default: []
+
+A list of paths to CSS files relative to your `baseUri` you want loaded for each test. You can also include external stylesheets.
+
+Stylesheets can be injected on a per test file basis using `<reference>` tags. See [loading dependencies](https://github.com/benhutchins/grunt-js-test#loading-dependencies).
 
 #### referenceTags
 Type: `Boolean`

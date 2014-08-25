@@ -48,6 +48,7 @@ module.exports = function (grunt) {
     exclude: ['/node_modules/'],    // utility to blacklist test files, by default we ignore anythign under a /node_modules/ directory
     baseUri: '/',                   // the path to use for web assets, usually / will work
     deps: [],                       // global dependencies for each test that you don't want to <reference>
+    stylesheets: [],                // array of global stylesheets to load with each test file
     referenceTags: true,            // indicate whether the js-test-env should look for <reference> tags
 
     // web server options

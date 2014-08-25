@@ -57,26 +57,13 @@ module.exports = function findTests(grunt, options) {
     }
   }).map(function (file, fileNum) {
     var abs = path.join(options.root, file);
-    var dir = path.dirname(abs);
-    var url = '/test/' + fileNum + '?js=' + file;
-
-    var injectFiles = [];
-
-    if (options.referenceTags) {
-      injectFiles = utils.findReferenceTags(abs, '.html');
-    }
-
-    if (fs.existsSync(abs.replace(/\.js$/, '.inject.html'))) {
-      injectFiles.push(abs.replace(/\.js$/, '.inject.html'));
-    }
 
     return {
-      url: url,
+      url: '/test/' + fileNum + '?js=' + file,
       file: file,
       filename: path.basename(file),
-      dir: dir,
-      abs: abs,
-      injectFiles: injectFiles
+      dir: path.dirname(abs),
+      abs: abs
     };
   });
 };

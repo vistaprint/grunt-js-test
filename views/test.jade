@@ -9,6 +9,9 @@ html(lang='en')
     link(rel='stylesheet', href=defaultBaseUri + '/js-test-env/site.css', media='screen')
     link(rel='stylesheet', href=defaultBaseUri + '/js-test-env/mocha.css', media='screen')
     base(href=projectBaseUri)
+    - for (var i=0; i < stylesheets.length; i++) {
+      link(rel='stylesheet', href=stylesheets[i], media='screen')
+    - }
   body(data-modules=modules, data-coverage=coverage)
     div(id='mocha')
 

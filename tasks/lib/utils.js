@@ -50,6 +50,12 @@ module.exports = function (grunt, options) {
       return files;
     },
 
+    // convert a provided dependency (which is an absolute file path)
+    // to web-accessible URIs for the given location
+    getDependencyUri: function (dep) {
+      return path.join(options.baseUri, path.relative(options.root, dep)).replace(/\\/g, '/');
+    },
+
     getDependencies: function (files) {
       // ensure files is an array
       if (!Array.isArray(files)) {
@@ -62,8 +68,22 @@ module.exports = function (grunt, options) {
       // a {file: dependencies} dictionary object
       var data = {};
 
+      // array of references css and html files
+      var css = [];
+      var html = [];
+
       var findDeps = function findDeps(filePath) {
-        return this.findReferenceTags(filePath, '.js').map(normalize);
+        return this.findReferenceTags(filePath).filter(function (reference) {
+          var ext = path.extname(reference);
+
+          if (ext === '.css') {
+            css[reference] = true;
+          } else if (ext === '.html') {
+            html[reference] = true;
+          } else if (ext === '.js') {
+            return true;
+          }
+        }).map(normalize);
       }.bind(this);
 
       var recursive = function (file) {
@@ -104,14 +124,12 @@ module.exports = function (grunt, options) {
         });
       }
 
-      // convert a provided dependency (which is an absolute file path)
-      // to web-accessible URIs for the given location
-      var resolveReferenceTag = function (dep) {
-        return path.join(options.baseUri, path.relative(options.root, dep)).replace(/\\/g, '/');
-      };
-
       // the included object will now be the sorted dependencies
-      return Object.keys(included).map(resolveReferenceTag);
+      return {
+        js: Object.keys(included).map(this.getDependencyUri),
+        css: Object.keys(css),
+        html: Object.keys(html),
+      };
     }
 
   };

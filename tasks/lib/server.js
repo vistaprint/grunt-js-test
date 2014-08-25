@@ -7,6 +7,7 @@ var path = require('path');
 var express = require('express');
 var bodyParser = require('body-parser');
 var request = require('request');
+var _ = require('lodash');
 
 var app = express();
 
@@ -136,34 +137,54 @@ module.exports = function (grunt, options) {
       return res.status(404).send('Test not found.');
     }
 
-    var deps = options.referenceTags ? utils.getDependencies(test.abs) : [];
-    var moduleName;
+    // array of stylesheets to include in test page
+    var stylesheets = options.stylesheets;
+
+    // array of javascript files to include in test page
+    var references = options.referenceTags ? utils.getDependencies(test.abs) : [];
 
     // determine if we want to generate coverage reports
     var coverage = typeof req.query.coverage !== 'undefined';
 
-    // attempt to find the module name for this file
-    if (options.requirejs) {
-      moduleName = path.relative(options.modulesRelativeTo || options.root, test.abs).replace(/\\/g, '/').replace(/\.js$/, '');
-    }
+    // module name, used if this is a requirejs project
+    var moduleName = (function () {
+      if (options.requirejs) {
+        return path.relative(options.modulesRelativeTo || options.root, test.abs).replace(/\\/g, '/').replace(/\.js$/, '');
+      } else {
+        return null;
+      }
+    })();
 
+    // render the output of the http request
     var render = function (injectHTML) {
       res.render('test', {
         modules: moduleName || '',
         injectHTML: injectHTML,
         test: test,
-        deps: deps,
+        deps: references.js,
+        stylesheets: stylesheets,
         coverage: coverage
       });
     };
 
     var injectHTML = options.injectHTML || '';
 
-    // if test has an inject HTML file, inject it
-    if (test.injectFiles && test.injectFiles.length > 0) {
-      test.injectFiles.forEach(function (injectFile) {
-        injectHTML += fs.readFileSync(injectFile);
+    // if we support reference tags, handle any found *.html and *.css reference tags
+    if (options.referenceTags) {
+      stylesheets = stylesheets.concat(_.map(references.css, utils.getDependencyUri));
+
+      references.html.forEach(function (reference) {
+        injectHTML += fs.readFileSync(reference);
       });
+    }
+
+    // look for a *.inject.html, if we find one, inject it
+    try {
+      // we do not check if the file exists, as that would result in two I/O hits
+      // instead, just try to read it, if it throws an error, then ignore the error
+      injectHTML += fs.readFileSync(test.abs.replace(/\.js$/, '.inject.html'));
+    } catch (ex) {
+      // no .inject.html exists, most likely, so move on
     }
 
     // if the test has an inject URL, request it and inject it
