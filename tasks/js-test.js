@@ -16,10 +16,10 @@ module.exports = function (grunt) {
   grunt.loadTasks(path.join(__dirname, '../node_modules/grunt-mocha/tasks'));
 
   // express server app, loaded from lib/server.js within startServer
-  var server;
+  var server, expressApp;
 
   var startServer = function (options, done) {
-    server = require(path.resolve(__dirname, 'lib', 'server.js'))(grunt, options);
+    expressApp = require(path.resolve(__dirname, 'lib', 'server.js'))(grunt, options);
 
     var args = [
       options.port,
@@ -37,7 +37,7 @@ module.exports = function (grunt) {
       args.splice(1, 0, options.hostname);
     }
 
-    server.listen.apply(server, args).on('error', grunt.fatal);
+    server = expressApp.listen.apply(expressApp, args).on('error', grunt.fatal);
   };
 
   var defaults = {
@@ -201,11 +201,7 @@ module.exports = function (grunt) {
         options: mochaConfig
       });
 
-      if (options.coverage) {
-        grunt.task.run(['mocha:grunt-js-test', 'js-test-save']);
-      } else {
-        grunt.task.run('mocha:grunt-js-test');
-      }
+      grunt.task.run(['mocha:grunt-js-test', 'js-test-save']);
 
       taskComplete();
     });
@@ -223,15 +219,24 @@ module.exports = function (grunt) {
 
     var done = this.async();
 
-    grunt.log.writeln('Generating coverage report.');
+    // turn off server, we need to do this in case another js-test task runs
+    server.close();
 
-    server.saveCoverageReport(function (err) {
-      if (err) {
-        grunt.log.error('Failed to generate coverage report.');
-      }
+    // now save the coverage report data if we should
+    if (options.coverage) {
+      grunt.log.writeln('Generating coverage report.');
 
+      expressApp.saveCoverageReport(function (err) {
+        if (err) {
+          grunt.log.error('Failed to generate coverage report.');
+        }
+
+        done();
+      });
+    } else {
+      // not saving a coverage report, so we're done
       done();
-    });
+    }
   });
 
   // start the grunt-js-test web server with keepalive
