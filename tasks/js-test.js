@@ -102,12 +102,17 @@ module.exports = function (grunt) {
   };
 
   // run all the tests (or a single test, if the --file argument is used)
-  grunt.registerTask('js-test', 'Run your client-side unit tests.', function () {
+  grunt.registerTask('js-test', 'Run your client-side unit tests.', function (target) {
     // test to see if the web server is running
     var taskComplete = this.async();
 
     // standardize the options
-    var options = this.options(defaults);
+    var options = _.extend(
+      {},
+      defaults,
+      grunt.config.get('js-test.options') || {},
+      grunt.config.get('js-test.' + target + '.options')
+    );
 
     // accept CLI options to change options
     acceptCLI(options);
