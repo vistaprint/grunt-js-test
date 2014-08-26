@@ -128,13 +128,17 @@ module.exports = function (grunt, options) {
   });
 
   // run a single test given the index number
-  // TODO: change from index numbers to paths
-  app.get('/test/:test', function (req, res) {
-    var test = tests[req.params.test];
+  app.get('/test', function (req, res) {
+    var test = _.filter(tests, function (test) {
+      return req.query.js == test.file;
+      // return test.originalUrl == req.path;
+    });
 
     // if we do not have this test, 404?
-    if (!test) {
+    if (test.length == 0) {
       return res.status(404).send('Test not found.');
+    } else {
+      test = test[0];
     }
 
     // array of stylesheets to include in test page

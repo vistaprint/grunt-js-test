@@ -53,11 +53,11 @@ module.exports = function findTests(grunt, options) {
     } else {
       return 0;
     }
-  }).map(function (file, fileNum) {
+  }).map(function (file) {
     var abs = path.join(options.root, file);
 
     return {
-      url: '/test/' + fileNum + '?js=' + file,
+      url: '/test?js=' + file,
       file: file,
       filename: path.basename(file),
       dir: path.dirname(abs),
