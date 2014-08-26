@@ -245,7 +245,7 @@ Should the test environment generate coverage reports? This can slow down runnin
 
 #### coverageTool
 Type: `String`
-Default: `jscover`
+Default: `istanbul`
 
 Choose between either `jscover` or `istanbul` for your coverage instrumentation and reporting service.
 
