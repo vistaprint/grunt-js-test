@@ -24,7 +24,7 @@ module.exports = function (grunt) {
     var args = [
       options.port,
       function () {
-        grunt.log.writeln('Web server started on port:' + options.port + (options.hostname ? ', hostname: ' + options.hostname : ', no hostname specified') + ' [pid: ' + process.pid + ']');
+        grunt.verbose.writeln('  Web server started on port:' + options.port + (options.hostname ? ', hostname: ' + options.hostname : ', no hostname specified') + ' [pid: ' + process.pid + ']');
 
         if (done) {
           done();
@@ -91,14 +91,29 @@ module.exports = function (grunt) {
       }
     }
 
-    // --log || --debug turns on test debugging
-    if (grunt.option('log') || grunt.option('debug')) {
-      options.log = true;
-    }
-
     // --identifier
     if (grunt.option('identifier') !== undefined) {
       options.identifier = grunt.option('identifier');
+    }
+
+    // --file
+    if (grunt.option('file') !== undefined) {
+      options.file = grunt.option('file');
+    }
+
+    // --search
+    if (grunt.option('search') !== undefined) {
+      options.search = grunt.option('search');
+    }
+
+    // --bail
+    if (grunt.option('bail') !== undefined) {
+      options.bail = true;
+    }
+
+    // --log || --debug turns on test debugging
+    if (grunt.option('log')) {
+      options.log = true;
     }
   };
 
@@ -129,42 +144,44 @@ module.exports = function (grunt) {
 
       var tests = findTests(grunt, options);
 
-      // standardize some toggles that can be passed via cli
+      // list all tests found web --verbose is provided
+      grunt.verbose.writeln('  Test files found:');
+      tests.forEach(function (test) {
+        grunt.verbose.writeln('    ' + test.file);
+      });
 
       // filter: find a specific test file
       if (options.file) {
         var file = options.file.toLowerCase();
-        grunt.verbose.write('Specific file provided:', file, '\n');
+        grunt.verbose.writeln('  --file filter:', file);
+
         tests = tests.filter(function (test) {
-          return file === test.file.toLowerCase();
+          var match = test.file.toLowerCase();
+          var pass = file == match;
+          grunt.verbose.writeln('    ', match, '=', pass ? 'true' : 'false');
+          return pass;
         });
 
         if (tests.length === 0) {
-          grunt.fail.warn('Failed to find file specified:', file);
-          return;
+          grunt.fail.warn('No test files matching:' + file + ' (try --verbose)');
         }
       }
 
-      // filter tests: RegExp matching
-      if (options.re) {
-        var re = new RegExp(options.re, options.rep || 'i');
-        grunt.verbose.write('Applying RegEx filter:', options.re, '\n');
-
-        tests = tests.filter(function (test) {
-          var pass = re.test(test.file);
-          grunt.verbose.write('  ', test.file, '=', pass ? 'pass' : 'fail', '\n');
-          return pass;
-        });
-      }
-
-      // filter tests: simple string contains matching
+      // filter tests: simple string matching
       if (options.search) {
         var search = options.search.toLowerCase();
-        grunt.verbose.write('Applying simple filter:', search, '\n');
+        var regex = false;
+        grunt.verbose.writeln('  --search filter:', search);
+
+        if (search.indexOf('*') > -1) {
+          search = new RegExp(options.search.replace('*', '.*'));
+          regex = true;
+        }
 
         tests = tests.filter(function (test) {
-          var pass = test.file.toLowerCase().indexOf(search) !== -1;
-          grunt.verbose.write('  ', test.file, '=', pass ? 'pass' : 'fail', '\n');
+          var match = test.file.toLowerCase();
+          var pass = regex ? search.test(match) : match.indexOf(search) > -1;
+          grunt.verbose.writeln('    ', match, '=', pass ? 'true' : 'false');
           return pass;
         });
       }
@@ -177,13 +194,6 @@ module.exports = function (grunt) {
       // option: bail - exit on first error found
       if (options.bail) {
         mochaConfig.bail = true;
-      }
-
-      // option: grep - grep within the test file, mocha does this (mocha-grep)
-      if (options.grep) {
-        mochaConfig.mocha = {
-          grep: options.grep
-        };
       }
 
       // option: send over console messages
@@ -253,6 +263,8 @@ module.exports = function (grunt) {
     var done = this.async();
 
     startServer(options, function () {
+      grunt.log.writeln('grunt-js-test web server available at http://' + options.hostname + ':' + options.port + '/');
+
       // attempt to open a web browser
       if (options.openBrowser && process.platform == 'win32') {
         try {

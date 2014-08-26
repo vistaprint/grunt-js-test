@@ -145,6 +145,26 @@ Pass `--identifier` with a value of a string you'd like to use as your job ident
 
 By default a datetime in the format of `YYYY-MM-DD HHMMSS` will be used.
 
+#### Filters
+
+These filters allow you to narrow down the tests you run via the `js-test` CLI. These can be useful when you want are writing a test and want to test it, or a single test is failing and you want to debug it.
+
+##### --file
+
+Pass `--file=test/something.js` to provide the path to a specific file you want to run.
+
+##### --search
+
+Pass `--search=jquery` with a simple string run only the tests that have file names containing the given string. This filter is always case insensitive. You can use `*` for a wildcard match.
+
+##### --bail
+
+Pass `--bail` to stop running tests once a single unit test fails.
+
+##### --log
+
+Pass `--log` to pass all `console.log` statements from your unit tests from PhantomJS to the Node console.
+
 ### Task Options
 
 All options of `js-test` are optional, if you specify nothing, it will run all JavaScript files anywhere in your project directory, recursively matching `*.unittests.js`.
@@ -256,17 +276,6 @@ Type: `String`
 Default: `process.cwd() + '/coverage'`
 
 Specify a directory where coverage report data should be saved.
-
-#### Filters
-
-These filters allow you to narrow down the tests you run via the `js-test` CLI. This is useful when updating a single test or when using grunt-js-test from a continuous integration service.
-
-    file: null,                     // run only this file, by file name
-    re: null,                       // run tests with file names that match this regular expression
-    search: null,                   // run tests with file names that contain the string passed (case insensitive)
-    bail: false,                    // if true we'll stop running tests once we find a single failure
-    grep: false,                    // passed to mocha, runs a regex test on the test descriptions
-    log: false,                     // if true, will pass console.log data from phantomjs to node console for debugging
 
 #### require
 Type: `Boolean`
