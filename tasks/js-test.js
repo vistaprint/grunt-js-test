@@ -115,6 +115,11 @@ module.exports = function (grunt) {
     if (grunt.option('log')) {
       options.log = true;
     }
+
+    // --noopen
+    if (grunt.option('noopen')) {
+      options.openBrowser = false;
+    }
   };
 
   // run all the tests (or a single test, if the --file argument is used)
