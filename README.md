@@ -277,7 +277,7 @@ Default: `process.cwd() + '/coverage'`
 
 Specify a directory where coverage report data should be saved.
 
-#### require
+#### requirejs
 Type: `Boolean`
 Default: `false`
 
