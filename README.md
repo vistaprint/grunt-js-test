@@ -237,6 +237,8 @@ Default: `Spec`
 
 Mocha reporter used by `js-test` when reporting to the console.
 
+Supported reporters are Spec, `Nyan`, `XUnit`, `Dot`, `List`, `Progress`, `JSON`, `Min` and `Doc`. For a more complete list, see [Mocha reporters](http://visionmedia.github.io/mocha/#reporters). The reporter value is case sensitive. `Min` and `Dot` are very helpful when debugging a failing test.
+
 #### coverage
 Type: `Boolean`
 Default: `false`
