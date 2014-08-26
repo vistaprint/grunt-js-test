@@ -13,8 +13,7 @@ module.exports = function (grunt) {
           'js/require.config.js',
           'test/test-bootstrapper.js'
         ],
-        requirejs: true,
-        moduleRelativeTo: process.cwd()
+        requirejs: true
       }
     }
   });
