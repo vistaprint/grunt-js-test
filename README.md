@@ -1,6 +1,6 @@
 # Grunt JavaScript Test Runner [![Build Status](https://secure.travis-ci.org/benhutchins/grunt-js-test.png?branch=master)](http://travis-ci.org/benhutchins/grunt-js-test) [![Dependency Status](https://gemnasium.com/benhutchins/grunt-js-test.png)](https://gemnasium.com/benhutchins/grunt-js-test)
 
-grunt-js-test is a plugin for [Grunt](http://gruntjs.com/) that is designed to run client-side unit tests using [Mocha](http://visionmedia.github.io/mocha/). You can easily run tests through the command line or a continuous integration suite using PhantomJS or you can pop up a simply server to run your tests in a browser using WebDriver, for development or testing of specific unit tests. grunt-js-test can also generate coverage reports using either [JSCover](https://tntim96.github.io/JSCover/) or [Istanbul](https://gotwarlost.github.io/istanbul/).
+grunt-js-test is a plugin for [Grunt](http://gruntjs.com/) that is designed to run client-side unit tests using [Mocha](http://visionmedia.github.io/mocha/). You can easily run tests through the command line or a continuous integration suite using PhantomJS or it can provide a server to run your tests in a browser using WebDriver and for writing and testing of unit tests. grunt-js-test can also generate coverage reports using either [JSCover](https://tntim96.github.io/JSCover/) or [Istanbul](https://gotwarlost.github.io/istanbul/).
 
 ## Getting Started
 
