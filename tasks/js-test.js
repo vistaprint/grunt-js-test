@@ -37,7 +37,14 @@ module.exports = function (grunt) {
       args.splice(1, 0, options.hostname);
     }
 
-    server = expressApp.listen.apply(expressApp, args).on('error', grunt.fatal);
+    server = expressApp.listen.apply(expressApp, args);
+
+    server.on('error', function (err) {
+      console.log('threw an error');
+      grunt.fatal(err);
+    });
+
+    server.timeout = options.serverTimeout;
   };
 
   var defaults = {
@@ -55,6 +62,7 @@ module.exports = function (grunt) {
     hostname: 'localhost',          // hostname for grunt-express server
     port: 8981,                     // port for grunt-express server
     staticPort: 8982,               // port used for secondary web server that serves your static project files
+    serverTimeout: 1000,            // timeout for http connections to servers
 
     // unit testing service options
     mocha: {},                      // grunt-mocha overrides
@@ -234,8 +242,26 @@ module.exports = function (grunt) {
 
     var done = this.async();
 
-    // turn off server, we need to do this in case another js-test task runs
-    server.close();
+    var serverClosed = false;
+    var staticServerClosed = false;
+    var coverageServerClosed = options.coverage ? false : true;
+
+    var checkAll = function () {
+      if (serverClosed && staticServerClosed && coverageServerClosed) {
+        // task can now be considered done
+        done();
+      }
+    };
+
+    server.close(function () {
+      serverClosed = true;
+      checkAll();
+    });
+
+    expressApp.staticServer.close(function () {
+      staticServerClosed = true;
+      checkAll();
+    });
 
     // now save the coverage report data if we should
     if (options.coverage) {
@@ -246,11 +272,17 @@ module.exports = function (grunt) {
           grunt.log.error('Failed to generate coverage report.');
         }
 
-        done();
+        var done = function () {
+          coverageServerClosed = true;
+          checkAll();
+        };
+
+        if (expressApp.coverageServer.close) {
+          expressApp.coverageServer.close(done);
+        } else {
+          done();
+        }
       });
-    } else {
-      // not saving a coverage report, so we're done
-      done();
     }
   });
 

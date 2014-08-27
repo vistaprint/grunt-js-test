@@ -49,9 +49,11 @@ module.exports = function (grunt, options, reportDirectory) {
         });
       });
 
-      app.listen(options.coverageProxyPort);
+      var server = app.listen(options.coverageProxyPort);
 
       grunt.log.ok('Started proxy web server on port ' + options.coverageProxyPort + '.\n');
+
+      return server;
     },
 
     save: function (coverageData, cb) {
