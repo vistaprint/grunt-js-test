@@ -38,12 +38,6 @@ module.exports = function (grunt) {
     }
 
     server = expressApp.listen.apply(expressApp, args);
-
-    server.on('error', function (err) {
-      console.log('threw an error');
-      grunt.fatal(err);
-    });
-
     server.timeout = options.serverTimeout;
   };
 
@@ -242,10 +236,12 @@ module.exports = function (grunt) {
 
     var done = this.async();
 
+    // js-test runs three web servers, we need to close them all
     var serverClosed = false;
     var staticServerClosed = false;
     var coverageServerClosed = options.coverage ? false : true;
 
+    // once a single server has closed, check to see if the others are closed as well, if so, complete task
     var checkAll = function () {
       if (serverClosed && staticServerClosed && coverageServerClosed) {
         // task can now be considered done
