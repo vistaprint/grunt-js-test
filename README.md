@@ -1,4 +1,4 @@
-# Grunt JavaScript Test Runner [![Build Status](https://secure.travis-ci.org/benhutchins/grunt-js-test.png?branch=master)](http://travis-ci.org/benhutchins/grunt-js-test) [![Dependency Status](https://gemnasium.com/benhutchins/grunt-js-test.png)](https://gemnasium.com/benhutchins/grunt-js-test)
+# Grunt JavaScript Test Runner [![Build Status](https://secure.travis-ci.org/vistaprint/grunt-js-test.png?branch=master)](http://travis-ci.org/vistaprint/grunt-js-test) [![Dependency Status](https://gemnasium.com/vistaprint/grunt-js-test.png)](https://gemnasium.com/vistaprint/grunt-js-test)
 
 grunt-js-test is a plugin for [Grunt](http://gruntjs.com/) that is designed to run client-side unit tests using [Mocha](http://visionmedia.github.io/mocha/). You can easily run tests through the command line or a continuous integration suite using PhantomJS or it can provide a server to run your tests in a browser using WebDriver and for writing and testing of unit tests. grunt-js-test can also generate coverage reports using either [JSCover](https://tntim96.github.io/JSCover/) or [Istanbul](https://gotwarlost.github.io/istanbul/).
 
@@ -20,7 +20,7 @@ grunt.loadNpmTasks('grunt-js-test');
 
 Open your `Gruntfile.js` and add your project's configuration as desired (all the options are described below). If you rely on all the defaults, you don't even need to provide anything.
 
-A few simple example projects are available in the [examples](https://github.com/benhutchins/grunt-js-test/tree/master/examples) directory.
+A few simple example projects are available in the [examples](https://github.com/vistaprint/grunt-js-test/tree/master/examples) directory.
 
 ### Write your tests
 
@@ -49,7 +49,7 @@ grunt-js-test generates the test HTML page for you, making it quicker to write c
 /// <reference path="../relative/file.js" />
 ```
 
-There is an example project using these reference tags in our [examples](https://github.com/benhutchins/grunt-js-test/tree/master/examples) directory as [examples/references](https://github.com/benhutchins/grunt-js-test/tree/master/examples/references).
+There is an example project using these reference tags in our [examples](https://github.com/vistaprint/grunt-js-test/tree/master/examples) directory as [examples/references](https://github.com/vistaprint/grunt-js-test/tree/master/examples/references).
 
 These reference tags are processed recursively and a dependency tree is created, then sorted, to generate a complete list of dependencies needed in an appropriate order. Therefore you can include files such as:
 
@@ -87,7 +87,7 @@ As grunt-js-test generates the test HTML pages for you, on occasion you need to 
 
 For example, if you had a test file called `something.unittests.js` you could have a similarly named file `something.unittests.inject.html`, the contents of which would be added to the body of the generated test page.
 
-There is an example project using these reference tags in our [examples](https://github.com/benhutchins/grunt-js-test/tree/master/examples) directory as [examples/injectHTML](https://github.com/benhutchins/grunt-js-test/tree/master/examples/injectHTML).
+There is an example project using these reference tags in our [examples](https://github.com/vistaprint/grunt-js-test/tree/master/examples) directory as [examples/injectHTML](https://github.com/vistaprint/grunt-js-test/tree/master/examples/injectHTML).
 
 You can also reference `.html` files you wish to have injected using a `reference` tags similar to referencing JavaScript dependencies. The format of which is simply:
 
@@ -205,7 +205,7 @@ Default: `[]`
 
 A list of paths to JavaScript files relative to your `baseUri` you want loaded as global dependencies for each test. You can also include external dependencies, such as `http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.js`.
 
-Dependencies can be injected on a per test file basis using `<reference>` tags. See [loading dependencies](https://github.com/benhutchins/grunt-js-test#loading-dependencies).
+Dependencies can be injected on a per test file basis using `<reference>` tags. See [loading dependencies](https://github.com/vistaprint/grunt-js-test#loading-dependencies).
 
 #### stylesheets
 Type: `Array<String>`
@@ -213,13 +213,13 @@ Default: []
 
 A list of paths to CSS files relative to your `baseUri` you want loaded for each test. You can also include external stylesheets.
 
-Stylesheets can be injected on a per test file basis using `<reference>` tags. See [loading dependencies](https://github.com/benhutchins/grunt-js-test#loading-dependencies).
+Stylesheets can be injected on a per test file basis using `<reference>` tags. See [loading dependencies](https://github.com/vistaprint/grunt-js-test#loading-dependencies).
 
 #### referenceTags
 Type: `Boolean`
 Default: `true`
 
-Look for `<reference>` tags within unit test files to automatically include additional dependencies. See [loading dependencies](https://github.com/benhutchins/grunt-js-test#loading-dependencies). Usually never hurts to leave it on.
+Look for `<reference>` tags within unit test files to automatically include additional dependencies. See [loading dependencies](https://github.com/vistaprint/grunt-js-test#loading-dependencies). Usually never hurts to leave it on.
 
 #### hostname
 Type: `String`
