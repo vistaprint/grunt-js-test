@@ -289,6 +289,12 @@ Default: `null`
 
 This defines the path your modules should be relative to, if it's different than your project's `root` directory. Only applicable when your project is a `requirejs` based project.
 
+#### injectQueryString
+Type: `String`
+Default: `null`
+
+Optional query string data to add to URLs when unit tests are running via the `js-test` command. Format must be a string with no prefixed ampersand. Example: `key=value&key2=value2`.
+
 #### injectHTML
 Type: `String`
 Default: `null`

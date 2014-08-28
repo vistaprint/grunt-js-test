@@ -51,6 +51,8 @@ module.exports = function (grunt) {
     deps: [],                       // global dependencies for each test that you don't want to <reference>
     stylesheets: [],                // array of global stylesheets to load with each test file
     referenceTags: true,            // indicate whether the js-test-env should look for <reference> tags
+    injectQueryString: null,        // optional URL query strings to inject into every test URL when using js-test task
+    injectHTML: null,               // optional HTML content to inject into every test page
 
     // web server options
     hostname: 'localhost',          // hostname for grunt-express server
@@ -195,7 +197,19 @@ module.exports = function (grunt) {
 
       // set the config for mocha passing the correct URLs to be used
       mochaConfig.urls = tests.map(function (test) {
-        return 'http://' + options.hostname + ':' + options.port + test.url + (options.coverage ? '&coverage=1' : '');
+        var url = 'http://' + options.hostname + ':' + options.port + test.url;
+
+        // if we're generating coverage data, let the server know specifically we want to do it right now
+        if (options.coverage) {
+          url += '&coverage=1';
+        }
+
+        // if there are extra query string arguments to add, add them
+        if (options.injectQueryString) {
+          url += '&' + options.injectQueryString;
+        }
+
+        return url;
       });
 
       // option: bail - exit on first error found
