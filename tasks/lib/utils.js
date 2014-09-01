@@ -8,6 +8,13 @@ var normalize = function (file) {
   return path.normalize(file);
 };
 
+// On windows, make all paths lowercase because the filesystem is not case sensitive.
+if (/^win/.test(process.platform)) {
+  normalize = function (file) {
+    return path.normalize(file).toLowerCase();
+  };
+}
+
 module.exports = function (grunt, options) {
   return {
 
