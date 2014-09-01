@@ -5,7 +5,7 @@ var path = require('path');
 var moment = require('moment');
 
 var normalize = function (file) {
-  return path.normalize(file).toLowerCase();
+  return path.normalize(file);
 };
 
 module.exports = function (grunt, options) {
