@@ -11,6 +11,7 @@ var path          = require('path');
 
 // Helpers.
 var findTests  = require('./lib/findTests');
+var normalize  = require('./lib/normalize');
 
 module.exports = function (grunt) {
   grunt.loadTasks(path.join(__dirname, '../node_modules/grunt-mocha/tasks'));
@@ -161,11 +162,11 @@ module.exports = function (grunt) {
 
       // filter: find a specific test file
       if (options.file) {
-        var file = options.file.toLowerCase();
+        var file = normalize(options.file);
         grunt.verbose.writeln('  --file filter:', file);
 
         tests = tests.filter(function (test) {
-          var match = test.file.toLowerCase();
+          var match = normalize(test);
           var pass = file == match;
           grunt.verbose.writeln('    ', match, '=', pass ? 'true' : 'false');
           return pass;
