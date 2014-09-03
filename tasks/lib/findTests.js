@@ -3,6 +3,7 @@
 // Nodejs libs.
 var fs = require('fs');
 var path = require('path');
+var normalize = require('./normalize');
 
 module.exports = function findTests(grunt, options) {
   // go through the list of glob patterns
@@ -20,7 +21,7 @@ module.exports = function findTests(grunt, options) {
     files = files.filter(function (file) {
       return options.include.every(function (regEx) {
         if (typeof regEx === 'string') {
-          return file.toLowerCase().indexOf(regEx.toLowerCase()) > -1;
+          return normalize(file).indexOf(normalize(regEx)) > -1;
         } else {
           return regEx.test(file);
         }
@@ -33,7 +34,7 @@ module.exports = function findTests(grunt, options) {
     files = files.filter(function (file) {
       return !options.exclude.every(function (regEx) {
         if (typeof regEx === 'string') {
-          return file.toLowerCase().indexOf(regEx.toLowerCase()) > -1;
+          return normalize(file).indexOf(normalize(regEx)) > -1;
         } else {
           return regEx.test(file);
         }
@@ -43,8 +44,8 @@ module.exports = function findTests(grunt, options) {
 
   // add test to the tests
   return files.sort(function (a, b) {
-    a = a.toLowerCase();
-    b = b.toLowerCase();
+    a = normalize(a);
+    b = normalize(b);
 
     if (a < b) {
       return -1;
@@ -53,11 +54,11 @@ module.exports = function findTests(grunt, options) {
     } else {
       return 0;
     }
-  }).map(function (file, fileNum) {
+  }).map(function (file) {
     var abs = path.join(options.root, file);
 
     return {
-      url: '/test/' + fileNum + '?js=' + file,
+      url: '/test?js=' + file,
       file: file,
       filename: path.basename(file),
       dir: path.dirname(abs),

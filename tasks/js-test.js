@@ -11,6 +11,7 @@ var path          = require('path');
 
 // Helpers.
 var findTests  = require('./lib/findTests');
+var normalize  = require('./lib/normalize');
 
 module.exports = function (grunt) {
   grunt.loadTasks(path.join(__dirname, '../node_modules/grunt-mocha/tasks'));
@@ -24,7 +25,7 @@ module.exports = function (grunt) {
     var args = [
       options.port,
       function () {
-        grunt.log.writeln('Web server started on port:' + options.port + (options.hostname ? ', hostname: ' + options.hostname : ', no hostname specified') + ' [pid: ' + process.pid + ']');
+        grunt.verbose.writeln('  Web server started on port:' + options.port + (options.hostname ? ', hostname: ' + options.hostname : ', no hostname specified') + ' [pid: ' + process.pid + ']');
 
         if (done) {
           done();
@@ -37,7 +38,8 @@ module.exports = function (grunt) {
       args.splice(1, 0, options.hostname);
     }
 
-    server = expressApp.listen.apply(expressApp, args).on('error', grunt.fatal);
+    server = expressApp.listen.apply(expressApp, args);
+    server.timeout = options.serverTimeout;
   };
 
   var defaults = {
@@ -50,11 +52,14 @@ module.exports = function (grunt) {
     deps: [],                       // global dependencies for each test that you don't want to <reference>
     stylesheets: [],                // array of global stylesheets to load with each test file
     referenceTags: true,            // indicate whether the js-test-env should look for <reference> tags
+    injectQueryString: null,        // optional URL query strings to inject into every test URL when using js-test task
+    injectHTML: null,               // optional HTML content to inject into every test page
 
     // web server options
     hostname: 'localhost',          // hostname for grunt-express server
     port: 8981,                     // port for grunt-express server
     staticPort: 8982,               // port used for secondary web server that serves your static project files
+    serverTimeout: 1000,            // timeout for http connections to servers
 
     // unit testing service options
     mocha: {},                      // grunt-mocha overrides
@@ -91,14 +96,34 @@ module.exports = function (grunt) {
       }
     }
 
-    // --log || --debug turns on test debugging
-    if (grunt.option('log') || grunt.option('debug')) {
-      options.log = true;
-    }
-
     // --identifier
     if (grunt.option('identifier') !== undefined) {
       options.identifier = grunt.option('identifier');
+    }
+
+    // --file
+    if (grunt.option('file') !== undefined) {
+      options.file = grunt.option('file');
+    }
+
+    // --search
+    if (grunt.option('search') !== undefined) {
+      options.search = grunt.option('search');
+    }
+
+    // --bail
+    if (grunt.option('bail') !== undefined) {
+      options.bail = true;
+    }
+
+    // --log || --debug turns on test debugging
+    if (grunt.option('log')) {
+      options.log = true;
+    }
+
+    // --noopen
+    if (grunt.option('noopen')) {
+      options.openBrowser = false;
     }
   };
 
@@ -129,61 +154,68 @@ module.exports = function (grunt) {
 
       var tests = findTests(grunt, options);
 
-      // standardize some toggles that can be passed via cli
+      // list all tests found web --verbose is provided
+      grunt.verbose.writeln('  Test files found:');
+      tests.forEach(function (test) {
+        grunt.verbose.writeln('    ' + test.file);
+      });
 
       // filter: find a specific test file
       if (options.file) {
-        var file = options.file.toLowerCase();
-        grunt.verbose.write('Specific file provided:', file, '\n');
+        var file = normalize(options.file);
+        grunt.verbose.writeln('  --file filter:', file);
+
         tests = tests.filter(function (test) {
-          return file === test.file.toLowerCase();
+          var match = normalize(test);
+          var pass = file == match;
+          grunt.verbose.writeln('    ', match, '=', pass ? 'true' : 'false');
+          return pass;
         });
 
         if (tests.length === 0) {
-          grunt.fail.warn('Failed to find file specified:', file);
-          return;
+          grunt.fail.warn('No test files matching:' + file + ' (try --verbose)');
         }
       }
 
-      // filter tests: RegExp matching
-      if (options.re) {
-        var re = new RegExp(options.re, options.rep || 'i');
-        grunt.verbose.write('Applying RegEx filter:', options.re, '\n');
-
-        tests = tests.filter(function (test) {
-          var pass = re.test(test.file);
-          grunt.verbose.write('  ', test.file, '=', pass ? 'pass' : 'fail', '\n');
-          return pass;
-        });
-      }
-
-      // filter tests: simple string contains matching
+      // filter tests: simple string matching
       if (options.search) {
         var search = options.search.toLowerCase();
-        grunt.verbose.write('Applying simple filter:', search, '\n');
+        var regex = false;
+        grunt.verbose.writeln('  --search filter:', search);
+
+        if (search.indexOf('*') > -1) {
+          search = new RegExp(options.search.replace('*', '.*'));
+          regex = true;
+        }
 
         tests = tests.filter(function (test) {
-          var pass = test.file.toLowerCase().indexOf(search) !== -1;
-          grunt.verbose.write('  ', test.file, '=', pass ? 'pass' : 'fail', '\n');
+          var match = test.file.toLowerCase();
+          var pass = regex ? search.test(match) : match.indexOf(search) > -1;
+          grunt.verbose.writeln('    ', match, '=', pass ? 'true' : 'false');
           return pass;
         });
       }
 
       // set the config for mocha passing the correct URLs to be used
       mochaConfig.urls = tests.map(function (test) {
-        return 'http://' + options.hostname + ':' + options.port + test.url + (options.coverage ? '&coverage=1' : '');
+        var url = 'http://' + options.hostname + ':' + options.port + test.url;
+
+        // if we're generating coverage data, let the server know specifically we want to do it right now
+        if (options.coverage) {
+          url += '&coverage=1';
+        }
+
+        // if there are extra query string arguments to add, add them
+        if (options.injectQueryString) {
+          url += '&' + options.injectQueryString;
+        }
+
+        return url;
       });
 
       // option: bail - exit on first error found
       if (options.bail) {
         mochaConfig.bail = true;
-      }
-
-      // option: grep - grep within the test file, mocha does this (mocha-grep)
-      if (options.grep) {
-        mochaConfig.mocha = {
-          grep: options.grep
-        };
       }
 
       // option: send over console messages
@@ -219,8 +251,28 @@ module.exports = function (grunt) {
 
     var done = this.async();
 
-    // turn off server, we need to do this in case another js-test task runs
-    server.close();
+    // js-test runs three web servers, we need to close them all
+    var serverClosed = false;
+    var staticServerClosed = false;
+    var coverageServerClosed = options.coverage ? false : true;
+
+    // once a single server has closed, check to see if the others are closed as well, if so, complete task
+    var checkAll = function () {
+      if (serverClosed && staticServerClosed && coverageServerClosed) {
+        // task can now be considered done
+        done();
+      }
+    };
+
+    server.close(function () {
+      serverClosed = true;
+      checkAll();
+    });
+
+    expressApp.staticServer.close(function () {
+      staticServerClosed = true;
+      checkAll();
+    });
 
     // now save the coverage report data if we should
     if (options.coverage) {
@@ -231,11 +283,17 @@ module.exports = function (grunt) {
           grunt.log.error('Failed to generate coverage report.');
         }
 
-        done();
+        var done = function () {
+          coverageServerClosed = true;
+          checkAll();
+        };
+
+        if (expressApp.coverageServer.close) {
+          expressApp.coverageServer.close(done);
+        } else {
+          done();
+        }
       });
-    } else {
-      // not saving a coverage report, so we're done
-      done();
     }
   });
 
@@ -253,6 +311,8 @@ module.exports = function (grunt) {
     var done = this.async();
 
     startServer(options, function () {
+      grunt.log.writeln('grunt-js-test web server available at http://' + options.hostname + ':' + options.port + '/');
+
       // attempt to open a web browser
       if (options.openBrowser && process.platform == 'win32') {
         try {

@@ -35,26 +35,8 @@ module.exports = function (grunt, options) {
     next();
   });
 
-  // create a static file server for project assets
-  var statics = express();
-
-  // ensure all responses are utf8 and are accessible cross-domain
-  // this is needed so we can perform ajax requests to get the contents
-  // of these static files from within the coverage report viewer
-  statics.use(function (req, res, next) {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'X-Requested-With');
-
-    if (req.method === 'OPTIONS') {
-      res.end();
-      return;
-    }
-
-    next();
-  });
-
-  statics.use(options.baseUri, express.static(options.root));
-  statics.listen(options.staticPort);
+  // start static file server
+  app.staticServer = require('./staticServer')(grunt, options);
 
   // start coverage instrumentation proxy server
   var coverageTool, coverageReportDirectory, createdCoverageReportDirectory;
@@ -67,7 +49,7 @@ module.exports = function (grunt, options) {
       options.coverage = false;
       grunt.log.error('Unsupported coverage reporter, disabling coverage.');
     } finally {
-      coverageTool.start();
+      app.coverageServer = coverageTool.start();
     }
   }
 
@@ -128,13 +110,17 @@ module.exports = function (grunt, options) {
   });
 
   // run a single test given the index number
-  // TODO: change from index numbers to paths
-  app.get('/test/:test', function (req, res) {
-    var test = tests[req.params.test];
+  app.get('/test', function (req, res) {
+    var test = _.filter(tests, function (test) {
+      return req.query.js == test.file;
+      // return test.originalUrl == req.path;
+    });
 
     // if we do not have this test, 404?
-    if (!test) {
+    if (test.length == 0) {
       return res.status(404).send('Test not found.');
+    } else {
+      test = test[0];
     }
 
     // array of stylesheets to include in test page
