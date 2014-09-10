@@ -161,6 +161,10 @@ Pass `--search=jquery` with a simple string run only the tests that have file na
 
 Pass `--bail` to stop running tests once a single unit test fails.
 
+##### --reporter
+
+Pass `--reporter=reporter` to specify the reporter to use when running tests.
+
 ##### --log
 
 Pass `--log` to pass all `console.log` statements from your unit tests from PhantomJS to the Node console.
