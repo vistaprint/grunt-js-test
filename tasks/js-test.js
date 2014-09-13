@@ -120,7 +120,7 @@ module.exports = function (grunt) {
     if (grunt.option('reporter') !== undefined) {
       options.reporter = grunt.option('reporter');
     }
-    
+
     // --log || --debug turns on test debugging
     if (grunt.option('log')) {
       options.log = true;
