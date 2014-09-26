@@ -159,7 +159,7 @@ module.exports = function (grunt) {
 
       var tests = findTests(grunt, options);
 
-      // list all tests found web --verbose is provided
+      // list all tests found when --verbose is provided
       grunt.verbose.writeln('  Test files found:');
       tests.forEach(function (test) {
         grunt.verbose.writeln('    ' + test.file);
@@ -171,7 +171,7 @@ module.exports = function (grunt) {
         grunt.verbose.writeln('  --file filter:', file);
 
         tests = tests.filter(function (test) {
-          var match = normalize(test);
+          var match = normalize(test.file);
           var pass = file == match;
           grunt.verbose.writeln('    ', match, '=', pass ? 'true' : 'false');
           return pass;

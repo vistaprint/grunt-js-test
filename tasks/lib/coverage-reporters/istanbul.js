@@ -18,6 +18,9 @@ module.exports = function (grunt, options, reportDirectory) {
 
         // if we're not requesting a JS file, do not instrunment it
         if (path.extname(file) != '.js') {
+          //Allow cross-origin resource requests during testing (e.g. handlebars templates)
+          res.header('Access-Control-Allow-Origin', '*');
+          res.header('Access-Control-Allow-Headers', 'X-Requested-With');
           res.sendFile(file);
           return;
         }
