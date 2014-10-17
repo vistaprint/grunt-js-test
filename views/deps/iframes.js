@@ -1,34 +1,3 @@
-function getDocHeight(doc) {
-	var body = doc.body;
-	var html = doc.documentElement;
-	return Math.max(
-		body.scrollHeight,
-		body.offsetHeight,
-		html.clientHeight,
-		html.scrollHeight,
-		html.offsetHeight
-	);
-}
-
-function setIframeHeight(ifrm) {
-	var doc = ifrm.contentDocument || ifrm.contentWindow.document;
-	ifrm.style.visibility = 'hidden';
-	ifrm.style.height = "10px"; // reset to minimal height ...
-	// IE opt. for bing/msn needs a bit added or scrollbar appears
-	ifrm.style.height = getDocHeight(doc) + 4 + "px";
-	ifrm.style.visibility = 'visible';
-}
-
-function fixIframe(iframeWindow) {
-	var iframes = document.getElementsByTagName('iframe');
-	var i = 0, l = iframes.length;
-	for (; i < l; i++) {
-		if (iframes[i].contentWindow === iframeWindow) {
-			setIframeHeight(iframes[i]);
-		}
-	}
-}
-
 function reportSuccess() {
 	var el = document.getElementById('passes');
 	var passes = parseInt(el.innerHTML, 10);
@@ -40,3 +9,48 @@ function reportFailure() {
 	var failures = parseInt(el.innerHTML, 10);
 	el.innerHTML = ++failures;
 }
+
+(function() {
+
+	var currentTestIndex = 0;
+	var currentTestUrl;
+
+	function nextTest() {
+		currentTestUrl = window.__tests__[currentTestIndex];
+		currentTestIndex ++;
+
+		if (!currentTestUrl) {
+			return;
+		}
+
+		$('#testFrame').attr('src', currentTestUrl + '&iframe=1');		
+	}
+
+	this.runAllTests = function() {
+		window.addEventListener('message', function(message) {
+			var data = JSON.parse(message.data);
+			var event = data[0];
+			if (event == 'mocha.end') {
+				var stats = data[1].stats;
+				var $testLink = $('<a>', { 
+					html: currentTestUrl, 
+					href: currentTestUrl,
+					target: 'blank'
+				});
+				if (stats.failures > 0) {
+					$testLink.appendTo('#failing');
+				} else {
+					$testLink.appendTo('#passing');
+				}
+
+				nextTest();
+			}	
+			if (event == 'mocha.fail') {
+				console.log(data[1].err);
+			}
+		}, false);
+
+		nextTest();
+	};
+
+})(this);
