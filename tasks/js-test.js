@@ -215,6 +215,8 @@ module.exports = function (grunt) {
           url += '&' + options.injectQueryString;
         }
 
+        url += '&phantom=1';
+
         return url;
       });
 
