@@ -1,13 +1,14 @@
 doctype html
 html(lang='en')
   head
-    title= "JS Test Env: All tests"
+    title= "All: grunt-js-test"
     meta(charset='utf-8')
     meta(name='viewport', content='width=device-width, initial-scale=1.0')
     meta(name='description', content='')
     meta(name='author', content='')
     link(rel='stylesheet', href='/js-test-env/site.css', media='screen')
     link(rel='stylesheet', href='/js-test-env/mocha.css', media='screen')
+    script(src='/js-test-env/jquery.js')
     script(src='/js-test-env/iframes.js')
   body
     #mocha(style='margin: 0 50px')
@@ -22,9 +23,12 @@ html(lang='en')
             | failures:
             em#failures 0
 
-      h1 Isolated tests, report separately
-      p(style='font-size: 14px') Scroll down and check each test
-    //- test-specific deps, test file should be last in list
-    - tests.forEach(function (test) {
-      iframe(seamless="seamless", src=test.url + "&iframe=1" + (coverage ? "&coverage=1" : ""))
-    - });
+      h1 All tests
+
+      iframe#testFrame(src='about:blank')
+      div#failing
+      div#passing
+    
+      script.
+        window.__tests__ = !{JSON.stringify(tests.map(function(test) { return test.url + (coverage ? '&coverage=1' : ''); }))};
+        window.runAllTests();

@@ -8,6 +8,7 @@ module.exports = function (grunt, options) {
   // this is needed so we can perform ajax requests to get the contents
   // of these static files from within the coverage report viewer
   statics.use(function (req, res, next) {
+
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', 'X-Requested-With');
 
@@ -19,7 +20,7 @@ module.exports = function (grunt, options) {
     next();
   });
 
-  statics.use(options.baseUri, express.static(options.root));
+  statics.use(options.baseUri, express.static(options.root, { maxAge: 0 }));
   var server = statics.listen(options.staticPort);
 
   server.on('error', function (err) {

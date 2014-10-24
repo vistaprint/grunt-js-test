@@ -8,40 +8,17 @@
 
   // Send messages to the parent phantom.js process via alert! Good times!!
   function sendMessage() {
-    if (window.PHANTOMJS) {
-      var args = [].slice.call(arguments);
+    var args = [].slice.call(arguments);
+    if (window.PHANTOMJS) {      
       alert(JSON.stringify(args));
+    } else if (window.parent !== window) {
+      window.parent.postMessage(JSON.stringify(args), "*");
     }
-  }
-
-  function debounce(func, threshold) {
-    var timeout;
-    return function debounced() {
-      var obj = this;
-      var args = arguments;
-
-      function delayed() {
-        func.apply(obj, args);
-        timeout = null;
-      }
-
-      if (timeout) {
-        clearTimeout(timeout);
-      }
-
-      timeout = setTimeout(delayed, threshold || 100);
-    };
   }
 
   function Reporter(runner) {
     // Setup HTML reporter to output data on the screen
     Mocha.reporters.HTML.apply(this, arguments);
-
-    function fixHeight() { // test, err
-      try {
-        window.parent.fixIframe(window);
-      } catch (ex) {}
-    }
 
     // Create a Grunt listener for each Mocha events
     // start, test, test end, suite, suite end, fail, pass, pending, end
@@ -59,10 +36,8 @@
     // if this test is within a frame, then listen for test results
     // and resize as data is added to make the parent page usable.
     if (window.parent !== window) {
-      runner.on('test end', debounce(fixHeight, 200));
       runner.on('fail', window.parent.reportFailure);
       runner.on('pass', window.parent.reportSuccess);
-      runner.on('end', fixHeight);
     }
 
     // if we are generating coverage reprot data, then we need to
@@ -92,6 +67,10 @@
           data.slow = test.slow;
         }
 
+        if (ev == "end") {
+          data.stats = this.stats;
+        }
+
         sendMessage('mocha.' + ev, data);
       });
     }
@@ -102,10 +81,6 @@
   }
 
   // extend our own Reporter will all the methods of Mocha's HTML reporter
-  // var Klass = function () {};
-  // Klass.prototype = Mocha.reporters.HTML.prototype;
-  // Reporter.prototype = new Klass();
-
   for (var prop in Mocha.reporters.HTML.prototype) {
     Reporter.prototype[prop] = Mocha.reporters.HTML.prototype[prop];
   }

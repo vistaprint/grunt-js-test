@@ -3,13 +3,27 @@
   padding-top: 70px;
 }
 
-iframe {
-	width: 100%;
-	height: 100%;
-	min-height: 100px;
-	border: none;
+#testFrame {
+    width: 100%;
+    height: 0;
+    border: none;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .right {
-	float: right;
+    float: right;
+}
+
+#passing a, #failing a {
+    display: block;
+}
+
+#passing a {
+    color: green;
+}
+
+#failing a {
+    color: red;
 }

@@ -149,7 +149,8 @@ module.exports = function (grunt, options) {
         test: test,
         deps: references.js,
         stylesheets: stylesheets,
-        coverage: coverage
+        coverage: coverage,
+        phantom: req.query.phantom
       });
     };
 

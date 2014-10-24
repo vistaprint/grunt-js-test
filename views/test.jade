@@ -1,13 +1,15 @@
 doctype html
 html(lang='en')
   head
-    title= 'grunt-js-test: ' + test.file
+    title= test.file + ': grunt-js-test'
     meta(charset='utf-8')
     meta(name='viewport', content='width=device-width, initial-scale=1.0')
     meta(name='description', content='')
     meta(name='author', content='')
-    link(rel='stylesheet', href=defaultBaseUri + '/js-test-env/site.css', media='screen')
-    link(rel='stylesheet', href=defaultBaseUri + '/js-test-env/mocha.css', media='screen')
+    - if (!phantom) {
+      link(rel='stylesheet', href=defaultBaseUri + '/js-test-env/site.css', media='screen')
+      link(rel='stylesheet', href=defaultBaseUri + '/js-test-env/mocha.css', media='screen')
+    - }
     base(href=projectBaseUri)
     - for (var i=0; i < stylesheets.length; i++) {
       link(rel='stylesheet', href=stylesheets[i], media='screen')
