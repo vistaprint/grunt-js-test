@@ -36,14 +36,14 @@ module.exports = function (grunt, options, reportDirectory) {
             return;
           }
 
-          instrumenter.instrument(contents.toString(), path.join(options.root, req.path), function (err, instrumentedCode) {
-            if (err) {
+          instrumenter.instrument(contents.toString(), path.join(options.root, req.path), function (err2, instrumentedCode) {
+            if (err2) {
               res.status(500).send({
                 success: false,
                 message: 'Failed to instrument code.'
               });
 
-              grunt.log.error('Failed to instrument code.', err);
+              grunt.log.error('Failed to instrument code.', err2);
             } else {
               res.set('Content-Type', 'text/javascript');
               res.status(200).send(instrumentedCode);

@@ -111,9 +111,9 @@ module.exports = function (grunt, options) {
 
   // run a single test given the index number
   app.get('/test', function (req, res) {
-    var test = _.filter(tests, function (test) {
-      return req.query.js == test.file;
-      // return test.originalUrl == req.path;
+    var test = _.filter(tests, function (t) {
+      return req.query.js == t.file;
+      // return t.originalUrl == req.path;
     });
 
     // if we do not have this test, 404?
@@ -142,10 +142,10 @@ module.exports = function (grunt, options) {
     }());
 
     // render the output of the http request
-    var render = function (injectHTML) {
+    var render = function (injectHTMLPath) {
       res.render('test', {
         modules: moduleName || '',
-        injectHTML: injectHTML,
+        injectHTMLPath: injectHTMLPath,
         test: test,
         deps: references.js,
         stylesheets: stylesheets,
@@ -178,7 +178,7 @@ module.exports = function (grunt, options) {
     if (options.injectServer) {
       var injectUrl = options.injectServer + '?file=' + test.file; // TODO: sanitize the injectUrl
 
-      request(injectUrl, function (err, res, body) {
+      request(injectUrl, function (err, resp, body) {
         if (err) {
           grunt.log.error('Inject server request failed', err);
           if (typeof body !== 'string') {

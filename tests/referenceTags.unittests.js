@@ -12,7 +12,7 @@ describe('<reference> tags', function () {
 		assert(references, [
 			path.join(__dirname, 'something.js'),
 			path.join(__dirname, 'something.html'),
-			path.join(__dirname, 'useless.png'),
+			path.join(__dirname, 'useless.png')
 		]);
 	});
 
@@ -20,7 +20,7 @@ describe('<reference> tags', function () {
 		var references = utils.findReferenceTags(path.join(__dirname, 'referenceTags.example.txt'), '.js');
 		assert(references.length === 1);
 		assert(references, [
-			path.join(__dirname, 'something.js'),
+			path.join(__dirname, 'something.js')
 		]);
 	});
 });

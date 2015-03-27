@@ -126,7 +126,7 @@ module.exports = function (grunt, options) {
       return {
         js: Object.keys(included).map(this.getDependencyUri),
         css: Object.keys(css),
-        html: Object.keys(html),
+        html: Object.keys(html)
       };
     }
 
