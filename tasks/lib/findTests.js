@@ -1,7 +1,6 @@
 'use strict';
 
 // Nodejs libs.
-var fs = require('fs');
 var path = require('path');
 var normalize = require('./normalize');
 

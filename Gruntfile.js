@@ -15,7 +15,7 @@ module.exports = function (grunt) {
         src: [
           'tasks/**/*.js',
           'tests/**/*.js',
-          'Gruntfile.js',
+          'Gruntfile.js'
         ]
       }
     }

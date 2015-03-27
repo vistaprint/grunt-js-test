@@ -16,7 +16,9 @@ module.exports = function (grunt, options, reportDirectory) {
 
     exec(cmd, function (err, stdout, stderr) {
       if (err) {
+		/*eslint-disable no-console */
         console.log(err, stdout, stderr);
+		/*eslint-enable no-console */
       }
 
       grunt.log.ok('JSCover proxy server terminated.');

@@ -83,7 +83,7 @@ module.exports = function (grunt) {
     requirejs: false,               // if your project is requirejs based, set this to true
     modulesRelativeTo: null,        // allows you to override how we determine the module name with its path
 
-    openBrowser: true,              // open web browser automatically when running `js-test-server` task
+    openBrowser: true               // open web browser automatically when running `js-test-server` task
   };
 
   var acceptCLI = function (options) {
@@ -290,15 +290,15 @@ module.exports = function (grunt) {
           grunt.log.error('Failed to generate coverage report.');
         }
 
-        var done = function () {
+        var coverageDone = function () {
           coverageServerClosed = true;
           checkAll();
         };
 
         if (expressApp.coverageServer.close) {
-          expressApp.coverageServer.close(done);
+          expressApp.coverageServer.close(coverageDone);
         } else {
-          done();
+          coverageDone();
         }
       });
     }
