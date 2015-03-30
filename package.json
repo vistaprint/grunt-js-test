@@ -38,14 +38,15 @@
     "test": "mocha tests/*.unittests.js"
   },
   "dependencies": {
+    "body-parser": "^1.6.5",
     "express": "4.x",
     "grunt-mocha": "0.4.x",
+    "istanbul": "^0.3.0",
     "jade": "1.x",
-    "request": "^2.34.0",
     "lodash": "^2.4.1",
-    "body-parser": "^1.6.5",
     "moment": "^2.8.1",
-    "istanbul": "^0.3.0"
+    "phantomjs": "1.9.13",
+    "request": "^2.34.0"
   },
   "peerDependencies": {
     "grunt": "~0.4"
