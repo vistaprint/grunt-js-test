@@ -145,7 +145,7 @@ module.exports = function (grunt, options) {
     var render = function (injectHTMLPath) {
       res.render('test', {
         modules: moduleName || '',
-        injectHTMLPath: injectHTMLPath,
+        injectHTML: injectHTMLPath,
         test: test,
         deps: references.js,
         stylesheets: stylesheets,
