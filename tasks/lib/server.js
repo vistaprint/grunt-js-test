@@ -172,6 +172,7 @@ module.exports = function (grunt, options) {
       injectHTML += fs.readFileSync(test.abs.replace(/\.js$/, '.inject.html'));
     } catch (ex) {
       // no .inject.html exists, most likely, so move on
+      // empty
     }
 
     // if the test has an inject URL, request it and inject it
