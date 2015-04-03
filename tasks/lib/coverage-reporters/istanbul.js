@@ -4,10 +4,15 @@ var fs = require('fs');
 var path = require('path');
 var express = require('express');
 var istanbul = require('istanbul');
+var Minimatch = require('minimatch').Minimatch;
 
 module.exports = function (grunt, options, reportDirectory) {
   var instrumenter = new istanbul.Instrumenter();
   var collector = new istanbul.Collector();
+  var excludeMatch;
+  if (options.istanbul && options.istanbul.excludes) {
+    excludeMatch = new Minimatch(options.istanbul.excludes);
+  }
 
   return {
     start: function () {
@@ -16,8 +21,8 @@ module.exports = function (grunt, options, reportDirectory) {
       app.use(options.baseUri, function (req, res) {
         var file = path.join(options.root, req.path);
 
-        // if we're not requesting a JS file, do not instrunment it
-        if (path.extname(file) != '.js') {
+        // if we're not requesting a JS file, do not instrument it
+        if ((path.extname(file) != '.js') || (excludeMatch && excludeMatch.match(file))) {
           //Allow cross-origin resource requests during testing (e.g. handlebars templates)
           res.header('Access-Control-Allow-Origin', '*');
           res.header('Access-Control-Allow-Headers', 'X-Requested-With');
