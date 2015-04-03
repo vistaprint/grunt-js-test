@@ -45,6 +45,7 @@
     "jade": "1.x",
     "lodash": "^2.4.1",
     "moment": "^2.8.1",
+    "minimatch": "^2.0.4",
     "phantomjs": "1.9.13",
     "request": "^2.34.0"
   },
