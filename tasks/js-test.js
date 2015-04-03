@@ -325,7 +325,9 @@ module.exports = function (grunt) {
         try {
           var exec = require('child_process').exec;
           exec('start "" "http://' + options.hostname + ':' + options.port + '"');
-        } catch (ex) {}
+        } catch (ex) {
+          // empty
+        }
       }
 
       grunt.task.run('js-test-server-keepalive');
