@@ -69,10 +69,12 @@ module.exports = function (grunt, options, reportDirectory) {
       cb(null);
     },
 
-    aggregate: function (cb) {
+    aggregate: function (format, cb) {
       var reporter = new istanbul.Reporter(null, reportDirectory);
 
-      reporter.add('html');
+      // Default to html if no format provided as this was the prior default
+      format = format || 'html';
+      reporter.add(format);
 
       reporter.write(collector, true, function () {
         grunt.verbose.writeln('Generated coverage report to: ' + reportDirectory);

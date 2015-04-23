@@ -47,9 +47,9 @@ module.exports = function (grunt, options) {
     } catch (ex) {
       options.coverageTool = null;
       options.coverage = false;
-      grunt.log.error('Unsupported coverage reporter, disabling coverage.');
+      grunt.log.error('Unsupported coverage reporter, disabling coverage.', ex);
     } finally {
-      app.coverageServer = coverageTool.start();
+      app.coverageServer = coverageTool.start(options.coverageFormat);
     }
   }
 
@@ -82,8 +82,8 @@ module.exports = function (grunt, options) {
     });
   });
 
-  app.saveCoverageReport = function (cb) {
-    coverageTool.aggregate(function (err) {
+  app.saveCoverageReport = function (format, cb) {
+    coverageTool.aggregate(format, function (err) {
       cb(err);
     });
   };

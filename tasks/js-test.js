@@ -285,7 +285,7 @@ module.exports = function (grunt) {
     if (options.coverage) {
       grunt.log.writeln('Generating coverage report.');
 
-      expressApp.saveCoverageReport(function (err) {
+      expressApp.saveCoverageReport(options.coverageFormat, function (err) {
         if (err) {
           grunt.log.error('Failed to generate coverage report.');
         }
