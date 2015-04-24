@@ -44,8 +44,8 @@
     "istanbul": "^0.3.0",
     "jade": "1.x",
     "lodash": "^2.4.1",
-    "moment": "^2.8.1",
     "minimatch": "^2.0.4",
+    "moment": "^2.8.1",
     "phantomjs": "1.9.13",
     "request": "^2.34.0"
   },
@@ -53,6 +53,7 @@
     "grunt": "~0.4"
   },
   "devDependencies": {
-    "grunt-eslint": ">=0.6.0"
+    "grunt-eslint": ">=0.6.0",
+    "minimatch": "^2.0.4"
   }
 }
