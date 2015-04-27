@@ -7,9 +7,12 @@ var request = require('request');
 var _ = require('lodash');
 
 module.exports = function (grunt, options, reportDirectory) {
-  var startCoverageServer = function () {
+  var startCoverageServer = function (format) {
     // start the jscover proxy server
-    var cmd = 'java -jar "' + path.join(__dirname, 'jscover/JSCover-all.jar') + '" -ws --proxy --port=3128';
+    var cmd = 'java -jar "' + path.join(__dirname, 'jscover/jscover-all.jar') + '" -ws --proxy --port=3128';
+    if (format) {
+      cmd += ' --format=' + format;
+    }
     var exec = require('child_process').exec;
 
     grunt.log.ok('JSCover proxy server started.');
@@ -50,7 +53,7 @@ module.exports = function (grunt, options, reportDirectory) {
       cb(null);
     },
 
-    aggregate: function (cb) {
+    aggregate: function (format, cb) {
       fs.writeFile(path.join(reportDirectory, 'jscover.json'), JSON.stringify(collector), cb);
     }
   };
