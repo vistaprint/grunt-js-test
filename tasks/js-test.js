@@ -340,12 +340,8 @@ module.exports = function (grunt) {
         }
       }
 
-      grunt.task.run('js-test-server-keepalive');
-      done();
+      // We do not call done, to keep the server away (keepalive)
+      // done();
     });
-  });
-
-  grunt.registerTask('js-test-server-keepalive', 'Keep server running', function () {
-    this.async();
   });
 };
