@@ -1,6 +1,6 @@
 /*
  * grunt-js-test
- * https://github.com/benhutchins/grunt-js-test
+ * https://github.com/vistaprint/grunt-js-test
  */
 
 'use strict';
@@ -9,18 +9,18 @@
 var _             = require('lodash');
 var path          = require('path');
 
+var EventEmitter  = require('events').EventEmitter;
+var reporters     = require('mocha').reporters;
+
 // Helpers.
 var findTests  = require('./lib/findTests');
 var normalize  = require('./lib/normalize');
+var helpers    = require('./lib/mocha-helpers');
 
 module.exports = function (grunt) {
-  grunt.loadTasks(path.join(__dirname, '../node_modules/grunt-mocha/tasks'));
-
   // express server app, loaded from lib/server.js within startServer
-  var server, expressApp;
-
   var startServer = function (options, done) {
-    expressApp = require(path.resolve(__dirname, 'lib', 'server.js'))(grunt, options);
+    var expressApp = require(path.resolve(__dirname, 'lib', 'server.js'))(grunt, options);
 
     var args = [
       options.port,
@@ -28,7 +28,7 @@ module.exports = function (grunt) {
         grunt.verbose.writeln('  Web server started on port:' + options.port + (options.hostname ? ', hostname: ' + options.hostname : ', no hostname specified') + ' [pid: ' + process.pid + ']');
 
         if (done) {
-          done();
+          done(server, expressApp);
         }
       }
     ];
@@ -38,7 +38,7 @@ module.exports = function (grunt) {
       args.splice(1, 0, options.hostname);
     }
 
-    server = expressApp.listen.apply(expressApp, args);
+    var server = expressApp.listen.apply(expressApp, args);
     server.timeout = options.serverTimeout;
   };
 
@@ -62,7 +62,7 @@ module.exports = function (grunt) {
     serverTimeout: 1000,            // timeout for http connections to servers
 
     // unit testing service options
-    mocha: {},                      // grunt-mocha overrides
+    timeout: 20000,                 // grunt-mocha overrides
     reporter: 'Spec',               // mocha reporter to use
 
     // coverage reporting options
@@ -86,7 +86,16 @@ module.exports = function (grunt) {
     openBrowser: true               // open web browser automatically when running `js-test-server` task
   };
 
-  var acceptCLI = function (options) {
+  var normalizeOptions = function (target) {
+    var options = _.extend(
+      {},
+      defaults,
+      grunt.config.get('js-test.options') || {},
+      grunt.config.get('js-test.' + target + '.options')
+    );
+
+    // process and accept CLI arguments are options
+
     // --coverage
     var coverage = grunt.option('coverage');
     if (coverage !== undefined) {
@@ -130,6 +139,8 @@ module.exports = function (grunt) {
     if (grunt.option('noopen')) {
       options.openBrowser = false;
     }
+
+    return options;
   };
 
   // run all the tests (or a single test, if the --file argument is used)
@@ -138,25 +149,10 @@ module.exports = function (grunt) {
     var taskComplete = this.async();
 
     // standardize the options
-    var options = _.extend(
-      {},
-      defaults,
-      grunt.config.get('js-test.options') || {},
-      grunt.config.get('js-test.' + target + '.options')
-    );
+    var options = normalizeOptions(target);
 
-    // accept CLI options to change options
-    acceptCLI(options);
-
-    startServer(options, function () {
-      var mochaConfig = _.extend({}, {
-        urls: ['test/*.unittests.html'], // this is a dummy, it's overridden below
-        inject: null, // we disable grunt-mocha's phantom-bridge, we implement our own in /view/deps/shared.js
-        reporter: options.reporter,
-        timeout: 20000,
-        run: false // default will be changing in grunt-mocha >= 0.5
-      }, options.mocha || {});
-
+    // start web server that serves test pages
+    startServer(options, function (server, expressApp) {
       var tests = findTests(grunt, options);
 
       // list all tests found when --verbose is provided
@@ -201,121 +197,136 @@ module.exports = function (grunt) {
         });
       }
 
-      // set the config for mocha passing the correct URLs to be used
-      mochaConfig.urls = tests.map(function (test) {
-        var url = 'http://' + options.hostname + ':' + options.port + test.url;
-
-        // if we're generating coverage data, let the server know specifically we want to do it right now
-        if (options.coverage) {
-          url += '&coverage=1';
-        }
-
-        // if there are extra query string arguments to add, add them
-        if (options.injectQueryString) {
-          url += '&' + options.injectQueryString;
-        }
-
-        url += '&phantom=1';
-
-        return url;
-      });
-
-      // option: bail - exit on first error found
-      if (options.bail) {
-        mochaConfig.bail = true;
-      }
-
       // option: send over console messages
       if (options.log) {
-        grunt.verbose.writeln('Enabling console.log within phantomjs.');
-
-        // log console.log messages
-        mochaConfig.log = true;
-
-        // log javascript errors
-        mochaConfig.logErrors = true;
+        grunt.verbose.writeln('Enabling console.log within phantomjs because `log` is enabled.');
+        options.logErrors = true;
       }
 
-      grunt.config.set('mocha.grunt-js-test', {
-        options: mochaConfig
-      });
+      // Setup phantomjs
+      var phantomjs = require('./lib/phantomjs')(grunt, options);
 
-      grunt.task.run(['mocha:grunt-js-test', 'js-test-save']);
+      // Combine any specified URLs with src files. @see http://gruntjs.com/api/inside-tasks#this.filessrc
+      // grunt.log.writeln('this.filesSrc', this.filesSrc);
 
-      taskComplete();
-    });
-  });
+      // Remember all stats from all tests
+      var testStats = [];
 
-  grunt.registerTask('js-test-save', 'Runs after completing tests from `js-test` to generate a coverage report.', function (target) {
-    var options = _.extend(
-      {},
-      defaults,
-      grunt.config.get('js-test.options') || {},
-      grunt.config.get('js-test.' + target + '.options')
-    );
+      // Process each filepath in-order.
+      grunt.util.async.forEachSeries(tests, function (test, next) {
+        grunt.log.writeln('Test ' + test.file);
 
-    acceptCLI(options);
+        // create a new mocha runner façade
+        var runner = new EventEmitter();
+        phantomjs.phantomjsEventManager.add(test.file, runner);
 
-    var done = this.async();
+        // Clear runner event listener when test is over
+        runner.on('end', function() {
+          phantomjs.phantomjsEventManager.remove(test.file);
+        });
 
-    // js-test runs three web servers, we need to close them all
-    var serverClosed = false;
-    var staticServerClosed = false;
-    var coverageServerClosed = options.coverage ? false : true;
-
-    // once a single server has closed, check to see if the others are closed as well, if so, complete task
-    var checkAll = function () {
-      if (serverClosed && staticServerClosed && coverageServerClosed) {
-        // task can now be considered done
-        done();
-      }
-    };
-
-    server.close(function () {
-      serverClosed = true;
-      checkAll();
-    });
-
-    expressApp.staticServer.close(function () {
-      staticServerClosed = true;
-      checkAll();
-    });
-
-    // now save the coverage report data if we should
-    if (options.coverage) {
-      grunt.log.writeln('Generating coverage report.');
-
-      expressApp.saveCoverageReport(options.coverageFormat, function (err) {
-        if (err) {
-          grunt.log.error('Failed to generate coverage report.');
-        }
-
-        var coverageDone = function () {
-          coverageServerClosed = true;
-          checkAll();
-        };
-
-        if (expressApp.coverageServer.close) {
-          expressApp.coverageServer.close(coverageDone);
+        // Set Mocha reporter
+        var Reporter = null;
+        if (reporters[options.reporter]) {
+          Reporter = reporters[options.reporter];
         } else {
-          coverageDone();
+          // Resolve external reporter module
+          var externalReporter;
+          try {
+            externalReporter = require.resolve(options.reporter);
+          } catch (e) {
+            // Resolve to local path
+            externalReporter = path.resolve(options.reporter);
+          }
+
+          if (externalReporter) {
+            try {
+              Reporter = require(externalReporter);
+            }
+            catch (e) {
+              // empty, handled below
+            }
+          }
+        }
+
+        if (Reporter === null) {
+          grunt.fatal('Specified reporter is unknown or unresolvable: ' + options.reporter);
+        }
+
+        new Reporter(runner);
+
+        // Launch PhantomJS.
+        phantomjs.spawn(test.url, {
+          // Exit code to use if PhantomJS fails in an uncatchable way.
+          failCode: 90,
+          // Explicitly set a killTimeout, because grunt-lib-phantomjs is broken currently
+          killTimeout: 5000,
+          // Pass the options needed to PhantomJS child process
+          options: {
+            timeout: options.timeout,
+            phantomScript: path.join(__dirname, 'lib', 'phantomjs-main.js')
+          },
+          // Do stuff when done.
+          done: function(err) {
+            var stats = runner.stats;
+            testStats.push(stats);
+
+            if (err) {
+              // If there was a PhantomJS error, abort the series.
+              grunt.fatal(err);
+              taskComplete(false);
+            } else {
+              // If unit tests failures, show notice
+              if (stats.failures > 0) {
+                var reduced = helpers.reduceStats([stats]);
+                var failMsg = reduced.failures + '/' + reduced.tests + ' tests failed (' + reduced.duration + 's)';
+
+                // Bail tests if bail option is true
+                if (options.bail) {
+                  grunt.warn(failMsg);
+                } else {
+                  grunt.log.error(failMsg);
+                }
+              }
+
+              // Process next file/url
+              next();
+            }
+          }
+        });
+      },
+      // All tests have been run.
+      function () {
+        var stats = helpers.reduceStats(testStats);
+
+        if (stats.failures === 0) {
+          grunt.log.ok(stats.tests + ' passed!' + ' (' + stats.duration + 's)');
+
+          // Async test pass
+          require('./lib/save')(grunt, server, expressApp, options, taskComplete);
+        } else {
+          var failMsg = stats.failures + '/' + stats.tests + ' tests failed (' + stats.duration + 's)';
+
+          // Bail tests if bail option is true
+          if (options.bail) {
+            grunt.warn(failMsg);
+          } else {
+            grunt.log.error(failMsg);
+          }
+
+          // Async test fail
+          taskComplete(false);
         }
       });
-    }
+    });
   });
 
   // start the grunt-js-test web server with keepalive
   grunt.registerTask('js-test-server', 'Start server with keepalive.', function (target) {
-    var options = _.extend(
-      {},
-      defaults,
-      grunt.config.get('js-test.options') || {},
-      grunt.config.get('js-test.' + target + '.options')
-    );
+    var options = normalizeOptions(target);
 
-    acceptCLI(options);
-
-    var done = this.async();
+    // var done = this.async();
+    this.async();
 
     startServer(options, function () {
       grunt.log.writeln('grunt-js-test web server available at http://' + options.hostname + ':' + options.port + '/');

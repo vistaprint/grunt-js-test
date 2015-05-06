@@ -55,9 +55,24 @@ module.exports = function findTests(grunt, options) {
     }
   }).map(function (file) {
     var abs = path.join(options.root, file);
+    var uri = '/test?js=' + file;
+    var url = 'http://' + options.hostname + ':' + options.port + uri;
+
+    // if we're generating coverage data, let the server know specifically we want to do it right now
+    if (options.coverage) {
+      url += '&coverage=1';
+    }
+
+    // if there are extra query string arguments to add, add them
+    if (options.injectQueryString) {
+      url += '&' + options.injectQueryString;
+    }
+
+    url += '&phantom=1';
 
     return {
-      url: '/test?js=' + file,
+      uri: uri,
+      url: url,
       file: file,
       filename: path.basename(file),
       dir: path.dirname(abs),
