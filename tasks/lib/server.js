@@ -4,10 +4,10 @@
 var fs = require('fs');
 var path = require('path');
 
+var _ = require('lodash');
 var express = require('express');
 var bodyParser = require('body-parser');
 var request = require('request');
-var _ = require('lodash');
 
 var app = express();
 
@@ -19,6 +19,7 @@ app.use(bodyParser.text({ limit: '200mb' }));
 
 // proxy static js-test-env javascript files
 app.use('/js-test-env', express.static(path.join(__dirname, '..', '..', 'views', 'deps')));
+app.use('/js-test-env/mocha', express.static(path.join(__dirname, '..', '..', 'node_modules', 'mocha')));
 
 module.exports = function (grunt, options) {
   var tests = require('./findTests')(grunt, options);
