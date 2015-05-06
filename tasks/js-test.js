@@ -325,7 +325,7 @@ module.exports = function (grunt) {
         var command = null;
 
         if (process.platform == 'win32') {
-          command = 'start';
+          command = 'start ""';
         } else if (process.platform == 'darwin') {
           command = 'open';
         }
@@ -333,7 +333,7 @@ module.exports = function (grunt) {
         if (command !== null) {
           try {
             var exec = require('child_process').exec;
-            exec(command + ' "" "http://' + options.hostname + ':' + options.port + '"');
+            exec(command + ' "http://' + options.hostname + ':' + options.port + '"');
           } catch (ex) {
             // empty
           }
