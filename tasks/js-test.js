@@ -321,12 +321,22 @@ module.exports = function (grunt) {
       grunt.log.writeln('grunt-js-test web server available at http://' + options.hostname + ':' + options.port + '/');
 
       // attempt to open a web browser
-      if (options.openBrowser && process.platform == 'win32') {
-        try {
-          var exec = require('child_process').exec;
-          exec('start "" "http://' + options.hostname + ':' + options.port + '"');
-        } catch (ex) {
-          // empty
+      if (options.openBrowser) {
+        var command = null;
+
+        if (process.platform == 'win32') {
+          command = 'start ""';
+        } else if (process.platform == 'darwin') {
+          command = 'open';
+        }
+
+        if (command !== null) {
+          try {
+            var exec = require('child_process').exec;
+            exec(command + ' "http://' + options.hostname + ':' + options.port + '"');
+          } catch (ex) {
+            // empty
+          }
         }
       }
 
