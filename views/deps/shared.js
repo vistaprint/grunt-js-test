@@ -1,4 +1,4 @@
-/* global chai:true, document:true, mocha:true, mochaPhantomJS: true */
+/* global chai:true, document:true, mocha:true, mochaPhantomJS:true */
 
 (function (window) {
   'use strict';
@@ -46,15 +46,15 @@
       runner.on('end', function () {
         // save coverage data to server, on complete, let phantom know the tests are over
         saveCoverageDataToServer(function () {
-          sendMessage('mocha.end');
+          createGruntListener('mocha.end')();
         });
       });
     } else {
       events.push('end');
     }
 
-    function createGruntListener(ev, runner) {
-      runner.on(ev, function (test, err) {
+    function createGruntListener(ev) {
+      return function (test, err) {
         var data = {
           err: err
         };
@@ -72,11 +72,11 @@
         }
 
         sendMessage('mocha.' + ev, data);
-      });
+      };
     }
 
     for (var i = 0; i < events.length; i++) {
-      createGruntListener(events[i], runner);
+      runner.on(events[i], createGruntListener(events[i]));
     }
   }
 
