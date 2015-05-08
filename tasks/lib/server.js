@@ -19,7 +19,8 @@ app.use(bodyParser.text({ limit: '200mb' }));
 
 // proxy static js-test-env javascript files
 app.use('/js-test-env', express.static(path.join(__dirname, '..', '..', 'views', 'deps')));
-app.use('/js-test-env/mocha', express.static(path.join(__dirname, '..', '..', 'node_modules', 'mocha')));
+app.use('/js-test-env/mocha', express.static(path.dirname(require.resolve('mocha'))));
+// more static inclusions occur below, based on options
 
 module.exports = function (grunt, options) {
   var tests = require('./findTests')(grunt, options);
@@ -35,6 +36,14 @@ module.exports = function (grunt, options) {
     res.locals.projectBaseUri = '//' + req.hostname + ':' + (res.locals.coverage ? options.coverageProxyPort : options.staticPort) + '/';
     next();
   });
+
+  // chai and sinon static file handlers
+  if (options.includeChai !== false) {
+    app.use('/js-test-env/chai', express.static(path.dirname(require.resolve('chai'))));
+  }
+  if (options.includeSinon !== false) {
+    app.use('/js-test-env/sinon', express.static(path.dirname(require.resolve('sinon'), 'pkg')));
+  }
 
   // start static file server
   app.staticServer = require('./staticServer')(grunt, options);

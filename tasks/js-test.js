@@ -64,6 +64,8 @@ module.exports = function (grunt) {
     // unit testing service options
     timeout: 20000,                 // grunt-mocha overrides
     reporter: 'Spec',               // mocha reporter to use
+    includeChai: true,
+    includeSinon: true,
 
     // coverage reporting options
     coverage: false,                // should we generate coverage reports (slows down tests)

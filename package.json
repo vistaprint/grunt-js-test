@@ -39,16 +39,18 @@
   },
   "dependencies": {
     "body-parser": "^1.6.5",
+    "chai": "*",
     "express": "4.x",
     "grunt-lib-phantomjs": "^0.7.0",
     "istanbul": "^0.3.0",
     "jade": "1.x",
     "lodash": "^2.4.1",
     "minimatch": "^2.0.4",
-    "phantomjs": "1.9.13",
-    "mocha": "^2.2.4",
+    "mocha": ">=1.4",
     "moment": "^2.8.1",
-    "request": "^2.34.0"
+    "phantomjs": "1.9.13",
+    "request": "^2.34.0",
+    "sinon": "*"
   },
   "peerDependencies": {
     "grunt": "~0.4"
