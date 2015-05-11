@@ -8,7 +8,7 @@ html(lang='en')
     meta(name='author', content='')
     - if (!phantom) {
       link(rel='stylesheet', href=defaultBaseUri + '/js-test-env/site.css', media='screen')
-      link(rel='stylesheet', href=defaultBaseUri + '/js-test-env/mocha.css', media='screen')
+      link(rel='stylesheet', href=defaultBaseUri + '/js-test-env/mocha/mocha.css', media='screen')
     - }
     base(href=projectBaseUri)
     - for (var i=0; i < stylesheets.length; i++) {
@@ -19,8 +19,12 @@ html(lang='en')
 
     //- global deps
     script(src=defaultBaseUri + '/js-test-env/mocha/mocha.js')
-    script(src=defaultBaseUri + '/js-test-env/chai.js')
-    script(src=defaultBaseUri + '/js-test-env/sinon.js')
+    - if (options.includeChai !== false) {
+      script(src=defaultBaseUri + '/js-test-env/chai/chai.js')
+    - }
+    - if (options.includeSinon !== false) {
+      script(src=defaultBaseUri + '/js-test-env/sinon/sinon.js')
+    - }
     - if (coverage && options.coverageTool == 'jscover') {
       script(src=defaultBaseUri + '/js-test-env/jscoverage.head.js')
       - if (coverageData) {

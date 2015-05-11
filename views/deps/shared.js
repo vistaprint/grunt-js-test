@@ -117,8 +117,11 @@
   // mocha.checkLeaks();
 
   window.addEventListener('load', function () {
-    window.assert = chai.assert;
-    window.expect = chai.expect;
+    // make quick-access variables for assert and expect if Chai is available
+    if (typeof window.chai !== 'undefined') { 
+      window.assert = chai.assert;
+      window.expect = chai.expect;
+    }
 
     // if this is not a require.js test, then run mocha on page load
     if (document.body.getAttribute('data-modules') == '') {
