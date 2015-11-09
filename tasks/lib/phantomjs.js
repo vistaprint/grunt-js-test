@@ -23,8 +23,13 @@ module.exports = function (grunt, options) {
       var name, fullTitle, slow, err;
       var evt = this.event.replace('mocha.', '');
 
+      if (evt == 'suite end' && suites.length <= 1) {
+        evt = 'end';
+      }
+
       if (evt === 'end') {
         phantomjs.halt();
+        evt = 'end';
       }
 
       // Expand test values (and façace the Mocha test object)
@@ -46,7 +51,7 @@ module.exports = function (grunt, options) {
 
       if (evt === 'suite') {
           suites.push(test);
-      } else if (evt === 'suite end') {
+      } else if (evt === 'suite end' || evt === 'end') {
           suites.pop(test);
       }
 
