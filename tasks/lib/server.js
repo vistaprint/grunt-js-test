@@ -41,8 +41,12 @@ module.exports = function (grunt, options) {
   if (options.includeChai !== false) {
     app.use('/js-test-env/chai', express.static(path.dirname(require.resolve('chai'))));
   }
+
   if (options.includeSinon !== false) {
-    app.use('/js-test-env/sinon', express.static(path.dirname(require.resolve('sinon'), 'pkg')));
+    // Sinon's default script is for CommonJS/AMD. 
+    // A browser package is available in the pkg directory.
+    var sinonPhysicalPath = path.join(require.resolve('sinon'), '../../pkg/');
+    app.use('/js-test-env/sinon', express.static(sinonPhysicalPath));
   }
 
   // start static file server
