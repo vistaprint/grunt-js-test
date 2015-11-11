@@ -55,6 +55,7 @@
     "grunt": "~0.4"
   },
   "devDependencies": {
-    "grunt-eslint": ">=0.6.0"
+    "grunt-eslint": ">=0.6.0",
+    "grunt": "~0.4"
   }
 }
