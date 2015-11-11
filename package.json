@@ -17,7 +17,7 @@
     "url": "https://github.com/vistaprint/grunt-js-test/issues",
     "email": "js-test-env@vistaprint.com"
   },
-  "license": "",
+  "license": "Apache2",
   "author": "Vistaprint (https://www.vistaprint.com/)",
   "contributors": [
     "Benjamin Hutchins <ben@hutchins.co> (https://github.com/benhutchins/)"
@@ -55,7 +55,8 @@
     "grunt": "~0.4"
   },
   "devDependencies": {
-    "grunt-eslint": ">=0.6.0",
+    "grunt-eslint": "^17.3.1",
     "grunt": "~0.4"
-  }
+  },
+  "license": "Apache-2.0"
 }

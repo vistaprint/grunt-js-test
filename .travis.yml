@@ -2,7 +2,7 @@ language: node_js
 node_js:
   - "0.10"
 before_script:
-  - npm install --dev
+  - npm install --only=dev
   - npm install grunt-cli -g
 script: grunt --verbose
 sudo: false
