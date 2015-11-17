@@ -46,7 +46,7 @@
       runner.on('end', function () {
         // save coverage data to server, on complete, let phantom know the tests are over
         saveCoverageDataToServer(function () {
-          createGruntListener('mocha.end')();
+          createGruntListener('end')();
         });
       });
     } else {
@@ -67,7 +67,7 @@
           data.slow = test.slow;
         }
 
-        if (ev == "end") {
+        if (ev == "suite end") {
           data.stats = this.stats;
         }
 
