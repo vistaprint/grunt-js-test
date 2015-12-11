@@ -27,22 +27,28 @@ function reportFailure() {
 	}
 
 	this.runAllTests = function() {
+		var failures = 0;
 		window.addEventListener('message', function(message) {
 			var data = JSON.parse(message.data);
 			var event = data[0];
-			if (event == 'mocha.end') {
+			if (event == 'mocha.suite end') {
 				var stats = data[1].stats;
+				failures += stats.failures;
+			}
+			if (event == 'mocha.end') {
 				var $testLink = $('<a>', { 
 					html: currentTestUrl, 
 					href: currentTestUrl,
 					target: 'blank'
 				});
-				if (stats.failures > 0) {
+
+				if (failures > 0) {
 					$testLink.appendTo('#failing');
+					failures = 0;
 				} else {
 					$testLink.appendTo('#passing');
 				}
-
+	
 				nextTest();
 			}	
 			if (event == 'mocha.fail') {
