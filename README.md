@@ -249,11 +249,13 @@ Default: `8983`
 
 Port used for proxy web server that instruments your JavaScript files for code coverage reporting. Should never have to change this unless something else uses this port.
 
-#### mocha
+#### phantomOptions
 Type: `Object`
-Default: `{}`
+Default: `phantomOptions: {
+            timeout: 20000
+          }`
 
-Object of options to pass to the [grunt-mocha](https://github.com/kmiyashiro/grunt-mocha/) task. Hopefully you never need to override anything here.
+Object of options to pass to [PhantomJS](http://phantomjs.org/api/command-line.html)
 
 #### reporter
 Type: `String`

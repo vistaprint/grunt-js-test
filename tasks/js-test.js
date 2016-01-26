@@ -62,10 +62,14 @@ module.exports = function (grunt) {
     serverTimeout: 1000,            // timeout for http connections to servers
 
     // unit testing service options
-    timeout: 20000,                 // grunt-mocha overrides
     reporter: 'Spec',               // mocha reporter to use
     includeChai: true,
     includeSinon: true,
+
+    // phantom js options
+    phantomOptions: {
+      timeout: 20000
+    },
 
     // coverage reporting options
     coverage: false,                // should we generate coverage reports (slows down tests)
@@ -264,10 +268,9 @@ module.exports = function (grunt) {
           // Explicitly set a killTimeout, because grunt-lib-phantomjs is broken currently
           killTimeout: 5000,
           // Pass the options needed to PhantomJS child process
-          options: {
-            timeout: options.timeout,
+          options: _.extend({}, options.phantomOptions, {
             phantomScript: path.join(__dirname, 'lib', 'phantomjs-main.js')
-          },
+          }),
           // Do stuff when done.
           done: function(err) {
             var stats = runner.stats;
