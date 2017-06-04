@@ -24,7 +24,7 @@ A few simple example projects are available in the [examples](https://github.com
 
 ### Write your tests
 
-Tests are loaded already wrapped up including [Mocha](http://visionmedia.github.io/mocha/), [Chai](http://chaijs.com/) and [Sinon](http://sinonjs.org/). This means you are good to start writing tests immediately.
+Tests are loaded already wrapped up including [Mocha](http://mochajs.org/), [Chai](http://chaijs.com/) and [Sinon](http://sinonjs.org/). This means you are good to start writing tests immediately.
 
 A simple example unit test using Mocha:
 
@@ -263,7 +263,7 @@ Default: `Spec`
 
 Mocha reporter used by `js-test` when reporting to the console.
 
-Supported reporters are Spec, `Nyan`, `XUnit`, `Dot`, `List`, `Progress`, `JSON`, `Min` and `Doc`. For a more complete list, see [Mocha reporters](http://visionmedia.github.io/mocha/#reporters). The reporter value is case sensitive. `Min` and `Dot` are very helpful when debugging a failing test.
+Supported reporters are Spec, `Nyan`, `XUnit`, `Dot`, `List`, `Progress`, `JSON`, `Min` and `Doc`. For a more complete list, see [Mocha reporters](http://mochajs.org/#reporters). The reporter value is case sensitive. `Min` and `Dot` are very helpful when debugging a failing test.
 
 #### coverage
 Type: `Boolean`
