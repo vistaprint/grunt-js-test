@@ -8,7 +8,6 @@ module.exports = function (grunt) {
 
     eslint: {
       options: {
-        config: 'eslint.json',
         format: 'compact'
       },
       'default': {

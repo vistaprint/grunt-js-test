@@ -85,7 +85,7 @@ page.onAlert = function(str) {
   // Unless there's a parse error. Then, complain.
   try {
     sendMessage(JSON.parse(str));
-  } catch(err) {
+  } catch (err) {
     sendMessage('error.invalidJSON', str);
   }
 };

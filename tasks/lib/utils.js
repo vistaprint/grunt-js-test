@@ -81,6 +81,8 @@ module.exports = function (grunt, options) {
           } else if (ext === '.js') {
             return true;
           }
+
+          return false;
         }).map(normalize);
       }.bind(this);
 

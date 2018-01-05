@@ -77,7 +77,7 @@ module.exports = function (grunt, options) {
     // we need data to write to the file
     if (!req.body) {
       grunt.log.error('No Coverage JSON data provided in POST, should never happen.');
-      return res.status(500).send('No JSON data provided.');
+      res.status(500).send('No JSON data provided.');
     }
 
     if (!createdCoverageReportDirectory) {
@@ -207,6 +207,8 @@ module.exports = function (grunt, options) {
       // no inject url, so we have all the inject HTML we need, most tests go here, just render the response
       render(injectHTML);
     }
+
+    return null;
   });
 
   return app;
