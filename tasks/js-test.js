@@ -209,9 +209,10 @@ module.exports = function (grunt) {
         options.logErrors = true;
       }
 
-      // Setup phantomjs
-      var phantomjs = require('./lib/phantomjs')(grunt, options);
+      // Setup chrome
+      var puppeteer = require('puppeteer');
 
+      
       // Combine any specified URLs with src files. @see http://gruntjs.com/api/inside-tasks#this.filessrc
       // grunt.log.writeln('this.filesSrc', this.filesSrc);
 
@@ -223,13 +224,13 @@ module.exports = function (grunt) {
         grunt.log.writeln('Test ' + test.file);
 
         // create a new mocha runner façade
-        var runner = new EventEmitter();
-        phantomjs.phantomjsEventManager.add(test.file, runner);
+        //var runner = new EventEmitter();
+        //phantomjs.phantomjsEventManager.add(test.file, runner);
 
         // Clear runner event listener when test is over
-        runner.on('end', function() {
-          phantomjs.phantomjsEventManager.remove(test.file);
-        });
+        // runner.on('end', function() {
+        //   phantomjs.phantomjsEventManager.remove(test.file);
+        // });
 
         // Set Mocha reporter
         var Reporter = null;
@@ -259,46 +260,66 @@ module.exports = function (grunt) {
           grunt.fatal('Specified reporter is unknown or unresolvable: ' + options.reporter);
         }
 
-        new Reporter(runner);
+        //new Reporter(runner);
+
+        var browser;
+
+        puppeteer.launch()
+          .then(function(b) {
+            browser = b;
+            return browser.newPage();
+          })
+          .then(function(page) {
+            return page.goto(test.url);
+          })
+          .then(function() {
+            grunt.log.writeln('loaded: ' + test.url);
+            return browser.close();
+          })
+          .then(function(browser) {
+            grunt.log.writeln('closed');
+            taskComplete(true);
+            next();
+          })
 
         // Launch PhantomJS.
-        phantomjs.spawn(test.url, {
-          // Exit code to use if PhantomJS fails in an uncatchable way.
-          failCode: 90,
-          // Explicitly set a killTimeout, because grunt-lib-phantomjs is broken currently
-          killTimeout: 5000,
-          // Pass the options needed to PhantomJS child process
-          options: _.extend({}, options.phantomOptions, {
-            phantomScript: path.join(__dirname, 'lib', 'phantomjs-main.js')
-          }),
-          // Do stuff when done.
-          done: function(err) {
-            var stats = runner.stats;
-            testStats.push(stats);
+        // phantomjs.spawn(test.url, {
+        //   // Exit code to use if PhantomJS fails in an uncatchable way.
+        //   failCode: 90,
+        //   // Explicitly set a killTimeout, because grunt-lib-phantomjs is broken currently
+        //   killTimeout: 5000,
+        //   // Pass the options needed to PhantomJS child process
+        //   options: _.extend({}, options.phantomOptions, {
+        //     phantomScript: path.join(__dirname, 'lib', 'phantomjs-main.js')
+        //   }),
+        //   // Do stuff when done.
+        //   done: function(err) {
+        //     var stats = runner.stats;
+        //     testStats.push(stats);
 
-            if (err) {
-              // If there was a PhantomJS error, abort the series.
-              grunt.fatal(err);
-              taskComplete(false);
-            } else {
-              // If unit tests failures, show notice
-              if (stats.failures > 0) {
-                var reduced = helpers.reduceStats([stats]);
-                var failMsg = reduced.failures + '/' + reduced.tests + ' tests failed (' + reduced.duration + 's)';
+        //     if (err) {
+        //       // If there was a PhantomJS error, abort the series.
+        //       grunt.fatal(err);
+        //       taskComplete(false);
+        //     } else {
+        //       // If unit tests failures, show notice
+        //       if (stats.failures > 0) {
+        //         var reduced = helpers.reduceStats([stats]);
+        //         var failMsg = reduced.failures + '/' + reduced.tests + ' tests failed (' + reduced.duration + 's)';
 
-                // Bail tests if bail option is true
-                if (options.bail) {
-                  grunt.warn(failMsg);
-                } else {
-                  grunt.log.error(failMsg);
-                }
-              }
+        //         // Bail tests if bail option is true
+        //         if (options.bail) {
+        //           grunt.warn(failMsg);
+        //         } else {
+        //           grunt.log.error(failMsg);
+        //         }
+        //       }
 
-              // Process next file/url
-              next();
-            }
-          }
-        });
+        //       // Process next file/url
+        //       next();
+        //     }
+        //   }
+        // });
       },
       // All tests have been run.
       function () {
