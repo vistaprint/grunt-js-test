@@ -20,7 +20,7 @@ module.exports = function (grunt) {
     },
     'js-test': {
       options: {
-          pattern: 'tests/*.unittests.js',
+          pattern: 'tests/*.browser.unittests.js',
           mocha: { 
               timeout: 6000
           }

@@ -264,7 +264,7 @@ module.exports = function (grunt) {
 
         var browser;
 
-        puppeteer.launch()
+        puppeteer.launch({ headless: false })
           .then(function(b) {
             browser = b;
             return browser.newPage();
