@@ -25,6 +25,8 @@ html(lang='en')
     - if (options.includeSinon !== false) {
       script(src=defaultBaseUri + '/js-test-env/sinon/sinon.js')
     - }
+    script mocha.setup('bdd');
+    script 
     - if (coverage && options.coverageTool == 'jscover') {
       script(src=defaultBaseUri + '/js-test-env/jscoverage.head.js')
       - if (coverageData) {
@@ -33,7 +35,6 @@ html(lang='en')
           window._$jscoverage = restoreCoverageData(document.getElementById('coverageData').innerHTML);
       - }
     - }
-    script(src=defaultBaseUri + '/js-test-env/shared.js')
 
     //- Inject HTML
     - if (injectHTML) {
@@ -51,3 +52,6 @@ html(lang='en')
     - for (var i=0; i<deps.length; i++) {
       script(src=deps[i])
     - }
+
+    script mocha.run();
+

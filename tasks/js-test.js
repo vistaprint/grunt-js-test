@@ -220,94 +220,44 @@ module.exports = function (grunt) {
 
       // Process each filepath in-order.
       grunt.util.async.forEachSeries(tests, function (test, next) {
-        grunt.log.writeln('Test ' + test.file);
+        grunt.log.write('Testing ' + test.file + '...');
+        
+        var cfg = {
+          file: test.url,
+          reporter: options.reporter,
+          timeout: 5000
+        };
 
-        // create a new mocha runner façade
-        var runner = new EventEmitter();
-        //phantomjs.phantomjsEventManager.add(test.file, runner);
-
-        // Clear runner event listener when test is over
-        // runner.on('end', function() {
-        //   phantomjs.phantomjsEventManager.remove(test.file);
-        // });
-
-        // Set Mocha reporter
-        var Reporter = null;
-        if (reporters[options.reporter]) {
-          Reporter = reporters[options.reporter];
-        } else {
-          // Resolve external reporter module
-          var externalReporter;
-          try {
-            externalReporter = require.resolve(options.reporter);
-          } catch (e) {
-            // Resolve to local path
-            externalReporter = path.resolve(options.reporter);
-          }
-
-          if (externalReporter) {
-            try {
-              Reporter = require(externalReporter);
-            }
-            catch (e) {
-              // empty, handled below
-            }
-          }
-        }
-
-        if (Reporter === null) {
-          grunt.fatal('Specified reporter is unknown or unresolvable: ' + options.reporter);
-        }
-
-        var reporter = new Reporter(runner);
-
-        browserDriver({
-            file: test.url,
-            reporter: 'spec'
-          })
+        browserDriver(cfg)
           .then(function(result) {
-              // var json = JSON.stringify(result, null, 2);
-              // console.log(json);
-
               var stats = result.result.stats;
 
               testStats.push(stats);
 
-              result.result.failures.forEach(function (failure) {
-                grunt.log.writeln("");
-                grunt.log.writeln("Error: " + failure.fullTitle);
-                grunt.log.writeln("expected: " + failure.err.expected);
-                grunt.log.writeln("actual: " + failure.err.actual);
-                grunt.log.writeln(failure.err.stack);
-              });
-
               // If unit tests failures, show notice
-              if (stats.failures > 0) {
-                var reduced = helpers.reduceStats([stats]);
-                var failMsg = reduced.failures + '/' + reduced.tests + ' tests failed (' + reduced.duration + 's)';
+              // if (stats.failures > 0) {
+              //   var reduced = helpers.reduceStats([stats]);
+              //   var failMsg = reduced.failures + '/' + reduced.tests + ' tests failed (' + reduced.duration + 's)';
 
-                // Bail tests if bail option is true
-                if (options.bail) {
-                  grunt.warn(failMsg);
-                } else {
-                  grunt.log.error(failMsg);
-                }
-              }
+              //   // Bail tests if bail option is true
+              //   if (options.bail) {
+              //     grunt.warn(failMsg);
+              //   } else {
+              //     grunt.log.error(failMsg);
+              //   }
+              // }
 
               next();
           })
           .catch(function (err) {
             grunt.log.error(err);
+
+            taskComplete(false);
           });
       },
       // All tests have been run.
       function () {
         var stats = helpers.reduceStats(testStats);
-
-        grunt.log.writeln("");
-        grunt.log.writeln("--------------------");
-        grunt.log.writeln("All tests run.");
-        grunt.log.writeln("--------------------");
 
         if (stats.failures === 0) {
           grunt.log.ok(stats.tests + ' passed!' + ' (' + stats.duration + 's)');
