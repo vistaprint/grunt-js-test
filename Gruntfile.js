@@ -38,10 +38,6 @@ module.exports = function (grunt) {
 
   grunt.loadTasks('./tasks');
 
-  grunt.registerTask('foo', function() {
-    grunt.log.write('happened!');
-  });
-
   // Whenever the "test" task is run, run the "nodeunit" task.
   // grunt.registerTask('test', ['eslint', 'nodeunit']);
 

@@ -9,9 +9,6 @@
 var _             = require('lodash');
 var path          = require('path');
 
-var EventEmitter  = require('events').EventEmitter;
-var reporters     = require('mocha').reporters;
-
 // Helpers.
 var findTests  = require('./lib/findTests');
 var normalize  = require('./lib/normalize');
