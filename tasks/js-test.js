@@ -141,7 +141,7 @@ module.exports = function (grunt) {
       options.log = true;
     }
 
-    // --noopen
+    // --noopenf
     if (grunt.option('noopen')) {
       options.openBrowser = false;
     }
@@ -210,9 +210,8 @@ module.exports = function (grunt) {
       }
 
       // Setup chrome
-      var puppeteer = require('puppeteer');
+      var browserDriver = require('mocha-headless-chrome');
 
-      
       // Combine any specified URLs with src files. @see http://gruntjs.com/api/inside-tasks#this.filessrc
       // grunt.log.writeln('this.filesSrc', this.filesSrc);
 
@@ -224,7 +223,7 @@ module.exports = function (grunt) {
         grunt.log.writeln('Test ' + test.file);
 
         // create a new mocha runner façade
-        //var runner = new EventEmitter();
+        var runner = new EventEmitter();
         //phantomjs.phantomjsEventManager.add(test.file, runner);
 
         // Clear runner event listener when test is over
@@ -260,70 +259,55 @@ module.exports = function (grunt) {
           grunt.fatal('Specified reporter is unknown or unresolvable: ' + options.reporter);
         }
 
-        //new Reporter(runner);
+        var reporter = new Reporter(runner);
 
-        var browser;
-
-        puppeteer.launch({ headless: false })
-          .then(function(b) {
-            browser = b;
-            return browser.newPage();
+        browserDriver({
+            file: test.url,
+            reporter: 'spec'
           })
-          .then(function(page) {
-            return page.goto(test.url);
+          .then(function(result) {
+              // var json = JSON.stringify(result, null, 2);
+              // console.log(json);
+
+              var stats = result.result.stats;
+
+              testStats.push(stats);
+
+              result.result.failures.forEach(function (failure) {
+                grunt.log.writeln("");
+                grunt.log.writeln("Error: " + failure.fullTitle);
+                grunt.log.writeln("expected: " + failure.err.expected);
+                grunt.log.writeln("actual: " + failure.err.actual);
+                grunt.log.writeln(failure.err.stack);
+              });
+
+              // If unit tests failures, show notice
+              if (stats.failures > 0) {
+                var reduced = helpers.reduceStats([stats]);
+                var failMsg = reduced.failures + '/' + reduced.tests + ' tests failed (' + reduced.duration + 's)';
+
+                // Bail tests if bail option is true
+                if (options.bail) {
+                  grunt.warn(failMsg);
+                } else {
+                  grunt.log.error(failMsg);
+                }
+              }
+
+              next();
           })
-          .then(function() {
-            grunt.log.writeln('loaded: ' + test.url);
-            return browser.close();
-          })
-          .then(function(browser) {
-            grunt.log.writeln('closed');
-            taskComplete(true);
-            next();
-          })
-
-        // Launch PhantomJS.
-        // phantomjs.spawn(test.url, {
-        //   // Exit code to use if PhantomJS fails in an uncatchable way.
-        //   failCode: 90,
-        //   // Explicitly set a killTimeout, because grunt-lib-phantomjs is broken currently
-        //   killTimeout: 5000,
-        //   // Pass the options needed to PhantomJS child process
-        //   options: _.extend({}, options.phantomOptions, {
-        //     phantomScript: path.join(__dirname, 'lib', 'phantomjs-main.js')
-        //   }),
-        //   // Do stuff when done.
-        //   done: function(err) {
-        //     var stats = runner.stats;
-        //     testStats.push(stats);
-
-        //     if (err) {
-        //       // If there was a PhantomJS error, abort the series.
-        //       grunt.fatal(err);
-        //       taskComplete(false);
-        //     } else {
-        //       // If unit tests failures, show notice
-        //       if (stats.failures > 0) {
-        //         var reduced = helpers.reduceStats([stats]);
-        //         var failMsg = reduced.failures + '/' + reduced.tests + ' tests failed (' + reduced.duration + 's)';
-
-        //         // Bail tests if bail option is true
-        //         if (options.bail) {
-        //           grunt.warn(failMsg);
-        //         } else {
-        //           grunt.log.error(failMsg);
-        //         }
-        //       }
-
-        //       // Process next file/url
-        //       next();
-        //     }
-        //   }
-        // });
+          .catch(function (err) {
+            grunt.log.error(err);
+          });
       },
       // All tests have been run.
       function () {
         var stats = helpers.reduceStats(testStats);
+
+        grunt.log.writeln("");
+        grunt.log.writeln("--------------------");
+        grunt.log.writeln("All tests run.");
+        grunt.log.writeln("--------------------");
 
         if (stats.failures === 0) {
           grunt.log.ok(stats.tests + ' passed!' + ' (' + stats.duration + 's)');

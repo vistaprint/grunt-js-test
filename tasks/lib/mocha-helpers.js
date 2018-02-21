@@ -23,7 +23,7 @@ module.exports.reduceStats = function (s) {
     prev.passes    += stats.passes;
     prev.failures  += stats.failures;
     prev.tests     += stats.tests;
-    prev.duration  += (stats.end - stats.start);
+    prev.duration  += (new Date(stats.end) - new Date(stats.start));
     return prev;
   }, initial);
 

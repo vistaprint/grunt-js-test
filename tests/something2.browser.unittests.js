@@ -1,6 +1,6 @@
 // <reference path="../js/breakpoints.js" />
 
-describe("example tests", function () {
+describe("example tests 2", function () {
 
     var assert = chai.assert;
 
