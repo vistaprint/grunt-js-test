@@ -20,10 +20,15 @@ module.exports = function (grunt) {
     },
     'js-test': {
       options: {
-          pattern: 'tests/*.browser.unittests.js',
+          pattern: 'tests/*.browser.working.unittests.js',
           mocha: { 
               timeout: 6000
           }
+      },
+      'broken': {
+        options: {
+          pattern: 'tests/*.browser.broken.unittests.js'
+        }
       }
     }
   });

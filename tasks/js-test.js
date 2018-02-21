@@ -220,7 +220,7 @@ module.exports = function (grunt) {
 
       // Process each filepath in-order.
       grunt.util.async.forEachSeries(tests, function (test, next) {
-        grunt.log.write('Testing ' + test.file + '...');
+        grunt.log.writeln('Testing ' + test.file + '...');
         
         var cfg = {
           file: test.url,
@@ -235,17 +235,17 @@ module.exports = function (grunt) {
               testStats.push(stats);
 
               // If unit tests failures, show notice
-              // if (stats.failures > 0) {
-              //   var reduced = helpers.reduceStats([stats]);
-              //   var failMsg = reduced.failures + '/' + reduced.tests + ' tests failed (' + reduced.duration + 's)';
+              if (stats.failures > 0) {
+                var reduced = helpers.reduceStats([stats]);
+                var failMsg = reduced.failures + '/' + reduced.tests + ' tests failed (' + reduced.duration + 's)';
 
-              //   // Bail tests if bail option is true
-              //   if (options.bail) {
-              //     grunt.warn(failMsg);
-              //   } else {
-              //     grunt.log.error(failMsg);
-              //   }
-              // }
+                // Bail tests if bail option is true
+                if (options.bail) {
+                  grunt.log.error(failMsg);
+                  taskComplete(false);
+                  return;
+                } 
+              }
 
               next();
           })
