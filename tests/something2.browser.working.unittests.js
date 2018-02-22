@@ -1,7 +1,7 @@
 // <reference path="../js/breakpoints.js" />
 /* globals chai */
 
-describe('example working tests 2', function () {
+describe('example working tests', function () {
 
     var assert = chai.assert;
 
