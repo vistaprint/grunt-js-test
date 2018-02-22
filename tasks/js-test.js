@@ -223,7 +223,7 @@ module.exports = function (grunt) {
           file: test.url,
           reporter: options.reporter,
           timeout: 5000,
-          args: "no-sandbox"
+          args: 'no-sandbox'
         };
 
         browserDriver(cfg)
