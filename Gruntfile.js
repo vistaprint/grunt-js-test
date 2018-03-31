@@ -21,11 +21,8 @@ module.exports = function (grunt) {
     'js-test': {
       options: {
           pattern: 'tests/*.browser.working.unittests.js',
-          reporter: 'spec',
-          mocha: { 
-              timeout: 6000
-          }
-      },
+          reporter: 'spec'      
+        },
       'broken': {
         options: {
           pattern: 'tests/*.browser.broken.unittests.js'

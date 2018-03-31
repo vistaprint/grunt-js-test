@@ -63,10 +63,8 @@ module.exports = function (grunt) {
     includeChai: true,
     includeSinon: true,
 
-    // phantom js options
-    phantomOptions: {
-      timeout: 20000
-    },
+    // headless chrome options
+    timeout: 20000,
 
     // coverage reporting options
     coverage: false,                // should we generate coverage reports (slows down tests)
@@ -219,10 +217,18 @@ module.exports = function (grunt) {
       grunt.util.async.forEachSeries(tests, function (test, next) {
         grunt.log.writeln('Testing ' + test.file + '...');
         
+        var timeout;
+        if (options.phantom) {
+          timeout = options.phantom.timeout;
+        } else if (options.mocha) {
+          timeout = options.mocha.timeout;
+        }
+        timeout = timeout || options.timeout;
+
         var cfg = {
           file: test.url,
           reporter: options.reporter,
-          timeout: options.mocha.timeout,
+          timeout: timeout,
           args: 'no-sandbox'
         };
 
