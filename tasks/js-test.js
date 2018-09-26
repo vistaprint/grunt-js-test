@@ -106,6 +106,21 @@ module.exports = function (grunt) {
       }
     }
 
+    // --port
+    if (grunt.option('port') !== undefined) {
+      options.port = grunt.option('port');
+    }
+
+    // --staticPort
+    if (grunt.option('staticPort') !== undefined) {
+      options.staticPort = grunt.option('staticPort');
+    }
+
+    // --coverageProxyPort
+    if (grunt.option('coverageProxyPort') !== undefined) {
+      options.coverageProxyPort = grunt.option('coverageProxyPort');
+    }
+
     // --identifier
     if (grunt.option('identifier') !== undefined) {
       options.identifier = grunt.option('identifier');
